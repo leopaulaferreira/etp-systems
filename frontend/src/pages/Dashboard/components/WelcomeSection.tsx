@@ -1,7 +1,7 @@
 import { LayoutDashboard } from 'lucide-react'
+import LearningHeroArtwork from '../../../components/ui/LearningHeroArtwork'
 import PageHero from '../../../components/ui/PageHero'
 import { useProfile } from '../../../profile/ProfileContext'
-import WelcomeIllustration from './WelcomeIllustration'
 
 export default function WelcomeSection() {
   const { profile } = useProfile()
@@ -13,7 +13,7 @@ export default function WelcomeSection() {
       icon={LayoutDashboard}
       title={<>Olá, {profile.name}</>}
       description="Continue aprendendo e acompanhe sua evolução."
-      artwork={<WelcomeIllustration />}
+      artwork={<LearningHeroArtwork variant="dashboard" />}
     />
   )
 }

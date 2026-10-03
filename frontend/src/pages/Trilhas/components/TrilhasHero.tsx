@@ -1,6 +1,6 @@
 import { BookOpenCheck } from 'lucide-react'
+import LearningHeroArtwork from '../../../components/ui/LearningHeroArtwork'
 import PageHero from '../../../components/ui/PageHero'
-import trilhasHeroLearning from '../../../assets/illustrations/trilhas-hero-learning-dark.webp'
 
 export default function TrilhasHero() {
   return (
@@ -9,13 +9,7 @@ export default function TrilhasHero() {
       icon={BookOpenCheck}
       title="Explorar Trilhas"
       description="Encontre jornadas para desenvolver novas habilidades."
-      artwork={
-        <img
-          src={trilhasHeroLearning}
-          alt=""
-          className="max-h-[160px] w-full object-contain object-right drop-shadow-[0_14px_18px_rgba(37,99,235,0.12)]"
-        />
-      }
+      artwork={<LearningHeroArtwork variant="paths" />}
     />
   )
 }
