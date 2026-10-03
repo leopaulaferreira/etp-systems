@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Bell, ChevronDown, LogOut, Menu } from 'lucide-react'
+import { Search, Bell, ChevronDown, LogOut, Menu, UserRound } from 'lucide-react'
 import Avatar from '../ui/Avatar'
 import { useAuth } from '../../auth/AuthContext'
 import { useProfile } from '../../profile/ProfileContext'
@@ -99,6 +99,18 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
               role="menu"
               className="absolute right-0 top-full mt-2 w-44 overflow-hidden rounded-xl border border-ink-200 bg-panel p-1.5 shadow-card"
             >
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setMenuOpen(false)
+                  navigate('/perfil')
+                }}
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-ink-700 transition-colors duration-150 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
+              >
+                <UserRound className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+                Meu perfil
+              </button>
               <button
                 type="button"
                 role="menuitem"
