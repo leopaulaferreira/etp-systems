@@ -8,7 +8,6 @@ export default function WelcomeSection() {
 
   return (
     <PageHero
-      featured
       eyebrow="Seu painel de aprendizado"
       icon={LayoutDashboard}
       title={<>Olá, {profile.name}</>}

@@ -7,8 +7,6 @@ type PageHeroProps = {
   title: ReactNode
   description: string
   artwork?: ReactNode
-  featured?: boolean
-  compact?: boolean
 }
 
 /** Cabeçalho compacto compartilhado pelas páginas internas e pelo Dashboard. */
@@ -18,12 +16,10 @@ export default function PageHero({
   title,
   description,
   artwork,
-  featured = false,
-  compact = false,
 }: PageHeroProps) {
   return (
     <section
-      className={`relative isolate flex items-center overflow-hidden rounded-[22px] border border-brand-blue-400/20 bg-[linear-gradient(115deg,#142747_0%,#101d35_52%,#0d192e_100%)] px-5 shadow-[0_18px_38px_-28px_rgba(0,0,0,0.9)] sm:px-7 lg:px-8 ${compact ? 'min-h-[128px] py-4 lg:min-h-[132px]' : featured ? 'min-h-[154px] py-5 lg:min-h-[184px] lg:py-6' : 'min-h-[154px] py-5 lg:min-h-[168px]'}`}
+      className="relative isolate flex min-h-[128px] items-center overflow-hidden rounded-[22px] border border-brand-blue-400/20 bg-[linear-gradient(115deg,#142747_0%,#101d35_52%,#0d192e_100%)] px-5 py-3.5 shadow-[0_18px_38px_-28px_rgba(0,0,0,0.9)] sm:px-7 lg:min-h-[132px] lg:px-8"
     >
       <span
         aria-hidden="true"
@@ -38,15 +34,15 @@ export default function PageHero({
         className="pointer-events-none absolute bottom-0 left-8 h-px w-40 bg-gradient-to-r from-brand-blue-400/30 to-transparent"
       />
 
-      <div className={`relative z-10 flex min-w-0 max-w-2xl flex-col items-start ${compact ? 'gap-1.5 xl:max-w-2xl' : 'gap-2 xl:max-w-[58%]'}`}>
-        <span className="inline-flex items-center gap-2 rounded-full border border-brand-blue-400/20 bg-brand-blue-500/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.11em] text-brand-blue-400">
+      <div className={`relative z-10 flex min-w-0 max-w-2xl flex-col items-start gap-1.5 ${artwork ? 'xl:max-w-[58%]' : ''}`}>
+        <span className="inline-flex items-center gap-2 rounded-full border border-brand-blue-400/20 bg-brand-blue-500/10 px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.11em] text-brand-blue-400">
           <Icon className="h-3.5 w-3.5 shrink-0 text-brand-cyan-400" strokeWidth={2} aria-hidden="true" />
           {eyebrow}
         </span>
-        <h1 className="text-[29px] font-extrabold leading-tight tracking-[-0.025em] text-ink-900 sm:text-[32px]">
+        <h1 className="text-[27px] font-extrabold leading-[1.13] tracking-[-0.025em] text-ink-900 sm:text-[29px]">
           {title}
         </h1>
-        <p className="max-w-xl text-[13px] leading-[1.55] text-ink-500 sm:text-sm">
+        <p className="max-w-xl text-xs leading-[1.45] text-ink-500 sm:text-[13px]">
           {description}
         </p>
       </div>
@@ -56,7 +52,7 @@ export default function PageHero({
           aria-hidden="true"
           className="pointer-events-none absolute inset-y-0 right-5 hidden w-[38%] items-center justify-end xl:flex"
         >
-          {artwork}
+          <div className="origin-right scale-[0.78]">{artwork}</div>
         </div>
       )}
     </section>
