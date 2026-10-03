@@ -1,31 +1,21 @@
 import { BookOpen } from 'lucide-react'
+import PageHero from '../../../components/ui/PageHero'
 import learningIllustration from '../../../assets/illustrations/dashboard-hero-learning-dark.webp'
 
 export default function CursosHero() {
   return (
-    <section className="relative isolate flex min-h-[206px] items-center overflow-hidden rounded-[24px] border border-brand-blue-500/20 bg-gradient-to-br from-[#111f3a] via-panel to-[#102755] px-6 py-8 shadow-[0_24px_50px_-32px_rgba(0,0,0,0.85)] sm:px-8 lg:min-h-[226px] lg:px-10 lg:py-9">
-      <span
-        aria-hidden="true"
-        className="absolute -left-16 -top-24 h-52 w-52 rounded-full border-[36px] border-brand-blue-500/[0.035]"
-      />
-      <div className="relative z-10 flex flex-col items-start gap-3.5 xl:max-w-[55%]">
-        <span className="inline-flex items-center gap-2 rounded-full border border-brand-blue-500/20 bg-brand-blue-500/10 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.11em] text-brand-blue-400">
-          <BookOpen className="h-3.5 w-3.5 text-brand-cyan-500" aria-hidden="true" />
-          Aprenda no seu ritmo
-        </span>
-        <h1 className="text-[31px] font-extrabold leading-[1.12] tracking-[-0.025em] text-ink-900 sm:text-[34px] lg:text-[36px]">
-          Explorar Cursos
-        </h1>
-        <p className="max-w-[620px] text-[15px] leading-7 text-ink-500 sm:text-base">
-          Descubra cursos individuais para desenvolver habilidades práticas e acelerar sua carreira.
-        </p>
-      </div>
-      <img
-        src={learningIllustration}
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute right-5 top-1/2 hidden h-[238px] w-[440px] -translate-y-1/2 object-contain object-right xl:block"
-      />
-    </section>
+    <PageHero
+      eyebrow="Aprenda no seu ritmo"
+      icon={BookOpen}
+      title="Explorar Cursos"
+      description="Descubra cursos para desenvolver habilidades práticas."
+      artwork={
+        <img
+          src={learningIllustration}
+          alt=""
+          className="max-h-[160px] w-full object-contain object-right drop-shadow-[0_14px_18px_rgba(37,99,235,0.12)]"
+        />
+      }
+    />
   )
 }
