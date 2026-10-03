@@ -1,9 +1,17 @@
-import { Award, Sparkles } from 'lucide-react'
+import { Award, BadgeCheck, Sparkles } from 'lucide-react'
 
 export default function CertificatesHero() {
   return (
     <section className="relative isolate flex min-h-[206px] items-center overflow-hidden rounded-[24px] border border-brand-blue-500/20 bg-gradient-to-br from-navy-800 via-panel to-navy-700 px-6 py-8 shadow-card sm:px-8 lg:min-h-[226px] lg:px-10 lg:py-9">
+      <span
+        aria-hidden="true"
+        className="absolute -left-16 -top-24 h-52 w-52 rounded-full border-[36px] border-brand-blue-500/[0.035]"
+      />
       <div className="relative z-10 flex flex-col items-start gap-3 xl:max-w-[65%]">
+        <span className="inline-flex items-center gap-2 rounded-full border border-brand-blue-500/20 bg-brand-blue-500/10 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.11em] text-brand-blue-400">
+          <BadgeCheck className="h-3.5 w-3.5 text-brand-cyan-400" aria-hidden="true" />
+          Seu aprendizado reconhecido
+        </span>
         <h1 className="text-[31px] font-extrabold leading-[1.12] tracking-[-0.025em] text-ink-900 sm:text-[34px] lg:text-[36px]">
           Meus Certificados
         </h1>

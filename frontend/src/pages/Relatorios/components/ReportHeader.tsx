@@ -30,6 +30,7 @@ export default function ReportHeader({
     <div className="flex min-w-0 flex-col gap-5">
       <section className="relative isolate flex min-h-[206px] items-center overflow-hidden rounded-[24px] border border-brand-blue-500/20 bg-gradient-to-br from-navy-800 via-panel to-navy-900 px-6 py-8 shadow-card sm:px-8 lg:min-h-[226px] lg:px-10 lg:py-9">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          <span className="absolute -left-16 -top-24 h-52 w-52 rounded-full border-[36px] border-brand-blue-500/[0.035]" />
           <span className="absolute -right-12 -top-48 h-[520px] w-[520px] rounded-full border border-brand-blue-400/10 bg-brand-blue-500/5" />
           <span className="absolute right-10 top-[-140px] h-[390px] w-[390px] rounded-full border border-brand-cyan-400/10" />
           <span className="absolute bottom-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-brand-blue-400/40 to-transparent" />

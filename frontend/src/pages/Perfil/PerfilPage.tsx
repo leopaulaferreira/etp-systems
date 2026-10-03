@@ -69,6 +69,7 @@ export default function PerfilPage() {
   return (
     <div className="flex min-w-0 flex-col gap-5 lg:gap-6">
       <section className="relative overflow-hidden rounded-[24px] border border-brand-blue-500/20 bg-gradient-to-br from-navy-800 via-panel to-navy-900 px-6 py-7 shadow-card sm:px-8 lg:px-10">
+        <span aria-hidden="true" className="pointer-events-none absolute -left-16 -top-24 h-52 w-52 rounded-full border-[36px] border-brand-blue-500/[0.035]" />
         <span aria-hidden="true" className="pointer-events-none absolute -right-12 -top-20 h-52 w-52 rounded-full border border-brand-blue-400/10 bg-brand-blue-500/5" />
         <span className="relative inline-flex items-center gap-2 rounded-full border border-brand-blue-400/20 bg-brand-blue-500/10 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.15em] text-brand-blue-400"><UserRound className="h-3.5 w-3.5" aria-hidden="true" />Sua jornada</span>
         <h1 className="relative mt-2 text-[31px] font-extrabold tracking-tight text-ink-900 sm:text-[36px]">Perfil</h1>
