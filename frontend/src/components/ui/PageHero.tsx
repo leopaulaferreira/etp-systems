@@ -8,6 +8,7 @@ type PageHeroProps = {
   description: string
   artwork?: ReactNode
   featured?: boolean
+  compact?: boolean
 }
 
 /** Cabeçalho compacto compartilhado pelas páginas internas e pelo Dashboard. */
@@ -18,10 +19,11 @@ export default function PageHero({
   description,
   artwork,
   featured = false,
+  compact = false,
 }: PageHeroProps) {
   return (
     <section
-      className={`relative isolate flex min-h-[154px] items-center overflow-hidden rounded-[22px] border border-brand-blue-400/20 bg-[linear-gradient(115deg,#142747_0%,#101d35_52%,#0d192e_100%)] px-5 py-5 shadow-[0_18px_38px_-28px_rgba(0,0,0,0.9)] sm:px-7 lg:px-8 ${featured ? 'lg:min-h-[184px] lg:py-6' : 'lg:min-h-[168px] lg:py-5'}`}
+      className={`relative isolate flex items-center overflow-hidden rounded-[22px] border border-brand-blue-400/20 bg-[linear-gradient(115deg,#142747_0%,#101d35_52%,#0d192e_100%)] px-5 shadow-[0_18px_38px_-28px_rgba(0,0,0,0.9)] sm:px-7 lg:px-8 ${compact ? 'min-h-[128px] py-4 lg:min-h-[132px]' : featured ? 'min-h-[154px] py-5 lg:min-h-[184px] lg:py-6' : 'min-h-[154px] py-5 lg:min-h-[168px]'}`}
     >
       <span
         aria-hidden="true"
@@ -36,7 +38,7 @@ export default function PageHero({
         className="pointer-events-none absolute bottom-0 left-8 h-px w-40 bg-gradient-to-r from-brand-blue-400/30 to-transparent"
       />
 
-      <div className="relative z-10 flex min-w-0 max-w-2xl flex-col items-start gap-2 xl:max-w-[58%]">
+      <div className={`relative z-10 flex min-w-0 max-w-2xl flex-col items-start ${compact ? 'gap-1.5 xl:max-w-2xl' : 'gap-2 xl:max-w-[58%]'}`}>
         <span className="inline-flex items-center gap-2 rounded-full border border-brand-blue-400/20 bg-brand-blue-500/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.11em] text-brand-blue-400">
           <Icon className="h-3.5 w-3.5 shrink-0 text-brand-cyan-400" strokeWidth={2} aria-hidden="true" />
           {eyebrow}

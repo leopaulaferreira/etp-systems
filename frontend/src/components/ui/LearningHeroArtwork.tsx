@@ -3,16 +3,14 @@ import {
   BookOpen,
   BookOpenCheck,
   Check,
-  CircleDot,
   GraduationCap,
-  MapPinned,
   Play,
   Sparkles,
   TrendingUp,
   type LucideIcon,
 } from 'lucide-react'
 
-type ArtworkVariant = 'dashboard' | 'courses' | 'myCourses' | 'paths'
+type ArtworkVariant = 'dashboard' | 'courses' | 'myCourses'
 
 const artwork: Record<ArtworkVariant, {
   icon: LucideIcon
@@ -41,13 +39,6 @@ const artwork: Record<ArtworkVariant, {
     badgeIcon: Play,
     cornerIcon: GraduationCap,
     rows: [88, 64, 42],
-  },
-  paths: {
-    icon: MapPinned,
-    rowIcon: CircleDot,
-    badgeIcon: MapPinned,
-    cornerIcon: GraduationCap,
-    rows: [86, 68, 92],
   },
 }
 
