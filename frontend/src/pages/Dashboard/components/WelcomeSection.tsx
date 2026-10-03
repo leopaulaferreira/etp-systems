@@ -1,8 +1,9 @@
 import WelcomeIllustration from './WelcomeIllustration'
-import { currentUser } from '../../../mocks/user.mock'
+import { useProfile } from '../../../profile/ProfileContext'
 import { LayoutDashboard } from 'lucide-react'
 
 export default function WelcomeSection() {
+  const { profile } = useProfile()
   return (
     <section className="relative isolate flex min-h-[206px] items-center overflow-hidden rounded-[24px] border border-brand-blue-500/20 bg-gradient-to-br from-[#111f3a] via-panel to-[#102755] px-6 py-8 shadow-[0_24px_50px_-32px_rgba(0,0,0,0.85)] sm:px-8 lg:min-h-[226px] lg:px-10 lg:py-9">
       <div
@@ -17,7 +18,7 @@ export default function WelcomeSection() {
           Seu painel de aprendizado
         </span>
         <h1 className="text-[31px] font-extrabold leading-[1.12] tracking-[-0.025em] text-ink-900 sm:text-[34px] lg:text-[36px]">
-          Olá, {currentUser.name} <span aria-hidden="true"> </span>
+          Olá, {profile.name} <span aria-hidden="true"> </span>
         </h1>
         <p className="max-w-[620px] text-[15px] leading-7 text-ink-500 sm:text-base">
           Que bom ter você aqui! Continue aprendendo e evoluindo na sua jornada profissional.

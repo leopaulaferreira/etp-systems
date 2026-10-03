@@ -1,6 +1,6 @@
 import { Award } from 'lucide-react'
 import symbol from '../../../assets/etp-symbol.svg'
-import { currentUser } from '../../../mocks/user.mock'
+import { useProfile } from '../../../profile/ProfileContext'
 import type { Certificate } from '../../../types/certificate'
 
 const accents = {
@@ -18,6 +18,7 @@ export default function CertificatePreview({
   item: Certificate
   compact?: boolean
 }) {
+  const { profile } = useProfile()
   return (
     <div
       aria-hidden="true"
@@ -37,7 +38,7 @@ export default function CertificatePreview({
       <span
         className={`border-b border-current pb-1 font-bold ${compact ? 'text-[5px]' : 'text-sm'}`}
       >
-        {currentUser.name}
+        {profile.name}
       </span>
       <span
         className={`max-w-[90%] font-bold leading-snug text-ink-900 ${compact ? 'line-clamp-2 text-[5px]' : 'text-sm'}`}
