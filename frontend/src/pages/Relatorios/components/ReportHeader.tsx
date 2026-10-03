@@ -28,31 +28,30 @@ export default function ReportHeader({
 }: Props) {
   return (
     <div className="flex min-w-0 flex-col gap-5">
-      <section className="relative isolate overflow-hidden rounded-[28px] border border-brand-blue-500/20 bg-gradient-to-br from-navy-800 via-panel to-navy-900 px-6 py-8 shadow-card sm:px-8 lg:px-10 lg:py-9">
+      <section className="relative isolate flex min-h-[206px] items-center overflow-hidden rounded-[24px] border border-brand-blue-500/20 bg-gradient-to-br from-navy-800 via-panel to-navy-900 px-6 py-8 shadow-card sm:px-8 lg:min-h-[226px] lg:px-10 lg:py-9">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
           <span className="absolute -right-12 -top-48 h-[520px] w-[520px] rounded-full border border-brand-blue-400/10 bg-brand-blue-500/5" />
           <span className="absolute right-10 top-[-140px] h-[390px] w-[390px] rounded-full border border-brand-cyan-400/10" />
           <span className="absolute bottom-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-brand-blue-400/40 to-transparent" />
         </div>
-        <div className="relative flex items-center justify-between gap-10">
+        <div className="relative flex w-full items-center justify-between gap-10">
           <div className="max-w-xl">
-            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-blue-400/20 bg-brand-blue-500/10 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.15em] text-brand-blue-400">
+            <span className="mb-2 inline-flex items-center gap-2 rounded-full border border-brand-blue-400/20 bg-brand-blue-500/10 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.15em] text-brand-blue-400">
               <BarChart3 className="h-3.5 w-3.5 text-brand-cyan-400" aria-hidden="true" /> Seu
               desenvolvimento
             </span>
-            <h1 className="text-[34px] font-extrabold leading-tight tracking-[-0.035em] text-ink-900 sm:text-[40px]">
+            <h1 className="text-[31px] font-extrabold leading-[1.12] tracking-[-0.025em] text-ink-900 sm:text-[34px] lg:text-[36px]">
               Relatórios
             </h1>
-            <p className="mt-3 max-w-lg text-sm leading-7 text-ink-500 sm:text-[15px]">
-              Cada passo conta. Transforme sua jornada de aprendizado em uma visão clara das suas
-              conquistas.
+            <p className="mt-2 max-w-lg text-sm leading-7 text-ink-500 sm:text-[15px]">
+              Acompanhe sua evolução.
             </p>
-            <span className="mt-5 inline-flex items-center gap-2 text-xs font-semibold text-brand-cyan-400">
+            <span className="mt-2 inline-flex items-center gap-2 text-xs font-semibold text-brand-cyan-400">
               <Sparkles className="h-3.5 w-3.5" aria-hidden="true" /> Conhecimento que se transforma
               em evolução
             </span>
           </div>
-          <div aria-hidden="true" className="relative mr-2 hidden h-44 w-56 shrink-0 xl:block">
+          <div aria-hidden="true" className="absolute right-2 top-1/2 hidden h-44 w-56 -translate-y-1/2 xl:block">
             <div className="absolute inset-x-2 inset-y-3 rotate-[-6deg] rounded-2xl border border-brand-blue-400/20 bg-panel-alt/80 p-5 shadow-card">
               <div className="flex items-center justify-between">
                 <span className="h-1.5 w-14 rounded-full bg-brand-blue-400/25" />
