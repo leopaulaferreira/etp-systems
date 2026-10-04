@@ -90,7 +90,7 @@ frontend/
 | `/dashboard` | autenticada | `DashboardPage` |
 | `/cursos` | autenticada | `CursosPage` — catálogo com busca, filtros, ordenação e detalhes |
 | `/avaliacoes` | autenticada | `AvaliacoesPage` — filtros, atividades, notas, resultados e gráficos |
-| `/trilhas`, `/meus-cursos`, `/certificados`, `/relatorios`, `/perfil`, `/configuracoes` | autenticada | `ComingSoonPage` (placeholder — vira página real quando a tela for construída) |
+| `/configuracoes` | autenticada | `ConfiguracoesPage` — dados pessoais, preferências de estudo e notificações |
 
 ## Autenticação (MOCK)
 

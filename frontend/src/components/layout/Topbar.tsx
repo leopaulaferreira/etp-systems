@@ -54,6 +54,7 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
         <button
           type="button"
           aria-label={`Notificações (${notificationCount} não lidas)`}
+          onClick={() => navigate('/configuracoes?secao=notificacoes')}
           className="relative flex h-10 w-10 items-center justify-center rounded-full text-ink-500 transition-colors duration-150 hover:bg-ink-100 hover:text-ink-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
         >
           <Bell className="h-5 w-5" strokeWidth={2} aria-hidden="true" />

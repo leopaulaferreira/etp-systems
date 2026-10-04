@@ -6,6 +6,7 @@ type EditableProfile = Pick<CurrentUser, 'name' | 'email' | 'location' | 'birthD
 type ProfileContextValue = {
   profile: CurrentUser
   updateProfile: (changes: Partial<EditableProfile>) => void
+  resetProfile: () => void
 }
 
 const ProfileContext = createContext<ProfileContextValue | null>(null)
@@ -40,7 +41,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   }, [profile])
 
   return (
-    <ProfileContext.Provider value={{ profile, updateProfile: (changes) => setProfile((current) => ({ ...current, ...changes })) }}>
+    <ProfileContext.Provider value={{ profile, updateProfile: (changes) => setProfile((current) => ({ ...current, ...changes })), resetProfile: () => setProfile({ ...currentUser }) }}>
       {children}
     </ProfileContext.Provider>
   )

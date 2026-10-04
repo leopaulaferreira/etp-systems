@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowRight, BadgeCheck, Bell, CalendarDays, CheckCheck, ChevronRight,
-  Clock3, Download, GraduationCap, Languages, Mail, MapPin, MapPinned, Pencil,
+  Clock3, Download, GraduationCap, Mail, MapPin, MapPinned, Pencil,
   ShieldCheck, Sparkles, Target, UserRound,
 } from 'lucide-react'
 import Avatar from '../../components/ui/Avatar'
@@ -18,7 +18,6 @@ import { downloadCertificate } from '../Certificados/certificatePdf'
 import { formatCertificateDate } from '../Certificados/certificates'
 import CertificatePreview from '../Certificados/components/CertificatePreview'
 import CourseThumbnail from '../MeusCursos/components/CourseThumbnail'
-import ProfileEditDialog from './components/ProfileEditDialog'
 
 const cardClass = 'min-w-0 rounded-[22px] border border-ink-200/70 bg-panel p-5 shadow-card sm:p-6'
 const linkClass = 'inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-bold text-brand-blue-400 hover:bg-brand-blue-500/10 hover:text-brand-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400'
@@ -47,7 +46,6 @@ export default function PerfilPage() {
   const { profile } = useProfile()
   const { assessments } = useAssessments()
   const completedAssessments = assessmentSummary(assessments).completed
-  const [editOpen, setEditOpen] = useState(false)
   const [announcement, setAnnouncement] = useState('')
 
   function download(item: (typeof certificates)[number]) {
@@ -106,12 +104,11 @@ export default function PerfilPage() {
           <SectionHeading title="Informações pessoais" />
           <dl className="flex-1">
             <DetailRow label="Nome completo">{profile.name}</DetailRow>
-            <DetailRow label="Data de nascimento">{profile.birthDate ? formatCertificateDate(profile.birthDate) : '—'}</DetailRow>
             <DetailRow label="Telefone">{profile.phone || '—'}</DetailRow>
             <DetailRow label="Cargo">{profile.position || '—'}</DetailRow>
             <DetailRow label="Empresa">{profile.company || '—'}</DetailRow>
           </dl>
-          <button type="button" onClick={() => setEditOpen(true)} className="flex min-h-10 items-center justify-center gap-2 rounded-xl border border-ink-200 text-xs font-bold text-brand-blue-400 hover:border-brand-blue-500/40 hover:bg-brand-blue-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Editar informações <Pencil className="h-3.5 w-3.5" aria-hidden="true" /></button>
+          <Link to="/configuracoes" className="flex min-h-10 items-center justify-center gap-2 rounded-xl border border-ink-200 text-xs font-bold text-brand-blue-400 hover:border-brand-blue-500/40 hover:bg-brand-blue-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Editar informações <Pencil className="h-3.5 w-3.5" aria-hidden="true" /></Link>
         </section>
 
         <section className={`${cardClass} flex flex-col gap-4`}>
@@ -154,15 +151,14 @@ export default function PerfilPage() {
         </section>
 
         <section className={`${cardClass} flex flex-col gap-4`}>
-          <SectionHeading title="Preferências rápidas" />
+          <SectionHeading title="Preferências" />
           <div className="flex flex-1 flex-col divide-y divide-ink-100">
             {[
               { label: 'Área de interesse', value: profile.learningFocus, icon: Target },
               { label: 'Nível de experiência', value: profile.experienceLevel, icon: GraduationCap },
               { label: 'Notificações', value: profile.notificationsEnabled ? 'Ativadas' : 'Desativadas', icon: Bell },
-              { label: 'Idioma', value: profile.language, icon: Languages },
             ].map(({ label, value, icon: Icon }) => (
-              <button key={label} type="button" onClick={() => setEditOpen(true)} className="flex min-w-0 items-center gap-2 py-3 text-left hover:text-brand-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"><Icon className="h-4 w-4 shrink-0 text-brand-blue-400" aria-hidden="true" /><span className="flex-1 text-xs font-semibold text-ink-700">{label}</span><span className="max-w-[42%] truncate text-right text-[11px] text-ink-500" title={value}>{value}</span><ChevronRight className="h-3.5 w-3.5 shrink-0 text-ink-500" aria-hidden="true" /></button>
+              <Link key={label} to="/configuracoes" className="flex min-w-0 items-center gap-2 py-3 text-left hover:text-brand-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"><Icon className="h-4 w-4 shrink-0 text-brand-blue-400" aria-hidden="true" /><span className="flex-1 text-xs font-semibold text-ink-700">{label}</span><span className="max-w-[42%] truncate text-right text-[11px] text-ink-500" title={value}>{value}</span><ChevronRight className="h-3.5 w-3.5 shrink-0 text-ink-500" aria-hidden="true" /></Link>
             ))}
           </div>
         </section>
@@ -178,7 +174,6 @@ export default function PerfilPage() {
       </div>
       <p className="text-center text-[11px] text-ink-500">Dados demonstrativos. Suas alterações neste perfil ficam salvas neste navegador.</p>
       <p role="status" className="sr-only">{announcement}</p>
-      {editOpen && <ProfileEditDialog onClose={() => setEditOpen(false)} />}
     </div>
   )
 }
