@@ -6,10 +6,11 @@ import DashboardPage from '../../pages/Dashboard/DashboardPage'
 import TrilhasPage from '../../pages/Trilhas/TrilhasPage'
 import CursosPage from '../../pages/Cursos/CursosPage'
 import MeusCursosPage from '../../pages/MeusCursos/MeusCursosPage'
-import ComingSoonPage from '../../pages/ComingSoonPage'
 import AvaliacoesPage from '../../pages/Avaliacoes/AvaliacoesPage'
 import CertificadosPage from '../../pages/Certificados/CertificadosPage'
 import RelatoriosPage from '../../pages/Relatorios/RelatoriosPage'
+import PerfilPage from '../../pages/Perfil/PerfilPage'
+import ConfiguracoesPage from '../../pages/Configuracoes/ConfiguracoesPage'
 
 export default function AppRoutes() {
   return (
@@ -25,8 +26,8 @@ export default function AppRoutes() {
           <Route path="/avaliacoes" element={<AvaliacoesPage />} />
           <Route path="/certificados" element={<CertificadosPage />} />
           <Route path="/relatorios" element={<RelatoriosPage />} />
-          <Route path="/perfil" element={<ComingSoonPage />} />
-          <Route path="/configuracoes" element={<ComingSoonPage />} />
+          <Route path="/perfil" element={<PerfilPage />} />
+          <Route path="/configuracoes" element={<ConfiguracoesPage />} />
         </Route>
       </Route>
 

@@ -34,7 +34,7 @@ export default function CertificateDialog({
       onKeyDown={(event) => {
         if (event.key !== 'Tab') return
         const controls = event.currentTarget.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), a[href]',
+          'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])',
         )
         const first = controls[0]
         const last = controls[controls.length - 1]

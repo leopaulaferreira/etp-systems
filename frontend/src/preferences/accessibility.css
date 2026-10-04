@@ -1,0 +1,10 @@
+html.etp-larger-text { font-size: 18px; }
+
+html.etp-reduced-motion *,
+html.etp-reduced-motion *::before,
+html.etp-reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}

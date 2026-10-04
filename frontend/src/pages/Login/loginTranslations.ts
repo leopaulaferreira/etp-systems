@@ -60,10 +60,10 @@ export const loginTranslations: Record<Locale, LoginCopy> = {
   'pt-BR': {
     languageSelector: 'Selecionar idioma',
     badge: 'Conhecimento para avançar',
-    headline: 'Impulsione sua carreira com',
-    headlineAccent: 'conhecimento que transforma.',
+    headline: 'Conhecimento para',
+    headlineAccent: 'ir além.',
     description:
-      'Plataforma completa para desenvolver habilidades, conquistar certificações e acelerar resultados.',
+      'Desenvolva habilidades, explore novas trilhas e transforme aprendizado em conquistas.',
     features: [
       { title: 'Aprendizado', subtitle: 'que transforma' },
       { title: 'Trilhas', subtitle: 'para evoluir' },
@@ -72,8 +72,8 @@ export const loginTranslations: Record<Locale, LoginCopy> = {
     ],
     secureLearning: 'Ambiente seguro e confiável para seu aprendizado.',
     welcome: 'Bem-vindo de volta',
-    title: 'Continue sua jornada',
-    subtitle: 'Entre com seus dados para acessar seus cursos.',
+    title: 'Entre na sua conta',
+    subtitle: 'Seus cursos e sua próxima conquista esperam por você.',
     accessType: 'Tipo de acesso',
     collaborator: 'Colaborador',
     company: 'Empresa / RH',
@@ -86,7 +86,7 @@ export const loginTranslations: Record<Locale, LoginCopy> = {
     submitting: 'Entrando...',
     socialDivider: 'ou entre com',
     firstAccess: 'Primeiro acesso?',
-    createAccount: 'Criar uma conta',
+    createAccount: 'Como acessar',
     protectedAccess: 'Ambiente protegido para seus dados de acesso.',
     privacy: 'Política de Privacidade',
     terms: 'Termos de Uso',

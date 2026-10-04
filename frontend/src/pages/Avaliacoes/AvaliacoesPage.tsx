@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { initialAssessments } from '../../mocks/avaliacoes.mock'
+import { useAssessments } from '../../assessments/AssessmentContext'
 import type { Assessment, AssessmentStatus } from '../../types/assessment'
 import {
   answerAssessment,
@@ -18,7 +18,7 @@ import AssessmentList from './components/AssessmentList'
 import AssessmentStats from './components/AssessmentStats'
 
 export default function AvaliacoesPage() {
-  const [items, setItems] = useState(initialAssessments)
+  const { assessments: items, setAssessments: setItems } = useAssessments()
   const [filters, setFilters] = useState<Filters>(initialFilters)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const filtered = useMemo(() => selectAssessments(items, filters), [items, filters])

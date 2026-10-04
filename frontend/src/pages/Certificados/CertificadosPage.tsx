@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { certificates, initialDownloads } from '../../mocks/certificados.mock'
-import { currentUser } from '../../mocks/user.mock'
+import { useProfile } from '../../profile/ProfileContext'
 import type { Certificate } from '../../types/certificate'
 import {
   certificateSummary,
@@ -26,6 +26,7 @@ const years = [
   .reverse()
 
 export default function CertificadosPage() {
+  const { profile } = useProfile()
   const [filters, setFilters] = useState(initialFilters)
   const [selected, setSelected] = useState<Certificate | null>(null)
   const [panel, setPanel] = useState<'hours' | 'history' | null>(null)
@@ -40,7 +41,7 @@ export default function CertificadosPage() {
   function download(item: Certificate) {
     if (item.status !== 'completed') return
     try {
-      downloadCertificate(item, currentUser.name)
+      downloadCertificate(item, profile.name)
       setDownloads((current) => [
         ...current,
         { certificateId: item.id, downloadedAt: new Date().toISOString() },
