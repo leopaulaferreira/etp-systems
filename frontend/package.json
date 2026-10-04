@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "lint": "oxlint",
+    "test:ajuda": "node --experimental-strip-types --test tests/ajuda.test.mjs",
     "test:avaliacoes": "node --experimental-strip-types --test tests/avaliacoes.test.mjs",
     "test:cursos": "node --experimental-strip-types --test tests/cursos.test.mjs",
     "test:certificados": "node --experimental-strip-types --test tests/certificados.test.mjs",

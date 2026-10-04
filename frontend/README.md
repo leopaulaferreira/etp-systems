@@ -91,6 +91,7 @@ frontend/
 | `/cursos` | autenticada | `CursosPage` — catálogo com busca, filtros, ordenação e detalhes |
 | `/avaliacoes` | autenticada | `AvaliacoesPage` — filtros, atividades, notas, resultados e gráficos |
 | `/configuracoes` | autenticada | `ConfiguracoesPage` — dados pessoais, preferências de estudo e notificações |
+| `/ajuda` | autenticada | `AjudaPage` — busca e categorias de FAQ, solicitação simulada de suporte |
 
 ## Autenticação (MOCK)
 

@@ -92,7 +92,7 @@ export default function AjudaPage() {
         </div>
         <Button type="button" className="shrink-0" icon={<Send className="h-4 w-4" aria-hidden="true" />} onClick={() => { setSubmitted(false); setSupportOpen(true) }}>Enviar solicitação</Button>
       </section>
-      <div role="status" aria-atomic="true">
+      <div role="status" aria-atomic="true" className={submitted ? '' : 'sr-only'}>
         {submitted && <p className="flex items-start gap-2 rounded-xl border border-brand-cyan-400/20 bg-brand-cyan-400/5 p-4 text-sm leading-6 text-ink-700"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-cyan-400" aria-hidden="true" /><span>Solicitação simulada com sucesso. Nenhum dado foi enviado à equipe de suporte.</span></p>}
       </div>
       <footer className="flex flex-col gap-3 text-xs text-ink-500">

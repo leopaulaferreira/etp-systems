@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import RequireAuth from '../../auth/RequireAuth'
 import AppLayout from '../../layouts/AppLayout'
@@ -11,7 +12,8 @@ import CertificadosPage from '../../pages/Certificados/CertificadosPage'
 import RelatoriosPage from '../../pages/Relatorios/RelatoriosPage'
 import PerfilPage from '../../pages/Perfil/PerfilPage'
 import ConfiguracoesPage from '../../pages/Configuracoes/ConfiguracoesPage'
-import AjudaPage from '../../pages/Ajuda/AjudaPage'
+
+const AjudaPage = lazy(() => import('../../pages/Ajuda/AjudaPage'))
 
 export default function AppRoutes() {
   return (
@@ -29,7 +31,7 @@ export default function AppRoutes() {
           <Route path="/relatorios" element={<RelatoriosPage />} />
           <Route path="/perfil" element={<PerfilPage />} />
           <Route path="/configuracoes" element={<ConfiguracoesPage />} />
-          <Route path="/ajuda" element={<AjudaPage />} />
+          <Route path="/ajuda" element={<Suspense fallback={<p role="status" className="text-sm text-ink-500">Carregando Central de Ajuda...</p>}><AjudaPage /></Suspense>} />
         </Route>
       </Route>
 
