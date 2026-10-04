@@ -82,9 +82,8 @@ export default function CourseArtwork({
     return (
       <div
         aria-hidden="true"
-        className="relative isolate flex min-h-[200px] items-center justify-center overflow-hidden bg-gradient-to-br from-navy-950 via-navy-900 to-navy-700"
+        className="relative isolate flex min-h-[200px] items-center justify-center"
       >
-        <span className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(white_1px,transparent_1px),linear-gradient(90deg,white_1px,transparent_1px)] [background-size:22px_22px]" />
         <span className="absolute h-44 w-44 rounded-full border border-brand-cyan-400/10" />
         <span className="absolute h-36 w-36 rotate-12 rounded-[28px] border border-brand-cyan-400/15 bg-brand-blue-500/10" />
         <span className="relative flex h-28 w-28 -rotate-3 items-center justify-center rounded-[26px] border border-brand-cyan-400/25 bg-gradient-to-br from-brand-blue-500/30 to-brand-cyan-400/10 shadow-[0_0_45px_-12px_rgba(34,195,238,0.4)]">

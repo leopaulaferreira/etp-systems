@@ -9,10 +9,26 @@ export default function FeaturedCourseCard({ course, onOpen }: FeaturedCourseCar
   return (
     <section
       aria-labelledby="featured-course-title"
-      className="grid overflow-hidden rounded-[22px] border border-brand-blue-500/25 bg-panel shadow-card md:grid-cols-[210px_minmax(0,1fr)]"
+      className="relative isolate grid overflow-hidden rounded-[24px] border border-white/[0.06] bg-gradient-to-r from-[#071225] via-navy-900 to-[#102755] shadow-[0_24px_50px_-32px_rgba(10,18,41,0.75)] md:grid-cols-[210px_minmax(0,1fr)]"
     >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:linear-gradient(rgba(255,255,255,0.35)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.35)_1px,transparent_1px)] [background-size:26px_26px] [mask-image:linear-gradient(90deg,black,transparent_68%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-20 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-brand-cyan-400/[0.09] blur-3xl"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-[60px] -top-20 h-56 w-56 rounded-full border border-white/[0.06]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-[15px] -top-[35px] h-36 w-36 rounded-full border border-brand-cyan-400/[0.08]"
+      />
       <CourseArtwork icon={course.icon} featured />
-      <div className="flex min-w-0 flex-col justify-center gap-3 p-5 sm:p-6">
+      <div className="relative flex min-w-0 flex-col justify-center gap-3 p-5 sm:p-6">
         <span className="inline-flex w-fit items-center gap-1.5 rounded-md border border-brand-blue-400/20 bg-brand-blue-500/10 px-2 py-1 text-[10px] font-extrabold uppercase tracking-wide text-brand-blue-400">
           <Sparkles className="h-3 w-3" aria-hidden="true" />
           Em destaque
