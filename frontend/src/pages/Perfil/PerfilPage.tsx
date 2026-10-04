@@ -172,7 +172,6 @@ export default function PerfilPage() {
           </ul>
         </section>
       </div>
-      <p className="text-center text-[11px] text-ink-500">Dados demonstrativos. Suas alterações neste perfil ficam salvas neste navegador.</p>
       <p role="status" className="sr-only">{announcement}</p>
     </div>
   )

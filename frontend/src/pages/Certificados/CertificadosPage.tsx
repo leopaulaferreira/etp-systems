@@ -95,9 +95,6 @@ export default function CertificadosPage() {
         onOpen={setSelected}
         onDownload={download}
       />
-      <p className="text-center text-[11px] leading-5 text-ink-500">
-        Dados demonstrativos. Os certificados deste protótipo não possuem validade oficial.
-      </p>
       <p role="status" className="sr-only">
         {announcement}
       </p>

@@ -15,6 +15,7 @@ das páginas internas. O código da página é carregado sob demanda.
 O envio é simulado imediatamente e confirmado na página. Nenhuma solicitação é
 armazenada, transmitida ou acompanhada. Cancelar descarta o formulário. A categoria
 ativa no FAQ é usada como valor inicial do formulário.
+O formulário também oferece a categoria “Outra” para assuntos fora do FAQ.
 
 Termos de Uso exibe uma indicação de indisponibilidade; Política de Privacidade
 leva à seção existente em Configurações. Não há novas páginas jurídicas.

@@ -441,8 +441,8 @@ export default function ConfiguracoesPage() {
           <p role="status" className={feedback ? "rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3 py-2 text-xs text-emerald-400" : "sr-only"}>{feedback}</p>
           {(editable || dirty) && (
             <div className="flex flex-wrap items-center justify-end gap-3 rounded-[22px] border border-ink-200/70 bg-panel px-4 py-3 shadow-card sm:px-5">
-              <p role="status" className={`mr-auto inline-flex min-h-5 items-center gap-1.5 text-xs ${saved ? 'text-emerald-400' : 'text-ink-500'}`}>
-                {saved ? <><Check className="h-4 w-4" aria-hidden="true" />Alterações salvas.</> : 'As alterações ficam salvas neste navegador.'}
+              <p role="status" className={saved ? 'mr-auto inline-flex min-h-5 items-center gap-1.5 text-xs text-emerald-400' : 'sr-only'}>
+                {saved && <><Check className="h-4 w-4" aria-hidden="true" />Alterações salvas.</>}
               </p>
               <button type="button" onClick={() => { setAccount(accountDraft(profile)); setSaved(false); setAccountError('') }} disabled={!dirty} className="min-h-10 rounded-xl border border-ink-200 px-4 text-sm font-bold text-ink-700 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 disabled:cursor-not-allowed disabled:opacity-40">Cancelar</button>
               <button type="submit" disabled={!dirty} className="min-h-10 rounded-xl bg-brand-blue-600 px-5 text-sm font-bold text-white hover:bg-brand-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 disabled:cursor-not-allowed disabled:opacity-40">Salvar alterações</button>

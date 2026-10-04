@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Info, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import {
   reportCourseStatus,
   reportPopularCourses,
@@ -109,10 +109,6 @@ export default function RelatoriosPage() {
       <ReportStats data={data} />
       <ReportCharts key={`${period}-${trail}`} data={data} onDetails={setDetail} />
       <ReportOverview onDetails={setDetail} />
-      <p className="flex items-center gap-2 text-xs leading-5 text-ink-500">
-        <Info className="h-4 w-4 shrink-0" aria-hidden="true" />
-        Dados demonstrativos · Referência 2024
-      </p>
       {detail && (
         <CertificateDialog title={detailTitles[detail]} onClose={() => setDetail(null)}>
           {(detail === 'evolution' || detail === 'trails') && (

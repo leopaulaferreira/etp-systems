@@ -70,6 +70,7 @@ export default function SupportDialog({ initialCategory, onClose, onSubmit }: Pr
           <select id="support-category" name="category" defaultValue={initialCategory ?? ''} required className="min-h-12 w-full rounded-xl border border-ink-200 bg-panel-alt px-3.5 text-sm text-ink-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">
             <option value="" disabled>Selecione uma categoria</option>
             {helpCategories.map(({ id, label }) => <option key={id} value={id}>{label}</option>)}
+            <option value="outra">Outra</option>
           </select>
         </div>
         <div className="flex flex-col gap-1.5">

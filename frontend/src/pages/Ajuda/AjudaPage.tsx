@@ -100,7 +100,7 @@ export default function AjudaPage() {
           <button type="button" aria-expanded={termsOpen} aria-controls="help-terms" onClick={() => setTermsOpen(!termsOpen)} className="rounded py-1 hover:text-brand-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Termos de Uso</button>
           <Link to="/configuracoes?secao=privacidade" className="rounded py-1 hover:text-brand-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Política de Privacidade</Link>
         </div>
-        <p id="help-terms" hidden={!termsOpen} className="text-center leading-5">Os Termos de Uso completos ainda não estão disponíveis. O ETP Systems é um protótipo acadêmico com dados e funcionalidades demonstrativos.</p>
+        <p id="help-terms" hidden={!termsOpen} className="text-center leading-5">Os Termos de Uso completos ainda não estão disponíveis.</p>
       </footer>
       {supportOpen && <SupportDialog initialCategory={category} onClose={() => setSupportOpen(false)} onSubmit={() => { setSupportOpen(false); setSubmitted(true) }} />}
     </div>
