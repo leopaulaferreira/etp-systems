@@ -6,7 +6,7 @@ type PageHeroProps = {
   icon: LucideIcon
   title: ReactNode
   description: string
-  artwork?: ReactNode
+  artworkIcon?: LucideIcon
 }
 
 /** Cabeçalho compacto compartilhado pelas páginas internas e pelo Dashboard. */
@@ -15,7 +15,7 @@ export default function PageHero({
   icon: Icon,
   title,
   description,
-  artwork,
+  artworkIcon: ArtworkIcon = Icon,
 }: PageHeroProps) {
   return (
     <section
@@ -34,7 +34,7 @@ export default function PageHero({
         className="pointer-events-none absolute bottom-0 left-8 h-px w-40 bg-gradient-to-r from-brand-blue-400/30 to-transparent"
       />
 
-      <div className={`relative z-10 flex min-w-0 max-w-2xl flex-col items-start gap-1.5 ${artwork ? 'xl:max-w-[58%]' : ''}`}>
+      <div className="relative z-10 flex w-full min-w-0 flex-col items-start gap-1.5 sm:pr-36">
         <span className="inline-flex items-center gap-2 rounded-full border border-brand-blue-400/20 bg-brand-blue-500/10 px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.11em] text-brand-blue-400">
           <Icon className="h-3.5 w-3.5 shrink-0 text-brand-cyan-400" strokeWidth={2} aria-hidden="true" />
           {eyebrow}
@@ -47,14 +47,12 @@ export default function PageHero({
         </p>
       </div>
 
-      {artwork && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-5 hidden w-[38%] items-center justify-end xl:flex"
-        >
-          <div className="origin-right scale-[0.78]">{artwork}</div>
-        </div>
-      )}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 right-6 hidden w-28 items-center justify-center text-white/20 sm:flex lg:right-8"
+      >
+        <ArtworkIcon className="h-24 w-24" strokeWidth={0.9} focusable="false" />
+      </div>
     </section>
   )
 }

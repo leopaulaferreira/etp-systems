@@ -1,38 +1,11 @@
 import {
-  Award,
   BarChart3,
   CalendarDays,
   Download,
   SlidersHorizontal,
-  TrendingUp,
 } from 'lucide-react'
 import PageHero from '../../../components/ui/PageHero'
 import { periodDates, periodLabels, type ReportPeriod } from '../report'
-
-function ReportArtwork() {
-  return (
-    <div className="relative h-[150px] w-[210px] shrink-0">
-      <div className="absolute inset-x-2 inset-y-3 -rotate-6 rounded-2xl border border-brand-blue-400/25 bg-panel-alt/90 p-4 shadow-card">
-        <div className="flex items-center justify-between">
-          <span className="h-1.5 w-12 rounded-full bg-brand-blue-400/25" />
-          <TrendingUp className="h-4 w-4 text-brand-cyan-400" aria-hidden="true" />
-        </div>
-        <div className="mt-5 flex h-12 items-end gap-2.5">
-          {[30, 45, 38, 65, 78, 100].map((height, index) => (
-            <span
-              key={index}
-              className="flex-1 rounded-t bg-gradient-to-t from-brand-blue-600/25 to-brand-blue-400/75"
-              style={{ height: `${height}%` }}
-            />
-          ))}
-        </div>
-      </div>
-      <span className="absolute -bottom-1 -right-1 flex h-12 w-12 items-center justify-center rounded-xl border border-brand-cyan-400/30 bg-navy-800 shadow-card">
-        <Award className="h-7 w-7 text-brand-cyan-400" strokeWidth={1.4} aria-hidden="true" />
-      </span>
-    </div>
-  )
-}
 
 type Props = {
   period: ReportPeriod
@@ -58,7 +31,6 @@ export default function ReportHeader({
         icon={BarChart3}
         title="Relatórios"
         description="Acompanhe sua evolução."
-        artwork={<ReportArtwork />}
       />
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">

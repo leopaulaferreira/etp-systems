@@ -1,5 +1,4 @@
-import { BookOpenCheck } from 'lucide-react'
-import LearningHeroArtwork from '../../../components/ui/LearningHeroArtwork'
+import { BookOpenCheck, Route } from 'lucide-react'
 import PageHero from '../../../components/ui/PageHero'
 
 export default function TrilhasHero() {
@@ -7,9 +6,9 @@ export default function TrilhasHero() {
     <PageHero
       eyebrow="Jornadas de aprendizado"
       icon={BookOpenCheck}
+      artworkIcon={Route}
       title="Explorar Trilhas"
       description="Explore trilhas para evoluir."
-      artwork={<LearningHeroArtwork variant="paths" />}
     />
   )
 }
