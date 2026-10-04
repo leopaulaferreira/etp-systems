@@ -48,13 +48,14 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
         <p className="mt-1 text-xs leading-relaxed text-white/55">
           Nossa equipe está pronta para apoiar sua jornada.
         </p>
-        <button
-          type="button"
+        <NavLink
+          to="/ajuda"
+          onClick={onNavigate}
           className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-brand-cyan-500 px-3 py-2 text-xs font-semibold text-navy-950 transition-colors duration-150 hover:bg-brand-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan-400/50"
         >
           Central de Ajuda
           <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />
-        </button>
+        </NavLink>
       </div>
     </aside>
   )

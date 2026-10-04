@@ -11,6 +11,7 @@ import CertificadosPage from '../../pages/Certificados/CertificadosPage'
 import RelatoriosPage from '../../pages/Relatorios/RelatoriosPage'
 import PerfilPage from '../../pages/Perfil/PerfilPage'
 import ConfiguracoesPage from '../../pages/Configuracoes/ConfiguracoesPage'
+import AjudaPage from '../../pages/Ajuda/AjudaPage'
 
 export default function AppRoutes() {
   return (
@@ -28,6 +29,7 @@ export default function AppRoutes() {
           <Route path="/relatorios" element={<RelatoriosPage />} />
           <Route path="/perfil" element={<PerfilPage />} />
           <Route path="/configuracoes" element={<ConfiguracoesPage />} />
+          <Route path="/ajuda" element={<AjudaPage />} />
         </Route>
       </Route>
 
