@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { Award, BookOpen, ChevronDown, ClipboardCheck, Headset, Search, SearchX, UserRound, X } from 'lucide-react'
+import { Award, BookOpen, CheckCircle2, ChevronDown, ClipboardCheck, Headset, Search, SearchX, Send, UserRound, X } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import PageHero from '../../components/ui/PageHero'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import { filterHelpQuestions, helpCategories, type HelpCategory } from './help'
+import SupportDialog from './SupportDialog'
 
 const categoryIcons = { conta: UserRound, cursos: BookOpen, avaliacoes: ClipboardCheck, certificados: Award }
 
@@ -11,6 +13,9 @@ export default function AjudaPage() {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<HelpCategory | null>(null)
   const [openQuestion, setOpenQuestion] = useState<string | null>(null)
+  const [supportOpen, setSupportOpen] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [termsOpen, setTermsOpen] = useState(false)
   const questions = filterHelpQuestions(query, category)
   const filtered = Boolean(query || category)
 
@@ -77,6 +82,27 @@ export default function AjudaPage() {
           </div>
         )}
       </section>
+      <section aria-labelledby="help-support-title" className="flex flex-col gap-4 rounded-[22px] border border-brand-blue-400/20 bg-panel p-5 shadow-card sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-cyan-500/10 text-brand-cyan-400"><Headset className="h-5 w-5" aria-hidden="true" /></span>
+          <div>
+            <h2 id="help-support-title" className="text-base font-extrabold text-ink-900">Ainda precisa de ajuda?</h2>
+            <p className="mt-1 max-w-xl text-sm leading-6 text-ink-500">Se não encontrou a resposta que procura, envie uma solicitação para nossa equipe.</p>
+          </div>
+        </div>
+        <Button type="button" className="shrink-0" icon={<Send className="h-4 w-4" aria-hidden="true" />} onClick={() => { setSubmitted(false); setSupportOpen(true) }}>Enviar solicitação</Button>
+      </section>
+      <div role="status" aria-atomic="true">
+        {submitted && <p className="flex items-start gap-2 rounded-xl border border-brand-cyan-400/20 bg-brand-cyan-400/5 p-4 text-sm leading-6 text-ink-700"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-cyan-400" aria-hidden="true" /><span>Solicitação simulada com sucesso. Nenhum dado foi enviado à equipe de suporte.</span></p>}
+      </div>
+      <footer className="flex flex-col gap-3 text-xs text-ink-500">
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+          <button type="button" aria-expanded={termsOpen} aria-controls="help-terms" onClick={() => setTermsOpen(!termsOpen)} className="rounded py-1 hover:text-brand-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Termos de Uso</button>
+          <Link to="/configuracoes?secao=privacidade" className="rounded py-1 hover:text-brand-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Política de Privacidade</Link>
+        </div>
+        <p id="help-terms" hidden={!termsOpen} className="text-center leading-5">Os Termos de Uso completos ainda não estão disponíveis. O ETP Systems é um protótipo acadêmico com dados e funcionalidades demonstrativos.</p>
+      </footer>
+      {supportOpen && <SupportDialog initialCategory={category} onClose={() => setSupportOpen(false)} onSubmit={() => { setSupportOpen(false); setSubmitted(true) }} />}
     </div>
   )
 }
