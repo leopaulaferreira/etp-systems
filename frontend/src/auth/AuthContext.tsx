@@ -1,9 +1,12 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
-import { readMockSession, writeMockSession } from './auth.mock'
+import { readMockRole, readMockSession, writeMockSession, type AccountRole } from './auth.mock'
+import { company } from '../mocks/company.mock'
 
 type AuthContextValue = {
   isAuthenticated: boolean
-  login: () => void
+  role: AccountRole
+  companyId: string | null
+  login: (role?: AccountRole) => void
   logout: () => void
 }
 
@@ -18,20 +21,25 @@ const AuthContext = createContext<AuthContextValue | null>(null)
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(readMockSession)
+  const [role, setRole] = useState(readMockRole)
 
   const value = useMemo<AuthContextValue>(
     () => ({
       isAuthenticated,
-      login: () => {
-        writeMockSession(true)
+      role,
+      companyId: isAuthenticated && role === 'empresa' ? company.id : null,
+      login: (nextRole = 'colaborador') => {
+        writeMockSession(true, nextRole)
+        setRole(nextRole)
         setIsAuthenticated(true)
       },
       logout: () => {
         writeMockSession(false)
         setIsAuthenticated(false)
+        setRole('colaborador')
       },
     }),
-    [isAuthenticated],
+    [isAuthenticated, role],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

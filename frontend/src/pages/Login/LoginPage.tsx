@@ -13,6 +13,7 @@ import LoginBackdrop from './components/LoginBackdrop'
 import LoginIllustration from './components/LoginIllustration'
 import CertificateDialog from '../Certificados/components/CertificateDialog'
 import { useAuth } from '../../auth/AuthContext'
+import { homeForRole } from '../../auth/auth.mock'
 import etpSymbol from '../../assets/etp-symbol-white.svg'
 import { languageOptions, loginTranslations, type Locale } from './loginTranslations'
 import { loginSupportCopy } from './loginSupportCopy'
@@ -82,8 +83,8 @@ export default function LoginPage() {
         if (rememberEmail) localStorage.setItem(EMAIL_KEY, normalizedEmail)
         else localStorage.removeItem(EMAIL_KEY)
       } catch { /* O login demonstrativo não depende de armazenamento local. */ }
-      login()
-      navigate('/dashboard', { replace: true })
+      login(accountType)
+      navigate(homeForRole(accountType), { replace: true })
     }, 600)
   }
 

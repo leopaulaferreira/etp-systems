@@ -11,6 +11,20 @@
  * qualquer página precisem mudar.
  */
 const SESSION_KEY = 'etp-mock-session'
+const ROLE_KEY = 'etp-mock-role'
+export type AccountRole = 'colaborador' | 'empresa'
+
+export function homeForRole(role: AccountRole) {
+  return role === 'empresa' ? '/empresa/dashboard' : '/dashboard'
+}
+
+export function readMockRole(): AccountRole {
+  try {
+    return readMockSession() && window.sessionStorage.getItem(ROLE_KEY) === 'empresa' ? 'empresa' : 'colaborador'
+  } catch {
+    return 'colaborador'
+  }
+}
 
 export function readMockSession(): boolean {
   try {
@@ -20,10 +34,15 @@ export function readMockSession(): boolean {
   }
 }
 
-export function writeMockSession(value: boolean): void {
+export function writeMockSession(value: boolean, role: AccountRole = 'colaborador'): void {
   try {
-    if (value) window.sessionStorage.setItem(SESSION_KEY, 'true')
-    else window.sessionStorage.removeItem(SESSION_KEY)
+    if (value) {
+      window.sessionStorage.setItem(ROLE_KEY, role)
+      window.sessionStorage.setItem(SESSION_KEY, 'true')
+    } else {
+      window.sessionStorage.removeItem(SESSION_KEY)
+      window.sessionStorage.removeItem(ROLE_KEY)
+    }
   } catch {
     // sessionStorage indisponível (ex.: modo privado) — sessão fica só em memória
   }

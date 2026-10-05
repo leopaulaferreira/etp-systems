@@ -6,10 +6,13 @@ import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import { filterHelpQuestions, helpCategories, type HelpCategory } from './help'
 import SupportDialog from './SupportDialog'
+import { useAuth } from '../../auth/AuthContext'
 
 const categoryIcons = { conta: UserRound, cursos: BookOpen, avaliacoes: ClipboardCheck, certificados: Award }
 
 export default function AjudaPage() {
+  const { role } = useAuth()
+  const [privacyOpen, setPrivacyOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<HelpCategory | null>(null)
   const [openQuestion, setOpenQuestion] = useState<string | null>(null)
@@ -98,9 +101,10 @@ export default function AjudaPage() {
       <footer className="flex flex-col gap-3 text-xs text-ink-500">
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
           <button type="button" aria-expanded={termsOpen} aria-controls="help-terms" onClick={() => setTermsOpen(!termsOpen)} className="rounded py-1 hover:text-brand-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Termos de Uso</button>
-          <Link to="/configuracoes?secao=privacidade" className="rounded py-1 hover:text-brand-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Política de Privacidade</Link>
+          {role === 'empresa' ? <button type="button" aria-expanded={privacyOpen} aria-controls="help-company-privacy" onClick={() => setPrivacyOpen(!privacyOpen)} className="rounded py-1 hover:text-brand-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Política de Privacidade</button> : <Link to="/configuracoes?secao=privacidade" className="rounded py-1 hover:text-brand-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Política de Privacidade</Link>}
         </div>
         <p id="help-terms" hidden={!termsOpen} className="text-center leading-5">Os Termos de Uso completos ainda não estão disponíveis.</p>
+        {role === 'empresa' && <p id="help-company-privacy" hidden={!privacyOpen} className="text-center leading-5">A Política de Privacidade da área empresarial ainda não está disponível.</p>}
       </footer>
       {supportOpen && <SupportDialog initialCategory={category} onClose={() => setSupportOpen(false)} onSubmit={() => { setSupportOpen(false); setSubmitted(true) }} />}
     </div>

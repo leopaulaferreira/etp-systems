@@ -1,7 +1,8 @@
 import { NavLink } from 'react-router-dom'
-import { Headset, ArrowUpRight } from 'lucide-react'
+import { Headset, ArrowUpRight, LayoutDashboard, UsersRound, ClipboardCheck, Award, Building2, UserRound, ShieldCheck } from 'lucide-react'
 import etpSymbol from '../../assets/etp-symbol.svg'
 import { navItems } from './navItems'
+import { useAuth } from '../../auth/AuthContext'
 
 type SidebarProps = {
   /** Chamado quando um item de navegação é ativado — usado para fechar o drawer mobile. */
@@ -9,6 +10,20 @@ type SidebarProps = {
 }
 
 export default function Sidebar({ onNavigate }: SidebarProps) {
+  const { role } = useAuth()
+  const groups = role === 'empresa' ? [
+    { label: 'Painel da empresa', items: [
+      { id: 'overview', label: 'Visão geral', to: '/empresa/dashboard', icon: LayoutDashboard },
+      { id: 'team', label: 'Colaboradores', to: '/empresa/colaboradores', icon: UsersRound },
+      { id: 'assessments', label: 'Avaliações', to: '/empresa/avaliacoes', icon: ClipboardCheck },
+      { id: 'certificates', label: 'Certificados', to: '/empresa/certificados', icon: Award },
+    ] },
+    { label: 'Configurações', items: [
+      { id: 'company', label: 'Dados da empresa', to: '/empresa/configuracoes/dados', icon: Building2 },
+      { id: 'account', label: 'Minha conta', to: '/empresa/configuracoes/conta', icon: UserRound },
+      { id: 'security', label: 'Segurança', to: '/empresa/configuracoes/seguranca', icon: ShieldCheck },
+    ] },
+  ] : [{ label: '', items: navItems }]
   return (
     <aside
       tabIndex={-1}
@@ -20,7 +35,9 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
       </div>
 
       <nav className="flex flex-1 flex-col gap-1" aria-label="Navegação principal">
-        {navItems.map((item) => {
+        {groups.map((group) => <div key={group.label} className="mb-4 flex flex-col gap-1">
+          {group.label && <p className="px-3.5 pb-2 pt-2 text-[10px] font-bold uppercase tracking-widest text-white/40">{group.label}</p>}
+          {group.items.map((item) => {
           const Icon = item.icon
           return (
             <NavLink
@@ -37,7 +54,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
               {item.label}
             </NavLink>
           )
-        })}
+        })}</div>)}
       </nav>
 
       <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.05] p-4">

@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Bell, ChevronDown, LogOut, Menu, UserRound } from 'lucide-react'
+import { Search, Bell, Building2, ChevronDown, LogOut, Menu, UserRound } from 'lucide-react'
 import Avatar from '../ui/Avatar'
 import { useAuth } from '../../auth/AuthContext'
 import { useProfile } from '../../profile/ProfileContext'
+import { useCompanySettings } from '../../pages/Empresa/companySettings'
+import { company } from '../../mocks/company.mock'
 
 type TopbarProps = {
   /** Estado do drawer mobile — usado apenas para o aria-expanded do botão hambúrguer. */
@@ -14,10 +16,13 @@ type TopbarProps = {
 
 export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const { logout } = useAuth()
+  const { logout, role, companyId } = useAuth()
   const navigate = useNavigate()
   const { profile } = useProfile()
   const notificationCount = profile.notificationsEnabled ? profile.notificationCount : 0
+  const { settings } = useCompanySettings(companyId)
+  const isCompany = role === 'empresa'
+  const displayName = isCompany ? settings.contactName : profile.name
 
   function handleLogout() {
     setMenuOpen(false)
@@ -40,7 +45,7 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
         <Menu className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
       </button>
 
-      <div className="flex max-w-md flex-1 items-center gap-2.5 rounded-xl border border-ink-200 bg-panel-alt px-3.5 py-3 transition-[border-color,box-shadow] duration-150 focus-within:border-brand-blue-500 focus-within:ring-2 focus-within:ring-brand-blue-500/15">
+      {isCompany ? <div className="flex min-w-0 flex-1 items-center gap-2 text-xs font-semibold text-ink-500"><Building2 className="h-5 w-5 shrink-0 text-brand-blue-400" aria-hidden="true" /><span className="hidden sm:inline">Gestão de aprendizagem</span></div> : <div className="flex max-w-md flex-1 items-center gap-2.5 rounded-xl border border-ink-200 bg-panel-alt px-3.5 py-3 transition-[border-color,box-shadow] duration-150 focus-within:border-brand-blue-500 focus-within:ring-2 focus-within:ring-brand-blue-500/15">
         <Search className="h-[18px] w-[18px] shrink-0 text-ink-400" strokeWidth={2} aria-hidden="true" />
         <input
           type="search"
@@ -48,10 +53,10 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
           aria-label="Buscar cursos, trilhas, temas"
           className="w-full min-w-0 bg-transparent text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none"
         />
-      </div>
+      </div>}
 
       <div className="flex items-center gap-4">
-        <button
+        {!isCompany && <button
           type="button"
           aria-label={`Notificações (${notificationCount} não lidas)`}
           onClick={() => navigate('/configuracoes?secao=notificacoes')}
@@ -63,7 +68,7 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
               {notificationCount}
             </span>
           )}
-        </button>
+        </button>}
 
         <div className="h-8 w-px bg-ink-200" aria-hidden="true" />
 
@@ -83,10 +88,10 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
             onClick={() => setMenuOpen((open) => !open)}
             className="flex items-center gap-3 rounded-xl px-1.5 py-1 transition-colors duration-150 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
           >
-            <Avatar name={profile.name} className="h-10 w-10" />
+            <Avatar name={displayName} className="h-10 w-10" />
             <span className="flex flex-col items-start leading-tight">
-              <span className="text-sm font-semibold text-ink-900">{profile.name}</span>
-              <span className="text-xs text-ink-500">{profile.role}</span>
+              <span className="text-sm font-semibold text-ink-900">{displayName}</span>
+              <span className="text-xs text-ink-500">{isCompany ? company.role : profile.role}</span>
             </span>
             <ChevronDown
               className={`h-4 w-4 text-ink-400 transition-transform duration-200 ${menuOpen ? 'rotate-180' : ''}`}
@@ -105,12 +110,12 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
                 role="menuitem"
                 onClick={() => {
                   setMenuOpen(false)
-                  navigate('/perfil')
+                  navigate(isCompany ? '/empresa/configuracoes/conta' : '/perfil')
                 }}
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-ink-700 transition-colors duration-150 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
               >
                 <UserRound className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-                Meu perfil
+                {isCompany ? 'Minha conta' : 'Meu perfil'}
               </button>
               <button
                 type="button"

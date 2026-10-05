@@ -87,7 +87,12 @@ frontend/
 | Rota | Acesso | Página |
 |---|---|---|
 | `/login` | pública | `LoginPage` |
-| `/dashboard` | autenticada | `DashboardPage` |
+| `/dashboard` | colaborador | `DashboardPage` |
+| `/empresa/dashboard` | empresa | `EmpresaPage` — visão geral, progresso e indicadores |
+| `/empresa/colaboradores` | empresa | `ColaboradoresPage` — busca, filtros e resumo individual |
+| `/empresa/avaliacoes` | empresa | `CompanyRecordsPage` — consulta das notas |
+| `/empresa/certificados` | empresa | `CompanyRecordsPage` — consulta dos certificados |
+| `/empresa/configuracoes/:section` | empresa | `CompanySettingsPage` — dados, conta e segurança |
 | `/cursos` | autenticada | `CursosPage` — catálogo com busca, filtros, ordenação e detalhes |
 | `/avaliacoes` | autenticada | `AvaliacoesPage` — filtros, atividades, notas, resultados e gráficos |
 | `/configuracoes` | autenticada | `ConfiguracoesPage` — dados pessoais, preferências de estudo e notificações |
@@ -95,7 +100,9 @@ frontend/
 
 ## Autenticação (MOCK)
 
-`src/auth/` contém uma implementação **mock** de sessão (`isAuthenticated`, `login()`, `logout()`), usada apenas para o fluxo público/protegido e o botão de logout funcionarem antes de existir um backend real. Nenhuma página acessa `sessionStorage` diretamente — tudo passa por `useAuth()`. Quando a API (Spring Security/JWT) estiver disponível, apenas `src/auth/auth.mock.ts` (e a implementação interna de `AuthContext`) precisam ser substituídos.
+`src/auth/` contém uma sessão **mock** com perfil Colaborador ou Empresa. O login direciona ao painel correspondente, mantém o perfil ao recarregar e limpa a sessão no logout. A persistência passa por `useAuth()`. A separação de rotas organiza a interface, mas a autenticação e a autorização por empresa deverão ser implementadas na API (Spring Security/JWT). A integração também atualizará o envio de credenciais no login e os estados de erro/expiração.
+
+O [Painel da empresa](src/pages/Empresa/README.md) usa um conjunto único de dados para indicadores, lista e resumos individuais.
 
 ## Status atual
 
