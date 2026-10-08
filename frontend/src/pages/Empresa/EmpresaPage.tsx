@@ -6,7 +6,7 @@ import IllustratedIcon, { type IconTone } from '../../components/ui/IllustratedI
 import Avatar from '../../components/ui/Avatar'
 import { useCompanySettings } from './companySettings'
 import { useAuth } from '../../auth/AuthContext'
-import { employees } from '../../mocks/company.mock'
+import { employees, company } from '../../mocks/company.mock'
 import { companyEmployees, companySummary, formatCompanyDate, recentCompletions } from './company'
 import EmployeeDialog from './EmployeeDialog'
 
@@ -16,7 +16,8 @@ export default function EmpresaPage() {
   const { companyId } = useAuth()
   const { settings } = useCompanySettings(companyId)
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const team = companyEmployees(employees, companyId)
+  // O painel ainda usa dados sintéticos até a integração do domínio Empresa/RH.
+  const team = companyEmployees(employees, company.id)
   const summary = companySummary(team)
   const recent = recentCompletions(team)
   const selected = team.find((employee) => employee.id === selectedId)

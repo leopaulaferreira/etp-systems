@@ -6,7 +6,7 @@ import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import { useCompanySettings } from './companySettings'
 import { useAuth } from '../../auth/AuthContext'
-import { employees } from '../../mocks/company.mock'
+import { employees, company } from '../../mocks/company.mock'
 import { averageScore, companyEmployees, employeeProgress, employeeStatus, filterEmployees, statusLabels, type EmployeeStatus } from './company'
 import EmployeeDialog from './EmployeeDialog'
 
@@ -19,7 +19,7 @@ export default function ColaboradoresPage() {
   const [status, setStatus] = useState<EmployeeStatus | 'all'>('all')
   const [department, setDepartment] = useState('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const team = companyEmployees(employees, companyId)
+  const team = companyEmployees(employees, company.id)
   const visible = filterEmployees(team, query, status, department)
   const selected = team.find((employee) => employee.id === selectedId)
   const filtered = Boolean(query || status !== 'all' || department)

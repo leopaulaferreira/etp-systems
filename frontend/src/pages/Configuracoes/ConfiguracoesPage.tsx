@@ -11,7 +11,6 @@ import PageHero from '../../components/ui/PageHero'
 import { useProfile } from '../../profile/ProfileContext'
 import { useAuth } from '../../auth/AuthContext'
 import { useAccessibility } from '../../preferences/accessibility'
-import { currentUser } from '../../mocks/user.mock'
 import CertificateDialog from '../Certificados/components/CertificateDialog'
 
 type Section = 'conta' | 'seguranca' | 'notificacoes' | 'estudo' | 'acessibilidade' | 'privacidade'
@@ -90,9 +89,9 @@ function accountDraft(profile: AccountDraft): AccountDraft {
   }
 }
 
-function readStudySettings(): StudySettings {
+function readStudySettings(storageKey: string): StudySettings {
   try {
-    const saved: unknown = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? 'null')
+    const saved: unknown = JSON.parse(window.localStorage.getItem(storageKey) ?? 'null')
     if (saved && typeof saved === 'object') {
       const values = saved as Record<string, unknown>
       return {
@@ -114,7 +113,8 @@ function readStudySettings(): StudySettings {
 
 export default function ConfiguracoesPage() {
   const { profile, updateProfile, resetProfile } = useProfile()
-  const { logout } = useAuth()
+  const { logout, user } = useAuth()
+  const studyStorageKey = `${STORAGE_KEY}:${user?.id}`
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const accessibility = useAccessibility()
@@ -124,7 +124,7 @@ export default function ConfiguracoesPage() {
   const selected = sections.find((section) => section.id === requestedSection)?.id ?? 'estudo'
   function setSelected(section: Section) { setSearchParams({ secao: section }, { replace: true }) }
   const [account, setAccount] = useState(() => accountDraft(profile))
-  const [study, setStudy] = useState(readStudySettings)
+  const [study, setStudy] = useState(() => readStudySettings(studyStorageKey))
   const [saved, setSaved] = useState(false)
   const [securityNotice, setSecurityNotice] = useState(false)
   const [accountError, setAccountError] = useState('')
@@ -146,7 +146,7 @@ export default function ConfiguracoesPage() {
     const next = { ...study, [key]: value }
     setStudy(next)
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+      window.localStorage.setItem(studyStorageKey, JSON.stringify(next))
       setFeedback('Preferências salvas automaticamente.')
     } catch { setFeedback('Preferências aplicadas nesta sessão; armazenamento indisponível.') }
     setSaved(false)
@@ -173,18 +173,17 @@ export default function ConfiguracoesPage() {
       navigate('/login', { replace: true })
       return
     }
-    resetProfile()
-    setAccount(accountDraft(currentUser))
+    setAccount(accountDraft(resetProfile()))
     setStudy({ ...defaultStudy })
     accessibility.reset()
     try {
-      localStorage.removeItem(STORAGE_KEY)
+      localStorage.removeItem(studyStorageKey)
       localStorage.removeItem('etp-login-email')
     } catch { /* Restaura a sessão em memória. */ }
     setSaved(false)
     setAccountError('')
     setConfirmation(null)
-    setFeedback('Personalizações removidas. Dados demonstrativos restaurados.')
+    setFeedback('Personalizações removidas. Preferências padrão restauradas.')
   }
 
   function save(event: FormEvent<HTMLFormElement>) {
@@ -272,6 +271,7 @@ export default function ConfiguracoesPage() {
                         value={account[key]}
                         onChange={(event) => changeAccount(key, event.target.value)}
                         required={key === 'name' || key === 'email'}
+                        readOnly={key === 'email'}
                         pattern={key === 'name' ? '.*\\S.*' : undefined}
                         title={key === 'name' ? 'Informe um nome válido.' : undefined}
                         maxLength={key === 'email' ? 120 : 80}

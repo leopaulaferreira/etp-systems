@@ -5,17 +5,15 @@ import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import Avatar from '../../components/ui/Avatar'
 import CertificateDialog from '../Certificados/components/CertificateDialog'
-import { useAuth } from '../../auth/AuthContext'
-import { employees } from '../../mocks/company.mock'
+import { employees, company } from '../../mocks/company.mock'
 import { companyEmployees, formatCompanyDate } from './company'
 
 export default function CompanyRecordsPage({ kind }: { kind: 'assessments' | 'certificates' }) {
-  const { companyId } = useAuth()
   const [query, setQuery] = useState('')
   const [courseId, setCourseId] = useState('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const certificates = kind === 'certificates'
-  const records = companyEmployees(employees, companyId).flatMap(employee => employee.courses
+  const records = companyEmployees(employees, company.id).flatMap(employee => employee.courses
     .filter(course => certificates ? Boolean(course.certificateCode) : course.score !== null)
     .map(course => ({ id: `${employee.id}-${course.id}`, employee, course })))
   const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
