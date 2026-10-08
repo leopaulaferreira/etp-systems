@@ -1,15 +1,16 @@
 # Cursos
 
-Catálogo do protótipo escolar em `/cursos`, dentro do layout autenticado existente.
-O mock `../../mocks/cursos.mock.ts` contém 24 cursos individuais; o destaque também
-pertence a esse catálogo. A ordem inicial do mock representa a relevância.
+Catálogo em `/cursos`, dentro do layout autenticado existente. A página consulta
+`GET /api/cursos` e busca detalhes por `GET /api/cursos/{id}`. O mock
+`../../mocks/cursos.mock.ts` contém 24 cursos e funciona como alternativa local
+quando a API está indisponível. O destaque pertence ao catálogo.
 
 ## Funcionalidades
 
 - Cabeçalho ilustrado, destaque de Cibersegurança e grade responsiva de cards.
 - Busca por título, descrição e categoria, ignorando acentos e diferenças de caixa.
 - Filtros combinados de categoria e nível, acessíveis pelo botão Filtrar.
-- Ordenação por relevância, popularidade, menor duração ou nome.
+- Ordenação por relevância, menor duração ou nome. Popularidade aparece apenas com o mock local, que contém números demonstrativos de alunos.
 - Oito itens inicialmente; “Ver mais cursos” acrescenta oito por vez até o total.
 - Alterar busca, filtros ou ordenação reinicia a quantidade exibida em oito.
 - O destaque fica oculto durante uma busca ou filtro para não exibir conteúdo fora dos resultados.
@@ -19,7 +20,12 @@ pertence a esse catálogo. A ordem inicial do mock representa a relevância.
 
 Busca, filtros e ordenação são locais e reiniciam ao sair da página ou recarregar.
 O diálogo é uma apresentação do curso: não realiza matrícula nem reproduz aulas.
-Os números de alunos são fictícios. A integração com backend fica para uma etapa futura.
+Com a API ativa, a página omite contagens de alunos porque esse dado ainda não existe no banco.
+Se a consulta falhar, aparece um aviso com ação para tentar novamente.
+
+Em desenvolvimento, o Vite encaminha `/api` para `http://localhost:8080`. Para outra
+porta, use `API_PROXY_TARGET=http://localhost:18080 npm run dev`. No Compose, o proxy
+usa automaticamente o serviço `backend`.
 
 ## Validação
 
@@ -31,6 +37,6 @@ npm run lint
 npm run test:cursos
 ```
 
-Os testes verificam os dados, busca, filtros combinados, ordenação sem alterar o mock
+Os testes verificam dados da API, busca, filtros combinados, ordenação sem alterar o mock
 e duração fracionada. No navegador, confira também o carregamento de 8/16/24 cards,
 o estado vazio, a navegação por teclado nos detalhes e as larguras de celular a desktop.

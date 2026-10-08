@@ -1,6 +1,8 @@
 # Banco de Dados - ETP Systems
 
-Esta pasta contém os **arquivos relacionados ao banco de dados do sistema ETP Systems**.
+Esta pasta contém os **arquivos de referência do banco de dados do ETP Systems**.
+
+O [`schema.sql`](schema.sql) registra o schema original. O backend aplica a estrutura atual e suas mudanças pelas migrações Flyway em [`backend/src/main/resources/db/migration`](../backend/src/main/resources/db/migration). O Docker Compose não executa mais este script diretamente.
 
 Aqui serão armazenados os **scripts SQL e materiais de modelagem** utilizados para criar e estruturar o banco de dados da aplicação.
 
