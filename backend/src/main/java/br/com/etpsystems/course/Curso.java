@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -38,6 +39,26 @@ public class Curso {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
+
+    @NotBlank
+    @Size(max = 30)
+    @Column(name = "nivel", nullable = false, length = 30)
+    private String nivel = "Iniciante";
+
+    @Min(0)
+    @Column(name = "duracao_minutos", nullable = false)
+    private int duracaoMinutos;
+
+    @NotBlank
+    @Size(max = 30)
+    @Column(name = "icone", nullable = false, length = 30)
+    private String icone = "code";
+
+    @Column(name = "destaque", nullable = false)
+    private boolean destaque;
+
+    @Column(name = "ordem_exibicao", nullable = false)
+    private int ordemExibicao = 1000;
 
     @Column(name = "criado_em", insertable = false, updatable = false)
     private Instant criadoEm;
@@ -65,6 +86,26 @@ public class Curso {
 
     public Categoria getCategoria() {
         return categoria;
+    }
+
+    public String getNivel() {
+        return nivel;
+    }
+
+    public int getDuracaoMinutos() {
+        return duracaoMinutos;
+    }
+
+    public String getIcone() {
+        return icone;
+    }
+
+    public boolean isDestaque() {
+        return destaque;
+    }
+
+    public int getOrdemExibicao() {
+        return ordemExibicao;
     }
 
     public Instant getCriadoEm() {
