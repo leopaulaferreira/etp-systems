@@ -1,9 +1,9 @@
-import type { CatalogCourse, CourseCategory, CourseLevel } from '../../mocks/cursos.mock'
+import type { CatalogCourse, CourseLevel } from '../../mocks/cursos.mock'
 
 export type CourseOrder = 'relevance' | 'title' | 'duration' | 'popular'
 export type CatalogFilters = {
   query: string
-  category: CourseCategory | 'Todas'
+  category: string
   level: CourseLevel | 'Todos'
   order: CourseOrder
 }
@@ -33,7 +33,7 @@ export function selectCourses(courses: CatalogCourse[], filters: CatalogFilters)
   )
   if (filters.order === 'title') result.sort((a, b) => a.title.localeCompare(b.title, 'pt-BR'))
   if (filters.order === 'duration') result.sort((a, b) => a.durationHours - b.durationHours)
-  if (filters.order === 'popular') result.sort((a, b) => b.students - a.students)
+  if (filters.order === 'popular') result.sort((a, b) => (b.students ?? 0) - (a.students ?? 0))
   return result
 }
 

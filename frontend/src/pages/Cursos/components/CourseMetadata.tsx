@@ -22,7 +22,7 @@ export default function CourseMetadata({
         <LevelIcon className="h-4 w-4" aria-hidden="true" />
         {course.level}
       </span>
-      {showStudents && (
+      {showStudents && course.students !== undefined && (
         <span
           className="inline-flex items-center gap-1.5"
           aria-label={`${course.students.toLocaleString('pt-BR')} alunos`}

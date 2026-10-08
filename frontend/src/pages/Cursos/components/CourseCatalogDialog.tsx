@@ -5,9 +5,9 @@ import type { CatalogCourse } from '../../../mocks/cursos.mock'
 import CourseArtwork from './CourseArtwork'
 import CourseMetadata from './CourseMetadata'
 
-type CourseCatalogDialogProps = { course: CatalogCourse; onClose: () => void }
+type CourseCatalogDialogProps = { course: CatalogCourse; loading?: boolean; error?: boolean; onClose: () => void }
 
-export default function CourseCatalogDialog({ course, onClose }: CourseCatalogDialogProps) {
+export default function CourseCatalogDialog({ course, loading = false, error = false, onClose }: CourseCatalogDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   useEffect(() => {
     const dialog = dialogRef.current
@@ -22,6 +22,7 @@ export default function CourseCatalogDialog({ course, onClose }: CourseCatalogDi
   return (
     <dialog
       ref={dialogRef}
+      aria-busy={loading}
       aria-labelledby="catalog-dialog-title"
       aria-describedby="catalog-dialog-description"
       onCancel={(event) => {
@@ -72,6 +73,8 @@ export default function CourseCatalogDialog({ course, onClose }: CourseCatalogDi
         <p id="catalog-dialog-description" className="text-sm leading-6 text-ink-500">
           {course.description}
         </p>
+        {loading && <p role="status" className="text-xs text-ink-500">Atualizando detalhes...</p>}
+        {error && <p role="alert" className="text-xs text-ink-500">Não foi possível atualizar os detalhes. Exibindo os dados do catálogo.</p>}
         <div className="border-y border-ink-100 py-5">
           <CourseMetadata course={course} showStudents />
         </div>

@@ -1,4 +1,4 @@
-/** Catálogo fictício do protótipo escolar. Sem matrícula, progresso ou API. */
+/** Dados locais preservados como alternativa quando a API não estiver disponível. */
 export const courseCategories = [
   'Tecnologia',
   'Dados',
@@ -26,11 +26,12 @@ export type CatalogCourse = {
   id: string
   title: string
   description: string
-  category: CourseCategory
+  category: string
   level: CourseLevel
   durationHours: number
-  students: number
+  students?: number
   icon: CourseIcon
+  featured?: boolean
 }
 
 export const featuredCourse: CatalogCourse = {

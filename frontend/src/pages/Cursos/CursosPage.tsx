@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
-import { BookOpen, ChevronDown, SearchX } from 'lucide-react'
-import { catalogCourses, featuredCourse, type CatalogCourse } from '../../mocks/cursos.mock'
+import { useEffect, useMemo, useState } from 'react'
+import { BookOpen, ChevronDown, RefreshCw, SearchX } from 'lucide-react'
+import { catalogCourses, courseCategories, featuredCourse, type CatalogCourse } from '../../mocks/cursos.mock'
 import { initialFilters, selectCourses, type CatalogFilters } from './catalog'
+import { fetchCourseDetails, fetchCourses } from './courseApi'
 import CatalogCourseCard from './components/CatalogCourseCard'
 import CatalogToolbar from './components/CatalogToolbar'
 import CourseCatalogDialog from './components/CourseCatalogDialog'
@@ -14,15 +15,57 @@ export default function CursosPage() {
   const [filters, setFilters] = useState<CatalogFilters>(initialFilters)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-  const [selectedCourse, setSelectedCourse] = useState<CatalogCourse | null>(null)
-  const filteredCourses = useMemo(() => selectCourses(catalogCourses, filters), [filters])
+  const [courses, setCourses] = useState<CatalogCourse[]>([])
+  const [source, setSource] = useState<'loading' | 'api' | 'fallback'>('loading')
+  const [reload, setReload] = useState(0)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [details, setDetails] = useState<CatalogCourse | null>(null)
+  const [detailStatus, setDetailStatus] = useState<'ready' | 'loading' | 'error'>('ready')
+  const filteredCourses = useMemo(() => selectCourses(courses, filters), [courses, filters])
   const visibleCourses = filteredCourses.slice(0, visibleCount)
+  const selectedCourse = details?.id === selectedId ? details : courses.find((course) => course.id === selectedId)
+  const featured = source === 'api' ? courses.find((course) => course.featured) : featuredCourse
+  const categories = source === 'api'
+    ? [...new Set(courses.map((course) => course.category))]
+    : [...courseCategories]
   const isFiltered =
     filters.query.trim() !== '' || filters.category !== 'Todas' || filters.level !== 'Todos'
+
+  useEffect(() => {
+    const controller = new AbortController()
+    fetchCourses(controller.signal).then((data) => {
+      setCourses(data)
+      setSource('api')
+      setFilters((current) => current.order === 'popular' ? { ...current, order: 'relevance' } : current)
+    }).catch(() => {
+      if (controller.signal.aborted) return
+      setCourses(catalogCourses)
+      setSource('fallback')
+    })
+    return () => controller.abort()
+  }, [reload])
+
+  useEffect(() => {
+    if (!selectedId || source !== 'api') return
+    const controller = new AbortController()
+    fetchCourseDetails(selectedId, controller.signal).then((course) => {
+      setDetails(course)
+      setDetailStatus('ready')
+    }).catch(() => {
+      if (!controller.signal.aborted) setDetailStatus('error')
+    })
+    return () => controller.abort()
+  }, [selectedId, source])
 
   function updateFilters(update: Partial<CatalogFilters>) {
     setFilters((current) => ({ ...current, ...update }))
     setVisibleCount(PAGE_SIZE)
+  }
+
+  function openCourse(course: CatalogCourse) {
+    setDetails(null)
+    setDetailStatus(source === 'api' ? 'loading' : 'ready')
+    setSelectedId(course.id)
   }
 
   function resetFilters() {
@@ -51,17 +94,22 @@ export default function CursosPage() {
         onToggle={() => setFiltersExpanded((current) => !current)}
         onChange={updateFilters}
         onReset={resetFilters}
+        categories={categories}
+        showPopular={source !== 'api'}
       />
-      {!isFiltered && <FeaturedCourseCard course={featuredCourse} onOpen={setSelectedCourse} />}
+      {source === 'fallback' && <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-ink-200 bg-panel p-4 text-xs text-ink-700"><span>Não foi possível carregar a API. Exibindo os cursos locais.</span><button type="button" onClick={() => { setSelectedId(null); setSource('loading'); setReload((current) => current + 1) }} className="inline-flex items-center gap-2 font-bold text-brand-blue-400 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"><RefreshCw className="h-4 w-4" aria-hidden="true" />Tentar novamente</button></div>}
+      {source !== 'loading' && !isFiltered && featured && <FeaturedCourseCard course={featured} onOpen={openCourse} />}
       <section aria-labelledby="catalog-title" className="flex min-w-0 flex-col gap-5">
         <h2 id="catalog-title" className="sr-only">
           Catálogo de cursos
         </h2>
-        {visibleCourses.length > 0 ? (
+        {source === 'loading' ? (
+          <div role="status" className="rounded-[22px] border border-ink-200/70 bg-panel px-6 py-14 text-center text-sm text-ink-500">Carregando cursos...</div>
+        ) : visibleCourses.length > 0 ? (
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {visibleCourses.map((course) => (
               <li key={course.id} className="min-w-0">
-                <CatalogCourseCard course={course} onOpen={setSelectedCourse} />
+                <CatalogCourseCard course={course} onOpen={openCourse} />
               </li>
             ))}
           </ul>
@@ -83,7 +131,7 @@ export default function CursosPage() {
             </button>
           </div>
         )}
-        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3 pb-1">
+        {source !== 'loading' && <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3 pb-1">
           <p
             role="status"
             aria-atomic="true"
@@ -103,10 +151,10 @@ export default function CursosPage() {
               Ver mais cursos <ChevronDown className="h-4 w-4" aria-hidden="true" />
             </button>
           )}
-        </div>
+        </div>}
       </section>
       {selectedCourse && (
-        <CourseCatalogDialog course={selectedCourse} onClose={() => setSelectedCourse(null)} />
+        <CourseCatalogDialog course={selectedCourse} loading={detailStatus === 'loading'} error={detailStatus === 'error'} onClose={() => { setSelectedId(null); setDetails(null); setDetailStatus('ready') }} />
       )}
     </div>
   )

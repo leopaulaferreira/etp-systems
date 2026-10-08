@@ -1,5 +1,5 @@
 import { Search, SlidersHorizontal, X } from 'lucide-react'
-import { courseCategories, courseLevels } from '../../../mocks/cursos.mock'
+import { courseLevels } from '../../../mocks/cursos.mock'
 import type { CatalogFilters, CourseOrder } from '../catalog'
 
 type CatalogToolbarProps = {
@@ -8,6 +8,8 @@ type CatalogToolbarProps = {
   onToggle: () => void
   onChange: (update: Partial<CatalogFilters>) => void
   onReset: () => void
+  categories: string[]
+  showPopular: boolean
 }
 
 const selectClass =
@@ -19,6 +21,8 @@ export default function CatalogToolbar({
   onToggle,
   onChange,
   onReset,
+  categories,
+  showPopular,
 }: CatalogToolbarProps) {
   const activeCount = Number(filters.category !== 'Todas') + Number(filters.level !== 'Todos')
   const hasFilters = activeCount > 0 || filters.query.trim().length > 0
@@ -48,7 +52,7 @@ export default function CatalogToolbar({
             className="min-h-12 min-w-0 flex-1 bg-panel py-3 text-sm text-ink-700 outline-none"
           >
             <option value="relevance">Mais relevantes</option>
-            <option value="popular">Mais populares</option>
+            {showPopular && <option value="popular">Mais populares</option>}
             <option value="duration">Menor duração</option>
             <option value="title">Nome (A–Z)</option>
           </select>
@@ -86,7 +90,7 @@ export default function CatalogToolbar({
               className={selectClass}
             >
               <option value="Todas">Todas as categorias</option>
-              {courseCategories.map((category) => (
+              {categories.map((category) => (
                 <option key={category}>{category}</option>
               ))}
             </select>
