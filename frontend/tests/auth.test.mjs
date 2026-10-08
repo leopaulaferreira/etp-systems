@@ -100,6 +100,9 @@ test('token expirado ou rejeitado é removido', async t => {
   await session.restore()
   assert.equal(session.getSnapshot().expired, true)
   assert.equal(map.size, 0)
+  // StrictMode pode repetir a restauração na montagem; o aviso deve permanecer.
+  await session.restore()
+  assert.equal(session.getSnapshot().expired, true)
   map.set('etp-auth-session-v1', JSON.stringify({ accessToken: 'revoked', expiresAt: 9000 }))
   t.mock.method(globalThis, 'fetch', async () => response({}, 401))
   await session.restore()

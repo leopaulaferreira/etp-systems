@@ -1,48 +1,48 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
-import { readMockRole, readMockSession, writeMockSession, type AccountRole } from './auth.mock'
-import { company } from '../mocks/company.mock'
+import { createContext, useContext, useEffect, useSyncExternalStore, type ReactNode } from 'react'
+import { roleForUser, type AccountRole, type AuthUser } from './auth'
+import { authSession } from './session'
 
 type AuthContextValue = {
   isAuthenticated: boolean
+  status: ReturnType<typeof authSession.getSnapshot>['status']
+  expired: boolean
+  user: AuthUser | null
   role: AccountRole
   companyId: string | null
-  login: (role?: AccountRole) => void
+  login: typeof authSession.login
   logout: () => void
+  retry: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
-/**
- * Provedor de autenticação do protótipo — implementação MOCK.
- *
- * Não valida credenciais nem fala com nenhuma API: existe apenas para que
- * rotas públicas/protegidas e o fluxo de login/logout funcionem de ponta a
- * ponta antes do backend (Spring Security/JWT) estar disponível.
- */
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(readMockSession)
-  const [role, setRole] = useState(readMockRole)
+  const session = useSyncExternalStore(authSession.subscribe, authSession.getSnapshot)
 
-  const value = useMemo<AuthContextValue>(
-    () => ({
-      isAuthenticated,
-      role,
-      companyId: isAuthenticated && role === 'empresa' ? company.id : null,
-      login: (nextRole = 'colaborador') => {
-        writeMockSession(true, nextRole)
-        setRole(nextRole)
-        setIsAuthenticated(true)
-      },
-      logout: () => {
-        writeMockSession(false)
-        setIsAuthenticated(false)
-        setRole('colaborador')
-      },
-    }),
-    [isAuthenticated, role],
-  )
+  useEffect(() => {
+    const controller = new AbortController()
+    void authSession.restore(controller.signal)
+    return () => controller.abort()
+  }, [])
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  useEffect(() => {
+    if (session.expiresAt === null) return
+    const timer = window.setTimeout(authSession.expireIfNeeded, Math.max(0, session.expiresAt - Date.now()))
+    window.addEventListener('focus', authSession.expireIfNeeded)
+    document.addEventListener('visibilitychange', authSession.expireIfNeeded)
+    return () => {
+      window.clearTimeout(timer)
+      window.removeEventListener('focus', authSession.expireIfNeeded)
+      document.removeEventListener('visibilitychange', authSession.expireIfNeeded)
+    }
+  }, [session.expiresAt])
+
+  return <AuthContext.Provider value={{
+    isAuthenticated: session.status === 'authenticated', status: session.status, expired: session.expired,
+    user: session.user, role: session.user ? roleForUser(session.user) : 'colaborador',
+    companyId: session.user?.empresaId ?? null,
+    login: authSession.login, logout: () => authSession.logout(), retry: () => authSession.restore(),
+  }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth(): AuthContextValue {

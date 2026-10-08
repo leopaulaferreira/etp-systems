@@ -1,7 +1,6 @@
 import type { Locale } from './loginTranslations'
 
 type SupportCopy = {
-  demo: string
   rememberEmail: string
   capsLock: string
   company: string
@@ -11,64 +10,101 @@ type SupportCopy = {
   privacy: string
   terms: string
   close: string
+  invalidCredentials: string
+  unavailable: string
+  roleMismatch: string
+  expiredSession: string
 }
 
 export const loginSupportCopy: Record<Locale, SupportCopy> = {
-  'pt-BR': {
-    demo: 'Versão demonstrativa',
-    rememberEmail: 'Lembrar meu e-mail',
-    capsLock: 'Caps Lock está ativado.',
-    company: 'Acesse o painel da empresa para acompanhar seus colaboradores.',
-    recovery: 'A recuperação de senha estará disponível com a autenticação real. Nesta demonstração, use um e-mail válido e uma senha de pelo menos 6 caracteres. Não use sua senha pessoal.',
-    signup: 'O cadastro institucional será disponibilizado com a integração da plataforma. Para explorar a demonstração, informe um e-mail válido e uma senha de pelo menos 6 caracteres.',
-    provider: 'O acesso com {provider} ainda não está integrado. Use o formulário para explorar a demonstração.',
-    privacy: 'Esta demonstração guarda preferências neste navegador. Ao marcar “Lembrar meu e-mail”, somente o e-mail é salvo. A senha não é armazenada nem enviada a um serviço de autenticação.',
-    terms: 'O ETP Systems é um projeto acadêmico em demonstração. Cursos, resultados e certificados são ilustrativos. O acesso ainda não valida uma identidade real.',
-    close: 'Entendi',
+  "pt-BR": {
+    rememberEmail: "Lembrar meu e-mail",
+    capsLock: "Caps Lock está ativado.",
+    company: "Acesse o painel da empresa para acompanhar seus colaboradores.",
+    recovery: "A recuperação de senha por e-mail ainda não está disponível. Procure o responsável pelo acesso da sua organização.",
+    signup: "O cadastro público ainda não está disponível. Solicite uma conta ao responsável pelo ETP na sua organização.",
+    provider: "O acesso com {provider} ainda não está integrado. Entre com o e-mail e a senha da sua conta ETP.",
+    privacy: "Sua senha é enviada à API para autenticação e não é salva no navegador. O token de acesso fica nesta aba até sair ou expirar. Lembrar meu e-mail salva somente o endereço para o próximo acesso.",
+    terms: "O ETP Systems é um projeto acadêmico. O acesso exige uma conta cadastrada. Cursos, progresso e certificados ainda incluem conteúdo ilustrativo.",
+    close: "Entendi",
+    invalidCredentials: "E-mail ou senha inválidos. Confira os dados e tente novamente.",
+    unavailable: "Não foi possível entrar agora. Confira sua conexão e tente novamente.",
+    roleMismatch: "Esta conta pertence ao outro perfil. Selecione Colaborador ou Empresa / RH conforme seu cadastro.",
+    expiredSession: "Sua sessão expirou ou foi encerrada. Entre novamente para continuar.",
   },
-  en: {
-    demo: 'Demo version', rememberEmail: 'Remember my email', capsLock: 'Caps Lock is on.',
-    company: 'Access your company dashboard to follow employee learning.',
-    recovery: 'Password recovery will be available with real authentication. For this demo, use a valid email and at least 6 password characters. Do not use your personal password.',
-    signup: 'Institutional registration will be available after integration. Explore this demo with a valid email and at least 6 password characters.',
-    provider: '{provider} sign-in is not connected yet. Use the form to explore the demo.',
-    privacy: 'This demo stores preferences in your browser. “Remember my email” saves only your email. Passwords are neither stored nor sent to an authentication service.',
-    terms: 'ETP Systems is an academic demo. Courses, results and certificates are illustrative. Sign-in does not verify a real identity.', close: 'Got it',
+  "en": {
+    rememberEmail: "Remember my email",
+    capsLock: "Caps Lock is on.",
+    company: "Access your company dashboard to follow employee learning.",
+    recovery: "Password recovery by email is not available yet. Contact the person responsible for access at your organization.",
+    signup: "Public registration is not available yet. Request an account from your organization’s ETP contact.",
+    provider: "{provider} sign-in is not connected yet. Use your ETP account email and password.",
+    privacy: "Your password is sent to the API for authentication and is not saved in the browser. The access token stays in this tab until sign-out or expiry. Remember my email saves only your address.",
+    terms: "ETP Systems is an academic project. Access requires a registered account. Courses, progress and certificates still include sample content.",
+    close: "Got it",
+    invalidCredentials: "Invalid email or password. Check your details and try again.",
+    unavailable: "Unable to sign in right now. Check your connection and try again.",
+    roleMismatch: "This account belongs to the other access type. Select Employee or Company / HR to match your account.",
+    expiredSession: "Your session has expired or ended. Sign in again to continue.",
   },
-  es: {
-    demo: 'Versión de demostración', rememberEmail: 'Recordar mi correo', capsLock: 'Bloq Mayús está activado.',
-    company: 'Accede al panel de la empresa para seguir el aprendizaje de tus colaboradores.',
-    recovery: 'La recuperación estará disponible con la autenticación real. Usa un correo válido y una contraseña de al menos 6 caracteres. No uses tu contraseña personal.',
-    signup: 'El registro institucional estará disponible después de la integración. Explora la demo con un correo válido y al menos 6 caracteres de contraseña.',
-    provider: 'El acceso con {provider} aún no está integrado. Usa el formulario para explorar la demo.',
-    privacy: 'Esta demo guarda preferencias en tu navegador. “Recordar mi correo” guarda solo el correo. No se guarda ni se envía la contraseña a un servicio de autenticación.',
-    terms: 'ETP Systems es una demostración académica. Los cursos, resultados y certificados son ilustrativos. El acceso no verifica una identidad real.', close: 'Entendido',
+  "es": {
+    rememberEmail: "Recordar mi correo",
+    capsLock: "Bloq Mayús está activado.",
+    company: "Accede al panel de la empresa para seguir el aprendizaje de tus colaboradores.",
+    recovery: "La recuperación por correo aún no está disponible. Contacta al responsable de acceso de tu organización.",
+    signup: "El registro público aún no está disponible. Solicita una cuenta al responsable de ETP de tu organización.",
+    provider: "El acceso con {provider} aún no está integrado. Usa el correo y la contraseña de tu cuenta ETP.",
+    privacy: "Tu contraseña se envía a la API para autenticarte y no se guarda en el navegador. El token permanece en esta pestaña hasta salir o caducar. Recordar mi correo guarda solo tu dirección.",
+    terms: "ETP Systems es un proyecto académico. El acceso requiere una cuenta registrada. Los cursos, avances y certificados aún incluyen contenido ilustrativo.",
+    close: "Entendido",
+    invalidCredentials: "Correo o contraseña incorrectos. Revisa los datos e inténtalo de nuevo.",
+    unavailable: "No se pudo iniciar sesión. Comprueba tu conexión e inténtalo de nuevo.",
+    roleMismatch: "Esta cuenta pertenece al otro perfil. Selecciona Colaborador o Empresa / RR. HH. según tu cuenta.",
+    expiredSession: "Tu sesión ha caducado o finalizado. Vuelve a iniciar sesión.",
   },
-  fr: {
-    demo: 'Version de démonstration', rememberEmail: 'Mémoriser mon e-mail', capsLock: 'Verr. Maj est activé.',
-    company: 'Accédez au tableau de bord de votre entreprise pour suivre vos collaborateurs.',
-    recovery: 'La récupération sera disponible avec une authentification réelle. Utilisez un e-mail valide et au moins 6 caractères. Ne saisissez pas votre mot de passe personnel.',
-    signup: 'L’inscription sera disponible après intégration. Explorez la démo avec un e-mail valide et au moins 6 caractères pour le mot de passe.',
-    provider: 'La connexion avec {provider} n’est pas encore intégrée. Utilisez le formulaire pour explorer la démo.',
-    privacy: 'Cette démo conserve les préférences dans votre navigateur. Seul votre e-mail est mémorisé si vous le choisissez. Le mot de passe n’est ni enregistré ni envoyé à un service d’authentification.',
-    terms: 'ETP Systems est une démonstration académique. Les cours, résultats et certificats sont illustratifs. La connexion ne vérifie pas une identité réelle.', close: 'Compris',
+  "fr": {
+    rememberEmail: "Mémoriser mon e-mail",
+    capsLock: "Verr. Maj est activé.",
+    company: "Accédez au tableau de bord de votre entreprise pour suivre vos collaborateurs.",
+    recovery: "La récupération par e-mail est encore indisponible. Contactez le responsable des accès de votre organisation.",
+    signup: "L’inscription publique est encore indisponible. Demandez un compte au responsable ETP de votre organisation.",
+    provider: "La connexion avec {provider} n’est pas encore intégrée. Utilisez l’e-mail et le mot de passe de votre compte ETP.",
+    privacy: "Votre mot de passe est envoyé à l’API pour vous authentifier et n’est pas enregistré dans le navigateur. Le jeton reste dans cet onglet jusqu’à la déconnexion ou son expiration. Seule votre adresse e-mail est mémorisée sur demande.",
+    terms: "ETP Systems est un projet académique. L’accès exige un compte enregistré. Les cours, progressions et certificats incluent encore des exemples.",
+    close: "Compris",
+    invalidCredentials: "E-mail ou mot de passe incorrect. Vérifiez vos informations.",
+    unavailable: "Connexion impossible pour le moment. Vérifiez votre connexion et réessayez.",
+    roleMismatch: "Ce compte appartient à l’autre profil. Sélectionnez Collaborateur ou Entreprise / RH selon votre compte.",
+    expiredSession: "Votre session a expiré ou a pris fin. Connectez-vous à nouveau.",
   },
-  de: {
-    demo: 'Demoversion', rememberEmail: 'E-Mail merken', capsLock: 'Feststelltaste ist aktiviert.',
-    company: 'Verfolgen Sie den Lernfortschritt Ihrer Mitarbeitenden im Unternehmensdashboard.',
-    recovery: 'Die Wiederherstellung folgt mit echter Anmeldung. Verwenden Sie eine gültige E-Mail und mindestens 6 Passwortzeichen. Verwenden Sie kein persönliches Passwort.',
-    signup: 'Die Registrierung folgt nach der Integration. Erkunden Sie die Demo mit einer gültigen E-Mail und mindestens 6 Passwortzeichen.',
-    provider: 'Die Anmeldung mit {provider} ist noch nicht verbunden. Verwenden Sie das Formular für die Demo.',
-    privacy: 'Diese Demo speichert Einstellungen im Browser. Auf Wunsch wird nur die E-Mail gespeichert. Passwörter werden weder gespeichert noch an einen Anmeldedienst gesendet.',
-    terms: 'ETP Systems ist ein akademisches Demoprojekt. Kurse, Ergebnisse und Zertifikate dienen zur Illustration. Die Anmeldung prüft keine echte Identität.', close: 'Verstanden',
+  "de": {
+    rememberEmail: "E-Mail merken",
+    capsLock: "Feststelltaste ist aktiviert.",
+    company: "Verfolgen Sie den Lernfortschritt Ihrer Mitarbeitenden im Unternehmensdashboard.",
+    recovery: "Die Wiederherstellung per E-Mail ist noch nicht verfügbar. Wenden Sie sich an die zuständige Person Ihrer Organisation.",
+    signup: "Die öffentliche Registrierung ist noch nicht verfügbar. Fordern Sie ein Konto bei Ihrer ETP-Ansprechperson an.",
+    provider: "Die Anmeldung mit {provider} ist noch nicht integriert. Verwenden Sie E-Mail und Passwort Ihres ETP-Kontos.",
+    privacy: "Ihr Passwort wird zur Anmeldung an die API gesendet und nicht im Browser gespeichert. Der Zugriffstoken bleibt bis zur Abmeldung oder zum Ablauf in diesem Tab. Auf Wunsch wird nur Ihre E-Mail-Adresse gespeichert.",
+    terms: "ETP Systems ist ein akademisches Projekt. Der Zugang erfordert ein registriertes Konto. Kurse, Fortschritte und Zertifikate enthalten weiterhin Beispieldaten.",
+    close: "Verstanden",
+    invalidCredentials: "E-Mail oder Passwort ungültig. Prüfen Sie Ihre Eingaben.",
+    unavailable: "Anmeldung derzeit nicht möglich. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    roleMismatch: "Dieses Konto gehört zum anderen Profil. Wählen Sie Mitarbeiter oder Unternehmen / HR entsprechend Ihrem Konto.",
+    expiredSession: "Ihre Sitzung ist abgelaufen oder beendet. Melden Sie sich erneut an.",
   },
-  it: {
-    demo: 'Versione dimostrativa', rememberEmail: 'Ricorda la mia e-mail', capsLock: 'Bloc Maiusc è attivo.',
-    company: 'Accedi al pannello aziendale per seguire i progressi dei collaboratori.',
-    recovery: 'Il recupero sarà disponibile con l’autenticazione reale. Usa un’e-mail valida e almeno 6 caratteri per la password. Non usare la tua password personale.',
-    signup: 'La registrazione sarà disponibile dopo l’integrazione. Esplora la demo con un’e-mail valida e almeno 6 caratteri per la password.',
-    provider: 'L’accesso con {provider} non è ancora integrato. Usa il modulo per esplorare la demo.',
-    privacy: 'Questa demo salva le preferenze nel browser. Su richiesta viene salvata solo l’e-mail. La password non viene salvata né inviata a un servizio di autenticazione.',
-    terms: 'ETP Systems è una demo accademica. Corsi, risultati e certificati sono illustrativi. L’accesso non verifica un’identità reale.', close: 'Ho capito',
+  "it": {
+    rememberEmail: "Ricorda la mia e-mail",
+    capsLock: "Bloc Maiusc è attivo.",
+    company: "Accedi al pannello aziendale per seguire i progressi dei collaboratori.",
+    recovery: "Il recupero tramite e-mail non è ancora disponibile. Contatta il responsabile degli accessi della tua organizzazione.",
+    signup: "La registrazione pubblica non è ancora disponibile. Richiedi un account al referente ETP della tua organizzazione.",
+    provider: "L’accesso con {provider} non è ancora integrato. Usa e-mail e password del tuo account ETP.",
+    privacy: "La password viene inviata all’API per autenticarti e non viene salvata nel browser. Il token rimane in questa scheda fino all’uscita o alla scadenza. Ricorda la mia e-mail salva solo il tuo indirizzo.",
+    terms: "ETP Systems è un progetto accademico. L’accesso richiede un account registrato. Corsi, progressi e certificati includono ancora contenuti illustrativi.",
+    close: "Ho capito",
+    invalidCredentials: "E-mail o password non valide. Controlla i dati e riprova.",
+    unavailable: "Accesso non disponibile al momento. Controlla la connessione e riprova.",
+    roleMismatch: "Questo account appartiene all’altro profilo. Seleziona Collaboratore o Azienda / HR secondo il tuo account.",
+    expiredSession: "La sessione è scaduta o terminata. Accedi di nuovo.",
   },
 }

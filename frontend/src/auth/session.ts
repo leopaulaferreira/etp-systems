@@ -63,7 +63,7 @@ export function createAuthSession(storage: () => SessionStorage = () => window.s
   async function restore(signal?: AbortSignal) {
     const current = ++revision
     credentials ??= read()
-    if (!credentials) { logout(); return }
+    if (!credentials) { logout(snapshot.expired); return }
     if (credentials.expiresAt <= now()) { logout(true); return }
     publish({ status: 'checking', user: null, expiresAt: credentials.expiresAt, expired: false })
     try {

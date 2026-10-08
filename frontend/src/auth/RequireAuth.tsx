@@ -1,8 +1,8 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from './AuthContext'
-import { homeForRole, type AccountRole } from './auth.mock'
+import { homeForRole, type AccountRole } from './auth'
 
-/** Bloqueia rotas protegidas enquanto não há sessão mock ativa. */
+/** A sessão foi validada na API antes de liberar a navegação. */
 export default function RequireAuth({ role: requiredRole }: { role?: AccountRole }) {
   const { isAuthenticated, role } = useAuth()
   const location = useLocation()

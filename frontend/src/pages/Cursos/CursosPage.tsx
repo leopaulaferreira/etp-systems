@@ -3,6 +3,7 @@ import { BookOpen, ChevronDown, RefreshCw, SearchX } from 'lucide-react'
 import { catalogCourses, courseCategories, featuredCourse, type CatalogCourse } from '../../mocks/cursos.mock'
 import { initialFilters, selectCourses, type CatalogFilters } from './catalog'
 import { fetchCourseDetails, fetchCourses } from './courseApi'
+import { ApiError } from '../../api/client'
 import CatalogCourseCard from './components/CatalogCourseCard'
 import CatalogToolbar from './components/CatalogToolbar'
 import CourseCatalogDialog from './components/CourseCatalogDialog'
@@ -37,8 +38,9 @@ export default function CursosPage() {
       setCourses(data)
       setSource('api')
       setFilters((current) => current.order === 'popular' ? { ...current, order: 'relevance' } : current)
-    }).catch(() => {
+    }).catch((error) => {
       if (controller.signal.aborted) return
+      if (error instanceof ApiError && error.status === 401) return
       setCourses(catalogCourses)
       setSource('fallback')
     })

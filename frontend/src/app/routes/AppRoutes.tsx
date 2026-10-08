@@ -2,7 +2,6 @@ import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import RequireAuth from '../../auth/RequireAuth'
 import AppLayout from '../../layouts/AppLayout'
-import LoginPage from '../../pages/Login/LoginPage'
 import DashboardPage from '../../pages/Dashboard/DashboardPage'
 import TrilhasPage from '../../pages/Trilhas/TrilhasPage'
 import CursosPage from '../../pages/Cursos/CursosPage'
@@ -13,9 +12,10 @@ import RelatoriosPage from '../../pages/Relatorios/RelatoriosPage'
 import PerfilPage from '../../pages/Perfil/PerfilPage'
 import ConfiguracoesPage from '../../pages/Configuracoes/ConfiguracoesPage'
 import { useAuth } from '../../auth/AuthContext'
-import { homeForRole } from '../../auth/auth.mock'
+import { homeForRole } from '../../auth/auth'
 
 const AjudaPage = lazy(() => import('../../pages/Ajuda/AjudaPage'))
+const LoginPage = lazy(() => import('../../pages/Login/LoginPage'))
 const EmpresaPage = lazy(() => import('../../pages/Empresa/EmpresaPage'))
 
 const ColaboradoresPage = lazy(() => import('../../pages/Empresa/ColaboradoresPage'))
@@ -30,7 +30,7 @@ function HomeRedirect() {
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/login" element={<Suspense fallback={<p role="status" className="p-6 text-sm text-ink-500">Carregando acesso...</p>}><LoginPage /></Suspense>} />
 
       <Route element={<RequireAuth />}>
         <Route element={<AppLayout />}>

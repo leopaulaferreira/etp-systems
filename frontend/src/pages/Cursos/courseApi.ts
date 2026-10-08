@@ -1,4 +1,5 @@
 import type { CatalogCourse, CourseIcon, CourseLevel } from '../../mocks/cursos.mock'
+import { authSession } from '../../auth/session.ts'
 
 const icons = new Set<CourseIcon>([
   'cloud', 'python', 'communication', 'ai', 'security', 'governance',
@@ -31,20 +32,14 @@ export function parseCourse(value: unknown): CatalogCourse {
   }
 }
 
-async function request(path: string, signal?: AbortSignal): Promise<unknown> {
-  const response = await fetch(path, { signal, headers: { Accept: 'application/json' } })
-  if (!response.ok) throw new Error(`API de cursos indisponível (${response.status})`)
-  return response.json() as Promise<unknown>
-}
-
 export async function fetchCourses(signal?: AbortSignal): Promise<CatalogCourse[]> {
-  const result = await request('/api/cursos', signal)
+  const result = await authSession.request('/api/cursos', signal)
   if (!Array.isArray(result)) throw new Error('Resposta do catálogo inválida')
   return result.map(parseCourse)
 }
 
 export async function fetchCourseDetails(id: string, signal?: AbortSignal): Promise<CatalogCourse> {
-  const course = parseCourse(await request(`/api/cursos/${encodeURIComponent(id)}`, signal))
+  const course = parseCourse(await authSession.request(`/api/cursos/${encodeURIComponent(id)}`, signal))
   if (course.id !== id) throw new Error('O curso recebido não corresponde ao solicitado')
   return course
 }

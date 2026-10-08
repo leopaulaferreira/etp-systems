@@ -2,7 +2,6 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { employees, company } from '../src/mocks/company.mock.ts'
 import { companyEmployees, companySummary, employeeProgress, employeeStatus, filterEmployees, averageScore, recentCompletions } from '../src/pages/Empresa/company.ts'
-import { readMockSession, readMockRole, writeMockSession, homeForRole } from '../src/auth/auth.mock.ts'
 
 test('indicadores correspondem às inscrições e notas dos colaboradores', () => {
   const summary = companySummary(employees)
@@ -45,25 +44,4 @@ test('conclusões recentes são ordenadas e têm certificado associado ao colabo
   assert.deepEqual(recent.map(({ employee }) => employee.id), ['carla', 'ana', 'gabriel'])
   assert.ok(recent.every(({ course }) => course.progress === 100 && course.certificateCode))
   assert.deepEqual(employees, original)
-})
-
-test('sessão mantém o perfil, aceita sessões antigas e limpa ambos os valores no logout', () => {
-  const storage = new Map()
-  const previousWindow = globalThis.window
-  globalThis.window = { sessionStorage: { getItem: (key) => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value), removeItem: (key) => storage.delete(key) } }
-  try {
-    writeMockSession(true, 'empresa')
-    assert.equal(readMockSession(), true)
-    assert.equal(readMockRole(), 'empresa')
-    assert.equal(homeForRole(readMockRole()), '/empresa/dashboard')
-    writeMockSession(false)
-    assert.equal(readMockSession(), false)
-    assert.equal(readMockRole(), 'colaborador')
-    assert.equal(storage.size, 0)
-    storage.set('etp-mock-session', 'true')
-    assert.equal(readMockRole(), 'colaborador')
-    assert.equal(homeForRole(readMockRole()), '/dashboard')
-    writeMockSession(true, 'colaborador')
-    assert.equal(readMockRole(), 'colaborador')
-  } finally { globalThis.window = previousWindow }
 })

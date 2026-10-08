@@ -1,5 +1,5 @@
 import { type FormEvent, useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import {
   ArrowRight, BadgeCheck, Building2, ChevronDown, Eye, EyeOff, Globe,
   GraduationCap, LockKeyhole, Mail, Route, TrendingUp, UserRound,
@@ -13,7 +13,9 @@ import LoginBackdrop from './components/LoginBackdrop'
 import LoginIllustration from './components/LoginIllustration'
 import CertificateDialog from '../Certificados/components/CertificateDialog'
 import { useAuth } from '../../auth/AuthContext'
-import { homeForRole } from '../../auth/auth.mock'
+import { homeForRole } from '../../auth/auth'
+import { AccountRoleError } from '../../auth/session'
+import { ApiError } from '../../api/client'
 import etpSymbol from '../../assets/etp-symbol-white.svg'
 import { languageOptions, loginTranslations, type Locale } from './loginTranslations'
 import { loginSupportCopy } from './loginSupportCopy'
@@ -35,8 +37,7 @@ function getInitialLocale(): Locale {
 }
 
 export default function LoginPage() {
-  const navigate = useNavigate()
-  const { login } = useAuth()
+  const { login, isAuthenticated, role, expired } = useAuth()
   const [locale, setLocale] = useState<Locale>(getInitialLocale)
   const [accountType, setAccountType] = useState<AccountType>('colaborador')
   const [email, setEmail] = useState(() => readSaved(EMAIL_KEY))
@@ -47,9 +48,10 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [help, setHelp] = useState<HelpTopic | null>(null)
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
+  const [submitError, setSubmitError] = useState<'invalidCredentials' | 'unavailable' | 'roleMismatch' | null>(null)
   const emailRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
-  const submitTimer = useRef<number | undefined>(undefined)
+  const request = useRef<AbortController | null>(null)
   const copy = loginTranslations[locale]
   const support = loginSupportCopy[locale]
 
@@ -59,9 +61,9 @@ export default function LoginPage() {
     try { window.localStorage.setItem('etp-locale', locale) } catch { /* Idioma disponível nesta sessão. */ }
     return () => { document.documentElement.lang = previous }
   }, [locale])
-  useEffect(() => () => window.clearTimeout(submitTimer.current), [])
+  useEffect(() => () => request.current?.abort(), [])
 
-  function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     if (loading) return
     const normalizedEmail = email.trim()
@@ -69,8 +71,8 @@ export default function LoginPage() {
     if (!normalizedEmail) nextErrors.email = copy.errors.emailRequired
     else if (!emailPattern.test(normalizedEmail)) nextErrors.email = copy.errors.emailInvalid
     if (!password) nextErrors.password = copy.errors.passwordRequired
-    else if (password.length < 6) nextErrors.password = copy.errors.passwordLength
     setErrors(nextErrors)
+    setSubmitError(null)
     if (nextErrors.email || nextErrors.password) {
       if (nextErrors.email) emailRef.current?.focus()
       else passwordRef.current?.focus()
@@ -78,14 +80,23 @@ export default function LoginPage() {
     }
     setEmail(normalizedEmail)
     setLoading(true)
-    submitTimer.current = window.setTimeout(() => {
+    const controller = new AbortController()
+    request.current = controller
+    try {
+      await login(normalizedEmail, password, accountType, controller.signal)
       try {
         if (rememberEmail) localStorage.setItem(EMAIL_KEY, normalizedEmail)
         else localStorage.removeItem(EMAIL_KEY)
-      } catch { /* O login demonstrativo não depende de armazenamento local. */ }
-      login(accountType)
-      navigate(homeForRole(accountType), { replace: true })
-    }, 600)
+      } catch { /* Lembrar o e-mail é opcional. */ }
+      setPassword('')
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        setSubmitError(error instanceof AccountRoleError ? 'roleMismatch'
+          : error instanceof ApiError && (error.status === 401 || error.status === 400) ? 'invalidCredentials' : 'unavailable')
+      }
+    } finally {
+      if (!controller.signal.aborted) setLoading(false)
+    }
   }
 
   const helpTitle = help === 'recovery' ? copy.recoverPassword
@@ -95,6 +106,8 @@ export default function LoginPage() {
   const helpMessage = help === 'Google' || help === 'Microsoft'
     ? support.provider.replace('{provider}', help)
     : help ? support[help] : ''
+
+  if (isAuthenticated) return <Navigate to={homeForRole(role)} replace />
 
   return (
     <main className="login-shell">
@@ -146,7 +159,7 @@ export default function LoginPage() {
                 ['colaborador', copy.collaborator, UserRound],
                 ['empresa', copy.company, Building2],
               ] as const).map(([type, label, Icon]) => (
-                <button key={type} type="button" aria-pressed={accountType === type} onClick={() => setAccountType(type)} disabled={loading}>
+                <button key={type} type="button" aria-pressed={accountType === type} onClick={() => { setAccountType(type); setSubmitError(null) }} disabled={loading}>
                   <Icon size={16} strokeWidth={1.7} aria-hidden="true" />{label}
                 </button>
               ))}
@@ -154,6 +167,8 @@ export default function LoginPage() {
             {accountType === 'empresa' && <p className="login-company-note" role="status">{support.company}</p>}
 
             <form className="login-form" onSubmit={handleSubmit} noValidate aria-busy={loading}>
+              {expired && !submitError && <p role="status" className="rounded-xl border border-brand-blue-400/20 bg-brand-blue-500/10 p-3 text-xs leading-5 text-brand-blue-400">{support.expiredSession}</p>}
+              {submitError && <p role="alert" className="rounded-xl border border-red-400/20 bg-red-400/10 p-3 text-xs leading-5 text-red-400">{support[submitError]}</p>}
               <Input
                 ref={emailRef} id="email" label={copy.email} type="email"
                 placeholder={copy.emailPlaceholder} icon={<Mail size={17} strokeWidth={1.6} aria-hidden="true" />}

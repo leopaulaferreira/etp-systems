@@ -1,5 +1,6 @@
 import { BrowserRouter } from 'react-router-dom'
-import { AuthProvider } from '../auth/AuthContext'
+import { AuthProvider, useAuth } from '../auth/AuthContext'
+import SessionGate from '../auth/SessionGate'
 import { ProfileProvider } from '../profile/ProfileContext'
 import { AssessmentProvider } from '../assessments/AssessmentContext'
 import AppRoutes from './routes/AppRoutes'
@@ -9,12 +10,17 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ProfileProvider>
-          <AssessmentProvider>
-            <AccessibilityProvider><AppRoutes /></AccessibilityProvider>
-          </AssessmentProvider>
-        </ProfileProvider>
+        <SessionGate><SessionContent /></SessionGate>
       </AuthProvider>
     </BrowserRouter>
   )
+}
+
+function SessionContent() {
+  const { user } = useAuth()
+  return <ProfileProvider key={user?.id ?? 'guest'}>
+    <AssessmentProvider>
+      <AccessibilityProvider><AppRoutes /></AccessibilityProvider>
+    </AssessmentProvider>
+  </ProfileProvider>
 }
