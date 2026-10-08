@@ -6,6 +6,8 @@ import java.util.UUID;
 import br.com.etpsystems.company.Empresa;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -44,10 +47,11 @@ public class Usuario {
     @Column(name = "senha_hash", nullable = false, columnDefinition = "text")
     private String senhaHash;
 
-    @NotBlank
-    @Size(max = 50)
-    @Column(name = "perfil", length = 50)
-    private String perfil;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "perfil", nullable = false, length = 50)
+    private Perfil perfil;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empresa_id")
@@ -62,7 +66,7 @@ public class Usuario {
     protected Usuario() {
     }
 
-    public Usuario(String nome, String email, String senhaHash, String perfil, Empresa empresa) {
+    public Usuario(String nome, String email, String senhaHash, Perfil perfil, Empresa empresa) {
         this.nome = nome;
         this.email = email;
         this.senhaHash = senhaHash;
@@ -86,7 +90,7 @@ public class Usuario {
         return senhaHash;
     }
 
-    public String getPerfil() {
+    public Perfil getPerfil() {
         return perfil;
     }
 

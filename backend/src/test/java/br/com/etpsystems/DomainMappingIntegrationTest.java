@@ -9,6 +9,7 @@ import br.com.etpsystems.course.Categoria;
 import br.com.etpsystems.course.Curso;
 import br.com.etpsystems.track.Trilha;
 import br.com.etpsystems.user.Usuario;
+import br.com.etpsystems.user.Perfil;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -32,7 +33,7 @@ class DomainMappingIntegrationTest {
         entityManager.persist(categoria);
 
         Usuario usuario = new Usuario("Pessoa de teste", UUID.randomUUID() + "@example.test",
-                "hash-de-teste", "COLABORADOR", empresa);
+                "hash-de-teste", Perfil.COLABORADOR, empresa);
         Curso curso = new Curso("Curso de teste", "Conteúdo de teste", categoria);
         entityManager.persist(usuario);
         entityManager.persist(curso);
@@ -52,6 +53,7 @@ class DomainMappingIntegrationTest {
         Trilha trilhaCarregada = entityManager.find(Trilha.class, trilhaId);
 
         assertThat(carregado.getEmpresa().getId()).isEqualTo(empresa.getId());
+        assertThat(carregado.getPerfil()).isEqualTo(Perfil.COLABORADOR);
         assertThat(cursoCarregado.getCategoria().getId()).isEqualTo(categoria.getId());
         assertThat(trilhaCarregada.getEmpresa().getId()).isEqualTo(empresa.getId());
         assertThat(trilhaCarregada.getCursos()).extracting(Curso::getId).containsExactly(cursoId);
