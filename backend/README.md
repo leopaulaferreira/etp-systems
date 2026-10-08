@@ -1,19 +1,33 @@
 # Backend do ETP Systems
 
-API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. Esta primeira fase prepara a aplicação, a conexão com o banco, o health check e a documentação OpenAPI. As rotas de negócio e a autenticação entram nas próximas fases.
+API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. As duas primeiras fases preparam a aplicação, a conexão com o banco, o health check, a documentação OpenAPI e o mapeamento das entidades centrais. As rotas de negócio e a autenticação entram nas próximas fases.
 
 ## Estrutura
 
 ```text
 src/main/java/br/com/etpsystems/
 ├── EtpSystemsApplication.java
-└── config/
-    └── OpenApiConfig.java
+├── company/Empresa.java
+├── config/OpenApiConfig.java
+├── course/Categoria.java
+├── course/Curso.java
+├── track/Trilha.java
+└── user/Usuario.java
 ```
 
-Os módulos `auth`, `user`, `company`, `course`, `track`, `enrollment`, `progress`, `assessment`, `certificate`, `report` e `ai` serão criados à medida que suas regras forem implementadas. Cada módulo agrupará controller, service, repository, entity e DTO quando necessários.
+Os módulos `auth`, `enrollment`, `progress`, `assessment`, `certificate`, `report` e `ai` serão criados à medida que suas regras forem implementadas. Cada domínio agrupará controller, service, repository, entity e DTO quando necessários.
 
-O schema inicial está em [`../database/schema.sql`](../database/schema.sql). Nesta fase, o MySQL executa o script somente na primeira criação do volume. `spring.jpa.hibernate.ddl-auto=none` impede que Hibernate altere as tabelas. A modelagem e a validação das entidades ficam para a Fase 2.
+O schema inicial está em [`../database/schema.sql`](../database/schema.sql). O MySQL executa esse script somente na primeira criação do volume. Com `spring.jpa.hibernate.ddl-auto=validate`, a aplicação verifica o mapeamento na inicialização e não altera as tabelas.
+
+## Modelo atual
+
+- Um `Usuario` pertence a zero ou uma `Empresa`; uma empresa pode ter vários usuários.
+- Um `Curso` pertence a zero ou uma `Categoria`; uma categoria pode classificar vários cursos.
+- Uma `Trilha` pode pertencer a uma empresa e contém vários cursos; um curso pode participar de várias trilhas pela tabela `trilhas_cursos`.
+- As associações são navegáveis apenas pelo lado necessário nesta fase. Isso evita coleções grandes e carregamentos circulares em `Empresa`, `Categoria` e `Curso`.
+- Os identificadores são UUIDs armazenados como `CHAR(36)`. As datas continuam preenchidas pelo MySQL.
+
+O campo `usuarios.perfil` permanece textual porque o banco existente contém valores legados (`aluno` e `aluno_1`). A migração para os perfis definitivos será definida junto da autenticação. O catálogo do frontend também usa nível e duração; esses campos ainda não existem em `cursos` e precisarão de uma evolução do schema antes da API de cursos.
 
 ## Configuração local
 
@@ -45,6 +59,7 @@ O `.env` deve conter apenas variáveis no formato `CHAVE=valor`. Se a senha cont
 - `GET /actuator/health` retorna `{"status":"UP"}` quando a aplicação e o banco estão saudáveis.
 - `/swagger-ui/index.html` abre o Swagger UI.
 - `GET /v3/api-docs` fornece o documento OpenAPI JSON.
-- `mvn -f backend/pom.xml test` verifica os três endpoints com servidor HTTP de teste. O teste desativa apenas a conexão externa; a integração real com MySQL deve ser conferida ao iniciar pelo Compose.
+- `mvn -f backend/pom.xml test` verifica os três endpoints com servidor HTTP de teste. Esse teste desativa apenas a conexão externa.
+- Com o MySQL local ativo e as variáveis de `backend/.env` carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml -Dtest=DomainMappingIntegrationTest test` valida o schema e as cinco entidades com inserções revertidas ao final da transação. Sem `ETP_DB_TEST=true`, esse teste é ignorado para permitir execução sem banco.
 
 O Actuator expõe somente o endpoint de health. O frontend continua usando seus mocks até as APIs de domínio e autenticação estarem prontas.
