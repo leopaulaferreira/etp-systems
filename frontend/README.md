@@ -22,6 +22,12 @@ npm run dev
 
 Acesse `http://localhost:5173`.
 
+O login precisa do backend ativo. Configure e inicie os serviços conforme o
+[guia do backend](../backend/README.md). O Vite encaminha `/api` para a porta 8080
+por padrão. Para outra porta, copie `.env.example` para `.env.local` e ajuste
+`API_PROXY_TARGET` (por exemplo, `http://localhost:18080`). Nenhum segredo do backend
+deve ser copiado para o frontend. No Compose, o destino é `http://backend:8080`.
+
 ## Estrutura
 
 ```
@@ -31,10 +37,13 @@ frontend/
 │   │   ├── App.tsx                 # BrowserRouter + AuthProvider + AppRoutes
 │   │   └── routes/
 │   │       └── AppRoutes.tsx       # tabela de rotas (pública + protegidas)
-│   ├── auth/                       # autenticação MOCK (ver nota abaixo)
+│   ├── api/client.ts               # JSON, timeout e erros HTTP
+│   ├── auth/                       # autenticação pela API
 │   │   ├── AuthContext.tsx
 │   │   ├── RequireAuth.tsx
-│   │   └── auth.mock.ts
+│   │   ├── SessionGate.tsx
+│   │   ├── auth.ts
+│   │   └── session.ts
 │   ├── layouts/
 │   │   ├── AppLayout.tsx           # Sidebar + Topbar + <Outlet/>
 │   │   └── AppLayout.css
@@ -98,11 +107,44 @@ frontend/
 | `/configuracoes` | autenticada | `ConfiguracoesPage` — dados pessoais, preferências de estudo e notificações |
 | `/ajuda` | autenticada | `AjudaPage` — busca e categorias de FAQ, solicitação simulada de suporte |
 
-## Autenticação (MOCK)
+## Autenticação — Fase 5
 
-`src/auth/` contém uma sessão **mock** com perfil Colaborador ou Empresa. O login direciona ao painel correspondente, mantém o perfil ao recarregar e limpa a sessão no logout. A persistência passa por `useAuth()`. A separação de rotas organiza a interface, mas a autenticação e a autorização por empresa deverão ser implementadas na API (Spring Security/JWT). A integração também atualizará o envio de credenciais no login e os estados de erro/expiração.
+O formulário envia `{ email, senha }` a `POST /api/auth/login`. O perfil e a empresa
+vêm da API. Se a opção Colaborador/Empresa não corresponder à conta, o formulário
+orienta a trocar a seleção e não mantém o token retornado.
 
-O [Painel da empresa](src/pages/Empresa/README.md) usa um conjunto único de dados para indicadores, lista e resumos individuais.
+Somente token e validade ficam em `sessionStorage`, por aba. A senha nunca é
+persistida. Ao recarregar, `GET /api/auth/me` valida a sessão antes de liberar as
+rotas. As flags antigas do login mock são descartadas e não concedem acesso.
+Se o armazenamento estiver bloqueado, o acesso funciona apenas em memória.
+
+Expiração e respostas 401 encerram a sessão e pedem novo login. Respostas 403
+preservam a sessão e são repassadas à tela para tratamento. Falhas de rede na restauração
+oferecem retry ou retorno ao login; elas não liberam acesso nem simulam sucesso.
+O cliente usa timeout de 12 segundos e cancela requisições ao sair da tela.
+
+O logout limpa o token local. Não há renovação automática nem revogação individual
+no servidor: uma cópia do JWT permanece válida até expirar. O token em
+`sessionStorage` é acessível ao JavaScript desta origem; uma futura adoção de
+cookies HttpOnly exigirá adaptar o backend e a proteção CSRF.
+
+O catálogo envia Bearer nas consultas e conserva a alternativa local para falhas
+de disponibilidade. Um 401 encaminha para autenticação, sem ativar esse fallback.
+Cadastro, recuperação por e-mail e login Google/Microsoft continuam indisponíveis;
+os textos da tela explicam isso sem aceitar credenciais fictícias.
+
+Nome e e-mail iniciais vêm da conta real. Personalizações de perfil, preferências
+de estudo e configurações locais da empresa usam chaves por usuário. Avaliações
+em memória são reiniciadas quando a conta muda. O e-mail de acesso é somente
+leitura até existir uma API para alterá-lo.
+
+O [Painel da empresa](src/pages/Empresa/README.md) ainda usa dados sintéticos para
+indicadores e colaboradores. O UUID real da empresa permanece na sessão; os dados
+ilustrativos não são tratados como registros reais dessa organização.
+
+Validação: `npm run build`, `npm run lint`, `npm run test:auth` e
+`node --experimental-strip-types --test tests/*.test.mjs`. No navegador, verificar
+ambos os perfis, senha incorreta, recarga, logout, expiração, falha de rede e retry.
 
 ## Status atual
 
@@ -113,4 +155,5 @@ O [Painel da empresa](src/pages/Empresa/README.md) usa um conjunto único de dad
 - [x] **Avaliações** (`/avaliacoes`) — resumo, filtros, questões interativas, resultados e gráficos ([documentação](src/pages/Avaliacoes/README.md))
 - [ ] Demais páginas (Trilhas, Meus Cursos, Certificados, Relatórios, Perfil, Configurações) — hoje são placeholders (`ComingSoonPage`)
 
-O front-end ainda não está integrado a uma API real — os dados são fictícios/estáticos (`src/mocks/`) por enquanto.
+Login e catálogo de cursos usam a API real. Os demais domínios continuam com os
+dados de `src/mocks/` enquanto suas APIs são implementadas.

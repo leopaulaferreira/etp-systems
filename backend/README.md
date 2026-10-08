@@ -101,7 +101,7 @@ Entradas inválidas retornam 400; credenciais ou tokens inválidos retornam 401;
 
 A API usa Bearer sem cookies de sessão. O token expira após o prazo configurado; não há refresh token nem revogação individual nesta fase. Na futura integração, sair removerá o token do cliente, mas uma cópia continuará válida até expirar. `/api/auth/me` já rejeita usuário removido ou com perfil diferente do token.
 
-A Fase 4 não inclui cadastro público, confirmação/recuperação por e-mail nem login Google/Microsoft. A tela de login ainda usa a sessão mock; sua troca pela API e o tratamento de expiração no React pertencem à Fase 5.
+A Fase 4 não inclui cadastro público, confirmação/recuperação por e-mail nem login Google/Microsoft. A Fase 5 conecta a tela de login à API: o React valida a sessão por `/api/auth/me` ao recarregar e trata expiração e falhas de conexão. Consulte o [guia do frontend](../frontend/README.md).
 
 ## Verificação
 
@@ -113,4 +113,4 @@ A Fase 4 não inclui cadastro público, confirmação/recuperação por e-mail n
 - Com MySQL ativo e as variáveis locais carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml verify` inclui os testes de entidades, catálogo e autenticação com banco real. Sem essa variável, os três testes de banco são ignorados.
 - `AuthDatabaseIntegrationTest` cria contas e empresa temporárias com identificadores únicos, valida BCrypt/login e inicialização repetida, e remove os registros ao terminar. `DomainMappingIntegrationTest` reverte suas inserções por transação. As migrações Flyway permanecem aplicadas.
 
-O Actuator expõe somente o endpoint de health. A página Cursos usa esta API e recorre ao mock local se a consulta falhar; a integração do login e dos demais domínios permanece para fases futuras.
+O Actuator expõe somente o endpoint de health. Login e catálogo já estão integrados ao frontend. A página Cursos recorre ao mock local em falhas de disponibilidade; respostas 401 encerram a sessão. Os demais domínios serão integrados nas próximas fases.

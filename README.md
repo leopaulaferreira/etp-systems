@@ -129,8 +129,8 @@ conectando o usuário às principais áreas da aplicação.
 - separação entre perfis de acesso;
 - logout.
 
-O backend já oferece login com BCrypt e JWT. A autenticação do frontend ainda usa
-dados fictícios; a conexão da tela com essa API será feita na Fase 5.
+O login do frontend está integrado à API com BCrypt e JWT. A sessão é validada ao
+recarregar, respeita os perfis Colaborador e Empresa e é encerrada no logout ou na expiração.
 
 ---
 

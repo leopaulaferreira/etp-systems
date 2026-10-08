@@ -27,21 +27,23 @@ sem gestão ou matrícula em trilhas nesta página.
 
 ## Sessão e navegação
 
-AuthContext guarda o perfil escolhido e o ID da empresa do mock. O perfil persiste
-em sessionStorage; sessões anteriores sem perfil são tratadas como colaborador.
-Logout remove sessão e perfil. RequireAuth redireciona acessos ao painel do outro
-perfil; sidebar e topbar exibem a navegação e a identidade correspondentes.
+AuthContext recebe perfil, identidade e UUID real da empresa pela API de autenticação.
+O token persiste em sessionStorage e a recarga valida a sessão por `/api/auth/me`.
+Logout remove o token; flags de sessões mock antigas são ignoradas. RequireAuth
+redireciona acessos ao painel do outro perfil; sidebar e topbar exibem a navegação
+e a identidade correspondentes.
 Ajuda é compartilhada e seus links respeitam o perfil.
 
-Essas regras servem para o fluxo do protótipo. Não representam autenticação ou
-isolamento de dados seguros: na integração, a API deverá validar a identidade,
-as permissões e o vínculo empresarial em todas as consultas.
+A autenticação já é real, mas indicadores, colaboradores e resultados continuam
+usando exclusivamente o conjunto sintético do mock, separado do UUID da sessão.
+A futura API de Empresa/RH deverá filtrar os registros pelo vínculo do usuário
+autenticado e validar as permissões em todas as consultas.
 
 ## Validação
 
 `npm run test:empresa` cobre indicadores, isolamento da seleção, ausência de notas,
-zero real, filtros, ordenação, persistência e limpeza de sessão. As outras quatro
-suítes do frontend, build e lint também foram executados.
+zero real, filtros e ordenação. `npm run test:auth` cobre a sessão e suas falhas.
+As demais suítes do frontend, build e lint também foram executados.
 
 No navegador: login dos dois perfis, refresh, redirecionamentos, filtros combinados,
 lista vazia, modal por teclado, Tab/Escape/retorno de foco, ajuda, logout e drawer.
@@ -59,8 +61,8 @@ A sidebar organiza links diretos em Painel da empresa e Configurações:
 - `/empresa/configuracoes/conta`: nome do responsável e e-mail da conta.
 - `/empresa/configuracoes/seguranca`: informação de acesso e logout.
 
-Configurações persistem em localStorage com chave por empresa. O nome do responsável
+Configurações persistem em localStorage com chave por empresa e usuário. O nome do responsável
 atualiza a topbar e o nome da organização atualiza os cabeçalhos. Cancelar restaura
 os valores salvos; falhas de armazenamento são informadas. Isso não altera credenciais:
-a troca de senha depende da autenticação futura. Não se armazenam senhas aqui.
+o e-mail de acesso vem da API e é somente leitura; a troca de senha aguarda um endpoint próprio. Não se armazenam senhas aqui.
 Não há emissão/download de certificados, tentativas ou gestão de colaboradores nestas áreas.
