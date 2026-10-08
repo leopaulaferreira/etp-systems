@@ -17,6 +17,12 @@ server:
   port: ${SERVER_PORT:8080}
 
 etp:
+  demo:
+    enabled: ${ETP_DEMO_ENABLED:false}
+    password: ${ETP_DEMO_PASSWORD:}
+    colaborador-email: ${ETP_DEMO_COLABORADOR_EMAIL:etp@gmail.com}
+    empresa-email: ${ETP_DEMO_EMPRESA_EMAIL:rhetp@gmail.com}
+    company-name: ${ETP_DEMO_COMPANY_NAME:ETP Demonstração}
   security:
     jwt:
       secret: ${JWT_SECRET}
