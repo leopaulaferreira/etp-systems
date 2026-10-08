@@ -1,24 +1,26 @@
 # Backend do ETP Systems
 
-API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. As primeiras fases preparam a aplicação, o mapeamento das entidades centrais e a API pública de consulta de cursos. A autenticação entra em uma próxima fase.
+API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. As Fases 1–4 entregam a base, as entidades centrais, o catálogo de cursos e autenticação com BCrypt, JWT e perfis.
 
 ## Estrutura
 
 ```text
 src/main/java/br/com/etpsystems/
 ├── EtpSystemsApplication.java
-├── company/Empresa.java
-├── config/OpenApiConfig.java
+├── auth/          # Login, usuário autenticado, DTOs e erros de autenticação
+├── security/      # JWT, BCrypt, regras de acesso e CORS
+├── company/       # Empresa e repositório
+├── config/        # OpenAPI e contas locais opcionais
 ├── course/Categoria.java
 ├── course/Curso.java, CursoController.java, CursoService.java,
 │   CursoRepository.java e CursoResponse.java
 ├── track/Trilha.java
-└── user/Usuario.java
+└── user/          # Usuario, Perfil e repositório
 ```
 
-Os módulos `auth`, `enrollment`, `progress`, `assessment`, `certificate`, `report` e `ai` serão criados à medida que suas regras forem implementadas. Cada domínio agrupará controller, service, repository, entity e DTO quando necessários.
+Os módulos `enrollment`, `progress`, `assessment`, `certificate`, `report` e `ai` serão criados à medida que suas regras forem implementadas. Cada domínio agrupa controller, service, repository, entity e DTO quando necessários.
 
-As migrações em `src/main/resources/db/migration/` criam o schema (V1), acrescentam os campos do catálogo (V2) e incluem 24 cursos e 5 categorias iniciais (V3). Em bancos criados antes do Flyway, a V1 é registrada como baseline e as demais migrações são aplicadas. O arquivo [`../database/schema.sql`](../database/schema.sql) permanece como referência histórica. Com `spring.jpa.hibernate.ddl-auto=validate`, a aplicação verifica o mapeamento na inicialização e não altera as tabelas por conta própria.
+As migrações em `src/main/resources/db/migration/` criam o schema (V1), acrescentam os campos do catálogo (V2), incluem 24 cursos e 5 categorias iniciais (V3) e normalizam os perfis de usuário (V4). Em bancos criados antes do Flyway, a V1 é registrada como baseline e as demais migrações são aplicadas. O arquivo [`../database/schema.sql`](../database/schema.sql) permanece como referência histórica. Com `spring.jpa.hibernate.ddl-auto=validate`, a aplicação verifica o mapeamento na inicialização e não altera as tabelas por conta própria.
 
 ## Modelo atual
 
@@ -28,11 +30,15 @@ As migrações em `src/main/resources/db/migration/` criam o schema (V1), acresc
 - As associações são navegáveis apenas pelo lado necessário nesta fase. Isso evita coleções grandes e carregamentos circulares em `Empresa`, `Categoria` e `Curso`.
 - Os identificadores são UUIDs armazenados como `CHAR(36)`. As datas continuam preenchidas pelo MySQL.
 
-O campo `usuarios.perfil` permanece textual porque o banco existente contém valores legados (`aluno` e `aluno_1`). A migração para os perfis definitivos será definida junto da autenticação. O catálogo inicial preserva título, descrição, categoria, nível, duração, ícone e destaque do mock; a contagem fictícia de alunos não foi gravada.
+Os perfis são `COLABORADOR` e `EMPRESA`. A V4 converte `aluno` e `aluno_1` para `COLABORADOR`, preservando os usuários. Senhas legadas não são convertidas automaticamente: valores que não são hashes BCrypt válidos não autenticam. Uma conta `EMPRESA` representa uma pessoa do RH e precisa estar vinculada a uma empresa para entrar.
+
+O catálogo inicial preserva título, descrição, categoria, nível, duração, ícone e destaque do mock; a contagem fictícia de alunos não foi gravada.
 
 ## Configuração local
 
-É necessário Java 21+, Maven 3.9+ e MySQL 8. Copie `backend/.env.example` para `backend/.env` e preencha `DB_PASSWORD` e `DB_ROOT_PASSWORD` com valores locais. O arquivo `.env` é ignorado pelo Git. O banco usa `etp_db`, usuário `etp_user`, porta 3307 no host e 3306 no Docker.
+É necessário Java 21+, Maven 3.9+ e MySQL 8. Copie `backend/.env.example` para `backend/.env` e preencha `DB_PASSWORD`, `DB_ROOT_PASSWORD` e `JWT_SECRET`. Gere a chave JWT com `openssl rand -base64 32`. O arquivo `.env` é ignorado pelo Git. O banco usa `etp_db`, usuário `etp_user`, porta 3307 no host e 3306 no Docker.
+
+`JWT_SECRET` é uma chave de assinatura aleatória, separada da senha dos usuários. `JWT_EXPIRATION_MINUTES` vale 60 por padrão (intervalo permitido: 1–1440). `CORS_ALLOWED_ORIGINS` aceita uma lista de origens separadas por vírgula; os padrões locais são `http://localhost:5173` e `http://127.0.0.1:5173`.
 
 Para iniciar os serviços com Docker, na raiz do repositório:
 
@@ -55,14 +61,56 @@ mvn -f backend/pom.xml spring-boot:run
 
 O `.env` deve conter apenas variáveis no formato `CHAVE=valor`. Se a senha contiver caracteres interpretados pelo shell, coloque o valor entre aspas no arquivo.
 
+## Contas do grupo no ambiente local
+
+Para criar as contas automaticamente, configure `SPRING_PROFILES_ACTIVE=dev`, `ETP_DEMO_ENABLED=true` e `ETP_DEMO_PASSWORD` no `.env`. A senha é codificada com BCrypt antes de ser gravada; não inclua o valor real neste README, nas migrações ou em commits.
+
+| E-mail padrão | Perfil | Vínculo |
+| --- | --- | --- |
+| `etp@gmail.com` | `COLABORADOR` | ETP Demonstração |
+| `rhetp@gmail.com` | `EMPRESA` | ETP Demonstração |
+
+Os e-mails podem ser configurados com `ETP_DEMO_COLABORADOR_EMAIL` e `ETP_DEMO_EMPRESA_EMAIL`. O inicializador é transacional e funciona apenas no perfil `dev` com a opção habilitada. Reiniciar não duplica usuários nem altera suas senhas. Alterar `ETP_DEMO_PASSWORD` depois da criação não redefine a senha existente. Conflitos com contas de outro perfil ou empresa interrompem a inicialização em vez de sobrescrever dados.
+
+## Autenticação — Fase 4
+
+`POST /api/auth/login` recebe:
+
+```json
+{
+  "email": "etp@gmail.com",
+  "senha": "<senha configurada no ambiente local>"
+}
+```
+
+A resposta contém `accessToken`, `tokenType: "Bearer"`, `expiresIn` em segundos e `usuario` com `id`, `nome`, `email`, `perfil` e `empresaId`. O perfil vem do banco; campos extras enviados pelo cliente não concedem permissões. Nenhuma resposta de usuário expõe senha ou hash.
+
+`GET /api/auth/me` exige `Authorization: Bearer <accessToken>` e consulta o usuário atual. No Swagger, faça login, copie `accessToken`, clique em **Authorize** e cole somente o token para testar `/api/auth/me`.
+
+| Rotas | Regra |
+| --- | --- |
+| `POST /api/auth/login` | Pública |
+| `GET /api/auth/me` | JWT válido de colaborador ou empresa |
+| `GET /api/cursos` e `GET /api/cursos/{id}` | Públicas durante a integração gradual |
+| Health check, Swagger e OpenAPI (`GET`) | Públicos |
+| `/api/empresa/**` | Reservadas ao perfil `EMPRESA`; funcionalidades entram nas próximas fases |
+| `/api/colaborador/**` | Reservadas ao perfil `COLABORADOR`; funcionalidades entram nas próximas fases |
+| Demais rotas | Bloqueadas por padrão |
+
+Entradas inválidas retornam 400; credenciais ou tokens inválidos retornam 401; falta de permissão retorna 403. As falhas de credenciais usam a mesma mensagem para usuário inexistente e senha errada. A validação JWT verifica assinatura HS256, emissor, expiração, UUID do usuário e perfil.
+
+A API usa Bearer sem cookies de sessão. O token expira após o prazo configurado; não há refresh token nem revogação individual nesta fase. Na futura integração, sair removerá o token do cliente, mas uma cópia continuará válida até expirar. `/api/auth/me` já rejeita usuário removido ou com perfil diferente do token.
+
+A Fase 4 não inclui cadastro público, confirmação/recuperação por e-mail nem login Google/Microsoft. A tela de login ainda usa a sessão mock; sua troca pela API e o tratamento de expiração no React pertencem à Fase 5.
+
 ## Verificação
 
 - `GET /actuator/health` retorna `{"status":"UP"}` quando a aplicação e o banco estão saudáveis.
 - `/swagger-ui/index.html` abre o Swagger UI.
 - `GET /v3/api-docs` fornece o documento OpenAPI JSON.
 - `GET /api/cursos` retorna o catálogo na ordem de exibição; `GET /api/cursos/{id}` retorna um curso pelo UUID, com 404 para curso ausente.
-- `mvn -f backend/pom.xml test` verifica os três endpoints com servidor HTTP de teste. Esse teste desativa apenas a conexão externa.
-- Com o MySQL local ativo e as variáveis de `backend/.env` carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml -Dtest=DomainMappingIntegrationTest test` valida o schema e as cinco entidades com inserções revertidas ao final da transação. Sem `ETP_DB_TEST=true`, esse teste é ignorado para permitir execução sem banco.
-- No mesmo ambiente, `ETP_DB_TEST=true mvn -f backend/pom.xml -Dtest=CursoApiIntegrationTest test` valida lista, detalhes, 404 e ID inválido usando MySQL real.
+- `mvn -f backend/pom.xml verify` executa build e testes de saúde, documentação, login, tokens, permissões e CORS sem exigir MySQL. Os testes usam uma chave JWT própria, que não é empacotada na aplicação.
+- Com MySQL ativo e as variáveis locais carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml verify` inclui os testes de entidades, catálogo e autenticação com banco real. Sem essa variável, os três testes de banco são ignorados.
+- `AuthDatabaseIntegrationTest` cria contas e empresa temporárias com identificadores únicos, valida BCrypt/login e inicialização repetida, e remove os registros ao terminar. `DomainMappingIntegrationTest` reverte suas inserções por transação. As migrações Flyway permanecem aplicadas.
 
-O Actuator expõe somente o endpoint de health. A página Cursos usa esta API e recorre ao mock local se a consulta falhar; as demais integrações e a autenticação permanecem para fases futuras.
+O Actuator expõe somente o endpoint de health. A página Cursos usa esta API e recorre ao mock local se a consulta falhar; a integração do login e dos demais domínios permanece para fases futuras.

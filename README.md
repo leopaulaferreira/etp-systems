@@ -129,8 +129,8 @@ conectando o usuário às principais áreas da aplicação.
 - separação entre perfis de acesso;
 - logout.
 
-Atualmente a autenticação do frontend utiliza dados fictícios enquanto o backend
-está em desenvolvimento.
+O backend já oferece login com BCrypt e JWT. A autenticação do frontend ainda usa
+dados fictícios; a conexão da tela com essa API será feita na Fase 5.
 
 ---
 
@@ -246,4 +246,4 @@ TutorService
 
 ## Backend
 
-A Fase 1 do backend está disponível em [`backend/`](backend/README.md): Spring Boot, MySQL, Docker, health check e Swagger/OpenAPI. Consulte o guia para configurar o ambiente e executar os testes.
+As Fases 1–4 do backend estão disponíveis em [`backend/`](backend/README.md): Spring Boot, MySQL, Docker, migrações, entidades centrais, API de cursos, login com BCrypt/JWT e autorização por perfil. Consulte o guia para configurar as contas locais, usar o Swagger e executar os testes.
