@@ -1,82 +1,50 @@
-# Backend - ETP Systems
+# Backend do ETP Systems
 
-Esta pasta contém o **Back-end do sistema ETP Systems**.
+API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. Esta primeira fase prepara a aplicação, a conexão com o banco, o health check e a documentação OpenAPI. As rotas de negócio e a autenticação entram nas próximas fases.
 
-O back-end é responsável por toda a **lógica da aplicação**, comunicação com o banco de dados e fornecimento de dados para o front-end através de **APIs**.
+## Estrutura
 
----
-
-## 📌 Responsabilidades do Back-end
-
-- Implementar as **regras de negócio** do sistema
-- Gerenciar **usuários e autenticação**
-- Controlar **cursos e progresso dos usuários**
-- Conectar com o **banco de dados**
-- Fornecer **APIs para o Front-end**
-
----
-
-## ⚙️ Tecnologias previstas
-
-O projeto pode utilizar uma das seguintes tecnologias:
-
-- **Java + Spring Boot**
-ou
-- **Node.js**
-
-Banco de dados:
-
-- **PostgreSQL**
-
----
-
-## 📂 Estrutura inicial sugerida
-backend
-│
-├── src
-│
-├── controllers
-│
-├── services
-│
-├── models
-│
-├── repositories
-│
-└── config
-
-### Descrição das pastas
-
-**controllers**  
-Responsáveis por receber as requisições da API.
-
-**services**  
-Contêm a lógica de negócio da aplicação.
-
-**models**  
-Representam as entidades do sistema (Usuário, Curso, etc.).
-
-**repositories**  
-Responsáveis pela comunicação com o banco de dados.
-
-**config**  
-Configurações da aplicação.
-
----
-
-## 🚀 Objetivo desta camada
-
-Fornecer uma **API segura e eficiente** para o funcionamento da plataforma **ETP Systems**.
-
-O backend será responsável por garantir que os dados sejam **processados, armazenados e disponibilizados corretamente para o front-end**.
-
-## Variáveis de ambiente
-
-Copie o arquivo de exemplo para criar a configuração local:
-
-```bash
-cp backend/.env.example backend/.env
+```text
+src/main/java/br/com/etpsystems/
+├── EtpSystemsApplication.java
+└── config/
+    └── OpenApiConfig.java
 ```
 
-A conexão atual usa PostgreSQL em `localhost:5434`, com o banco `etp_db`,
-usuário `etp_user` e senha `etp_password`.
+Os módulos `auth`, `user`, `company`, `course`, `track`, `enrollment`, `progress`, `assessment`, `certificate`, `report` e `ai` serão criados à medida que suas regras forem implementadas. Cada módulo agrupará controller, service, repository, entity e DTO quando necessários.
+
+O schema inicial está em [`../database/schema.sql`](../database/schema.sql). Nesta fase, o MySQL executa o script somente na primeira criação do volume. `spring.jpa.hibernate.ddl-auto=none` impede que Hibernate altere as tabelas. A modelagem e a validação das entidades ficam para a Fase 2.
+
+## Configuração local
+
+É necessário Java 21+, Maven 3.9+ e MySQL 8. Copie `backend/.env.example` para `backend/.env` e preencha `DB_PASSWORD` e `DB_ROOT_PASSWORD` com valores locais. O arquivo `.env` é ignorado pelo Git. O banco usa `etp_db`, usuário `etp_user`, porta 3307 no host e 3306 no Docker.
+
+Para iniciar os serviços com Docker, na raiz do repositório:
+
+```bash
+docker compose --env-file backend/.env up --build -d database backend
+```
+
+O backend responde em `http://localhost:8080` por padrão. Se a porta 8080 estiver ocupada, altere `ETP_BACKEND_PORT` no `.env`, por exemplo para `18080`. A conexão interna do container aponta para `database:3306`; a aplicação local usa `localhost:3307`.
+
+O script `database/schema.sql` roda apenas quando o volume MySQL está vazio. Em um volume já existente, mudar usuário ou senha no `.env` não altera automaticamente as credenciais armazenadas no banco.
+
+Para executar a aplicação localmente com o MySQL do Compose:
+
+```bash
+set -a
+. backend/.env
+set +a
+mvn -f backend/pom.xml spring-boot:run
+```
+
+O `.env` deve conter apenas variáveis no formato `CHAVE=valor`. Se a senha contiver caracteres interpretados pelo shell, coloque o valor entre aspas no arquivo.
+
+## Verificação
+
+- `GET /actuator/health` retorna `{"status":"UP"}` quando a aplicação e o banco estão saudáveis.
+- `/swagger-ui/index.html` abre o Swagger UI.
+- `GET /v3/api-docs` fornece o documento OpenAPI JSON.
+- `mvn -f backend/pom.xml test` verifica os três endpoints com servidor HTTP de teste. O teste desativa apenas a conexão externa; a integração real com MySQL deve ser conferida ao iniciar pelo Compose.
+
+O Actuator expõe somente o endpoint de health. O frontend continua usando seus mocks até as APIs de domínio e autenticação estarem prontas.

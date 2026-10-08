@@ -241,3 +241,9 @@ TutorService
      ├── GeminiProvider
      │
      └── outros provedores futuramente
+
+```
+
+## Backend
+
+A Fase 1 do backend está disponível em [`backend/`](backend/README.md): Spring Boot, MySQL, Docker, health check e Swagger/OpenAPI. Consulte o guia para configurar o ambiente e executar os testes.
