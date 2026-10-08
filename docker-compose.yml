@@ -9,29 +9,40 @@ services:
       - /app/node_modules
     command: sh -c "npm install && npm run dev -- --host"
 
-  # backend:
-  #   build:
-  #     context: ./backend
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - database
-  #   env_file:
-  #     - ./backend/.env
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "${ETP_BACKEND_PORT:-8080}:8080"
+    environment:
+      DB_HOST: database
+      DB_PORT: "3306"
+      DB_NAME: ${DB_NAME:-etp_db}
+      DB_USER: ${DB_USER:-etp_user}
+      DB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD em backend/.env}
+    depends_on:
+      database:
+        condition: service_healthy
 
   database:
-    image: mysql:8
+    image: mysql:8.4
     container_name: etp-db
     environment:
-      MYSQL_DATABASE: etp_db
-      MYSQL_USER: etp_user
-      MYSQL_PASSWORD: etp_password
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ${DB_NAME:-etp_db}
+      MYSQL_USER: ${DB_USER:-etp_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD em backend/.env}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Defina DB_ROOT_PASSWORD em backend/.env}
     ports:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -u\"$$MYSQL_USER\" -p\"$$MYSQL_PASSWORD\" \"$$MYSQL_DATABASE\" -e 'SELECT 1' >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
     restart: unless-stopped
 
 volumes:

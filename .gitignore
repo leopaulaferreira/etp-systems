@@ -13,10 +13,8 @@ Thumbs.db
 .env.local
 .env.*.local
 
-# Backend (Java/Node — placeholder until backend/ is scaffolded)
+# Backend
 backend/target/
-backend/node_modules/
-backend/dist/
 
 # Database
 database/*.sql.bak
