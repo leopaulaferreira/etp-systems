@@ -42,6 +42,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
         "spring.autoconfigure.exclude=org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration",
+        "etp.demo.enabled=false",
         "DB_PASSWORD=test"
 })
 @Import(AuthSecurityTest.ProtectedRoutes.class)
