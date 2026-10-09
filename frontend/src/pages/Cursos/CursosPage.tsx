@@ -5,6 +5,7 @@ import { initialFilters, selectCourses, type CatalogFilters } from './catalog'
 import { fetchCourseDetails, fetchCourses } from './courseApi'
 import { ApiError } from '../../api/client'
 import { enrollCourse, fetchMyCourses } from '../MeusCursos/myCoursesApi'
+import { useAssessments } from '../../assessments/AssessmentContext'
 import CatalogCourseCard from './components/CatalogCourseCard'
 import CatalogToolbar from './components/CatalogToolbar'
 import CourseCatalogDialog from './components/CourseCatalogDialog'
@@ -14,6 +15,7 @@ import FeaturedCourseCard from './components/FeaturedCourseCard'
 const PAGE_SIZE = 8
 
 export default function CursosPage() {
+  const { reload: reloadAssessments } = useAssessments()
   const [filters, setFilters] = useState<CatalogFilters>(initialFilters)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
@@ -90,6 +92,7 @@ export default function CursosPage() {
     try {
       await enrollCourse(course.id)
       setEnrolledIds((current) => new Set([...current, course.id]))
+      reloadAssessments()
     } catch {
       setEnrollError(true)
     } finally {
