@@ -13,8 +13,6 @@ const selectClass =
 export default function AssessmentFilters({ filters, onChange, onReset }: AssessmentFiltersProps) {
   const active =
     filters.query.trim() ||
-    filters.type !== 'Todos' ||
-    filters.courseType !== 'Todos' ||
     filters.status !== 'all'
   return (
     <div className="flex flex-col gap-3 rounded-[20px] border border-ink-200/70 bg-panel p-4 shadow-card">
@@ -32,35 +30,7 @@ export default function AssessmentFilters({ filters, onChange, onReset }: Assess
           className="min-w-0 flex-1 bg-transparent py-2.5 text-sm text-ink-900 outline-none placeholder:text-ink-500"
         />
       </div>
-      <div className="grid grid-cols-1 gap-3 min-[440px]:grid-cols-3">
-        <label className="flex min-w-0 flex-col gap-1.5 text-[11px] font-semibold text-ink-500">
-          Tipo
-          <select
-            aria-label="Tipo de avaliação"
-            value={filters.type}
-            onChange={(event) => onChange({ type: event.target.value as Filters['type'] })}
-            className={selectClass}
-          >
-            <option value="Todos">Todos os tipos</option>
-            <option>Quiz</option>
-            <option>Teste</option>
-          </select>
-        </label>
-        <label className="flex min-w-0 flex-col gap-1.5 text-[11px] font-semibold text-ink-500">
-          Curso / Trilha
-          <select
-            aria-label="Curso ou trilha"
-            value={filters.courseType}
-            onChange={(event) =>
-              onChange({ courseType: event.target.value as Filters['courseType'] })
-            }
-            className={selectClass}
-          >
-            <option value="Todos">Todos os conteúdos</option>
-            <option>Curso</option>
-            <option>Trilha</option>
-          </select>
-        </label>
+      <div className="sm:w-56">
         <label className="flex min-w-0 flex-col gap-1.5 text-[11px] font-semibold text-ink-500">
           Status
           <select
@@ -70,7 +40,7 @@ export default function AssessmentFilters({ filters, onChange, onReset }: Assess
             className={selectClass}
           >
             <option value="all">Todos os status</option>
-            {(Object.keys(statusLabels) as AssessmentStatus[]).map((status) => (
+            {(['pending', 'in_progress', 'completed'] as AssessmentStatus[]).map((status) => (
               <option key={status} value={status}>
                 {statusLabels[status]}
               </option>

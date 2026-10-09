@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ArrowRight, CalendarDays, TrendingUp } from 'lucide-react'
 import type { Assessment } from '../../../types/assessment'
-import { calculateScore, formatAssessmentDate } from '../assessment'
+import { calculateScore, canStart, formatAssessmentDate } from '../assessment'
 import AssessmentIcon from './AssessmentIcon'
 
 const panelClass = 'min-w-0 rounded-[22px] border border-ink-200/70 bg-panel p-5 shadow-card'
@@ -15,8 +15,8 @@ export default function AssessmentInsights({
 }) {
   const [showAll, setShowAll] = useState(false)
   const upcoming = items
-    .filter((item) => item.status !== 'completed' && item.dueAt)
-    .sort((a, b) => a.dueAt!.localeCompare(b.dueAt!))
+    .filter(canStart)
+    .sort((a, b) => (a.dueAt ?? '9999').localeCompare(b.dueAt ?? '9999'))
   const questions = items.flatMap((item) => item.questions)
   const multiple = questions.filter((question) => question.kind === 'multiple_choice').length
   const multiplePercent = questions.length ? Math.round((multiple / questions.length) * 100) : 0
@@ -69,9 +69,7 @@ export default function AssessmentInsights({
                     </span>
                   </span>
                   <span className="shrink-0 pt-0.5 text-right text-[10px] font-bold text-ink-500">
-                    Até
-                    <br />
-                    <span className="text-ink-700">{formatAssessmentDate(item.dueAt!)}</span>
+                    {item.dueAt ? <>Até<br /><span className="text-ink-700">{formatAssessmentDate(item.dueAt)}</span></> : <span className="text-ink-700">Disponível</span>}
                   </span>
                 </button>
               </li>
@@ -79,7 +77,7 @@ export default function AssessmentInsights({
           </ul>
         ) : (
           <p className="py-3 text-sm leading-6 text-ink-500">
-            Tudo em dia! Nenhuma avaliação pendente na agenda.
+            Nenhuma avaliação disponível no momento.
           </p>
         )}
         {upcoming.length > 3 && (

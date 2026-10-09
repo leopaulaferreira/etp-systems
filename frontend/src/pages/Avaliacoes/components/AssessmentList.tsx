@@ -1,4 +1,5 @@
 import { ArrowRight, CheckCircle2, SearchX } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import type { Assessment } from '../../../types/assessment'
 import { latestScore } from '../assessment'
 import AssessmentBadge from './AssessmentBadge'
@@ -160,15 +161,15 @@ export default function AssessmentList({ items, total, onOpen, onReset }: Assess
       ) : (
         <div className="flex flex-col items-center gap-3 px-6 py-12 text-center">
           <SearchX className="h-8 w-8 text-brand-blue-400" aria-hidden="true" />
-          <h3 className="text-base font-bold text-ink-900">Nenhuma avaliação encontrada</h3>
-          <p className="text-sm leading-6 text-ink-500">Tente outro termo ou ajuste os filtros.</p>
-          <button
+          <h3 className="text-base font-bold text-ink-900">{total ? 'Nenhuma avaliação encontrada' : 'Nenhuma avaliação disponível'}</h3>
+          <p className="text-sm leading-6 text-ink-500">{total ? 'Tente outro termo ou ajuste os filtros.' : 'Inscreva-se em um curso piloto para estudar a aula e fazer sua avaliação.'}</p>
+          {total ? <button
             type="button"
             onClick={onReset}
             className="mt-1 min-h-10 rounded-xl bg-brand-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"
           >
             Ver todas as avaliações
-          </button>
+          </button> : <Link to="/cursos" className="mt-1 inline-flex min-h-10 items-center rounded-xl bg-brand-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Explorar cursos</Link>}
         </div>
       )}
     </section>
