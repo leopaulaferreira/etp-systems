@@ -43,12 +43,7 @@ export function createCertificatePdf(item: Certificate, name: string): Blob {
     ),
     text(`Código de referência: ${item.code}`, 70, 137, 12),
     '0.40 0.45 0.55 rg',
-    text(
-      'Documento demonstrativo do protótipo ETP Systems, sem validade de certificação.',
-      70,
-      78,
-      10,
-    ),
+    text('Emitido pelo ETP Systems.', 70, 78, 10),
   ].join('\n')
   const objects = [
     '<< /Type /Catalog /Pages 2 0 R >>',

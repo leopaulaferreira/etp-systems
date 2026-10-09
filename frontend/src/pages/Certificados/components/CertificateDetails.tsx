@@ -12,7 +12,7 @@ export function CertificateBadge({ item }: { item: Certificate }) {
     <span
       className={`inline-flex self-start rounded-md px-2 py-1 text-[9px] font-extrabold uppercase tracking-wide ${item.status === 'completed' ? 'bg-brand-blue-500/15 text-brand-blue-400' : 'bg-emerald-400/15 text-emerald-300'}`}
     >
-      {item.status === 'completed' ? 'Concluído' : 'Em andamento'}
+      {item.status === 'completed' ? 'Concluído' : item.awaitingRelease ? 'Aguardando liberação' : 'Em andamento'}
     </span>
   )
 }
@@ -37,7 +37,7 @@ export default function CertificateDetails({
           {item.issuedAt && (
             <p className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4 shrink-0" aria-hidden="true" />
-              Concluído em {formatCertificateDate(item.issuedAt)}
+              Emitido em {formatCertificateDate(item.issuedAt)}
             </p>
           )}
           <p className="flex items-center gap-2">
@@ -70,7 +70,9 @@ export default function CertificateDetails({
         ) : (
           <>
             <p className="text-xs leading-5 text-ink-500">
-              Progresso: {item.progress}%. Conclua o curso para liberar seu certificado.
+              {item.awaitingRelease
+                ? 'Avaliação aprovada. O certificado ficará disponível após a liberação do curso.'
+                : `Progresso: ${item.progress}%. O certificado fica disponível após aprovação e liberação do curso.`}
             </p>
             <progress
               value={item.progress}

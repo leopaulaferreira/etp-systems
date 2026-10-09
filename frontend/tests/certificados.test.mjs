@@ -8,6 +8,23 @@ import {
   selectCertificates,
 } from '../src/pages/Certificados/certificates.ts'
 import { createCertificatePdf } from '../src/pages/Certificados/certificatePdf.ts'
+import { parseCertificate } from '../src/pages/Certificados/certificatesApi.ts'
+
+test('converte certificado emitido pela API e rejeita dados incompletos', () => {
+  const payload = {
+    id: '11111111-1111-4111-8111-111111111111',
+    courseId: '22222222-2222-4222-8222-222222222222',
+    holderName: 'Titular', title: 'Segurança da Informação', description: 'Curso piloto', durationHours: 3.5,
+    code: `ETP-${'A'.repeat(32)}`, issuedAt: '2026-10-09T12:00:00Z',
+  }
+  const item = parseCertificate(payload)
+  assert.equal(item.status, 'completed')
+  assert.equal(item.courseId, '22222222-2222-4222-8222-222222222222')
+  assert.equal(item.hours, 3.5)
+  assert.equal(item.holderName, 'Titular')
+  assert.throws(() => parseCertificate({ ...payload, code: '' }), /incompletos/)
+  assert.equal(parseCertificate({ ...payload, code: 'LEGADO-123' }).code, 'LEGADO-123')
+})
 
 test('indicadores correspondem aos certificados e histórico disponíveis', () => {
   assert.deepEqual(certificateSummary(certificates), { completed: 7, ongoing: 3, hours: 48 })
@@ -70,7 +87,7 @@ test('PDF mantém acentos e referências válidas com caracteres especiais no no
   assert(pdf.startsWith('%PDF-1.4'))
   assert(pdf.includes('Jo\\343o \\(Silva\\) \\\\ ETP'))
   assert(pdf.includes(certificates[0].code))
-  assert(pdf.includes('sem validade de certifica'))
+  assert(pdf.includes('Emitido pelo ETP Systems'))
   assert.equal(new TextEncoder().encode(pdf).length, pdf.length)
   const start = Number(pdf.match(/startxref\n(\d+)/)[1])
   assert.equal(pdf.slice(start, start + 4), 'xref')

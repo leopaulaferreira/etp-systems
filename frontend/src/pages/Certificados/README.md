@@ -1,21 +1,9 @@
 # Certificados
 
-Tela do protótipo em `/certificados`, protegida pela sessão mock existente.
-Segue os tokens visuais, o layout e os componentes por página das demais telas.
+A página `/certificados` usa a sessão JWT e consulta `GET /api/colaborador/certificados`. A API retorna certificados emitidos para o usuário autenticado, com nome do titular, curso, código único e data de emissão. A página também combina inscrições e avaliações disponíveis para mostrar cursos que ainda aguardam certificação. Esses cursos não permitem download.
 
-Os dados ficam em `../../mocks/certificados.mock.ts`: sete certificados concluídos
-(48 horas), três cursos em andamento e 14 downloads demonstrativos. A busca ignora
-acentos; status e ano de emissão podem ser combinados. Cursos em andamento não
-possuem data de emissão. A ordenação mantém esses cursos depois dos concluídos,
-exceto na ordenação alfabética.
+A aprovação em uma avaliação emite um certificado quando o curso está habilitado para certificação. O progresso informado manualmente não autoriza a emissão. Nesta fase, Segurança da Informação e Computação em Nuvem estão habilitados; LGPD na Prática aguarda a terceira videoaula e a revisão das questões.
 
-Os indicadores filtram a lista ou abrem os detalhes de horas e o histórico.
-Os certificados podem ser visualizados em diálogo e baixados em PDF. O PDF é
-gerado localmente, sem dependências, e identifica o documento como demonstrativo.
-Cursos em andamento exibem progresso e um acesso a Meus Cursos, sem permitir
-download. O histórico conta solicitações de download, não confirma arquivos salvos.
+A busca, os filtros e a ordenação atuam sobre os dados recebidos da API. O PDF é gerado localmente com o nome do titular e o código fornecidos pelo backend. Os downloads são contabilizados apenas durante a visita atual; não existe histórico persistente de downloads ou verificação pública do código. Em caso de falha na API, a página mostra uma opção para tentar novamente.
 
-Não há emissão oficial, verificação de códigos nem sincronização com as outras
-telas ou API. Filtros e novos downloads são reiniciados ao sair da página.
-
-Validação em `frontend/`: `npm run test:certificados`, `npm run build` e `npm run lint`.
+Validação em `frontend/`: `npm run test:certificados`, `npm run build` e `npm run lint`. O arquivo `mocks/certificados.mock.ts` permanece como fixture dos testes de filtros e PDF; a página não o utiliza.

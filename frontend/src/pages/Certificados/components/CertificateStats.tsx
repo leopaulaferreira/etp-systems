@@ -35,7 +35,7 @@ export default function CertificateStats({ summary, downloads, onSelect }: Props
       tone: 'orange',
     },
     {
-      label: 'Total de downloads',
+      label: 'Downloads nesta visita',
       value: downloads,
       action: 'history',
       link: 'Ver histórico',

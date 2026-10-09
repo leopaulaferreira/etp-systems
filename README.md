@@ -195,8 +195,10 @@ manualmente pelo colaborador.
 
 ## 🏆 Certificados
 
-Planejado para registrar e disponibilizar certificados associados aos cursos
-concluídos.
+Certificados são emitidos após aprovação em avaliações de cursos habilitados,
+com código único e consulta na API. A página de Certificados mostra os documentos
+emitidos e permite baixar PDF. LGPD na Prática aguarda a terceira videoaula e a
+revisão das questões antes de habilitar a emissão.
 
 ---
 
@@ -248,4 +250,4 @@ TutorService
 
 ## Backend
 
-As Fases 1–8 do backend estão disponíveis em [`backend/`](backend/README.md): Spring Boot, MySQL, Docker, migrações, catálogo, login com BCrypt/JWT, inscrições, progresso e avaliações. Consulte o guia para configurar as contas locais, usar o Swagger e executar os testes.
+As Fases 1–9 do backend estão disponíveis em [`backend/`](backend/README.md): Spring Boot, MySQL, Docker, migrações, catálogo, login com BCrypt/JWT, inscrições, progresso, avaliações e certificados. Consulte o guia para configurar as contas locais, usar o Swagger e executar os testes.

@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { certificates, initialDownloads } from '../../mocks/certificados.mock'
+import { useEffect, useState } from 'react'
+import { RefreshCw } from 'lucide-react'
 import { useProfile } from '../../profile/ProfileContext'
 import type { Certificate } from '../../types/certificate'
 import {
@@ -16,23 +16,33 @@ import CertificateDialog from './components/CertificateDialog'
 import CertificateList, { CertificateToolbar } from './components/CertificateList'
 import CertificateStats from './components/CertificateStats'
 import CertificatesHero from './components/CertificatesHero'
-
-const summary = certificateSummary(certificates)
-const featured = selectCertificates(certificates, { ...initialFilters, status: 'completed' })[0]
-const years = [
-  ...new Set(certificates.flatMap((item) => (item.issuedAt ? [item.issuedAt.slice(0, 4)] : []))),
-]
-  .sort()
-  .reverse()
+import { fetchCertificatePage } from './certificatesApi'
 
 export default function CertificadosPage() {
   const { profile } = useProfile()
+  const [certificates, setCertificates] = useState<Certificate[]>([])
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+  const [reload, setReload] = useState(0)
   const [filters, setFilters] = useState(initialFilters)
   const [selected, setSelected] = useState<Certificate | null>(null)
   const [panel, setPanel] = useState<'hours' | 'history' | null>(null)
-  const [downloads, setDownloads] = useState(initialDownloads)
+  const [downloads, setDownloads] = useState<{ certificateId: string; downloadedAt: string }[]>([])
   const [announcement, setAnnouncement] = useState('')
+  const summary = certificateSummary(certificates)
+  const featured = selectCertificates(certificates, { ...initialFilters, status: 'completed' })[0]
+  const years = [...new Set(certificates.flatMap((item) => item.issuedAt ? [item.issuedAt.slice(0, 4)] : []))].sort().reverse()
   const filtered = selectCertificates(certificates, filters)
+
+  useEffect(() => {
+    const controller = new AbortController()
+    fetchCertificatePage(controller.signal).then((items) => {
+      setCertificates(items)
+      setStatus('ready')
+    }).catch(() => {
+      if (!controller.signal.aborted) setStatus('error')
+    })
+    return () => controller.abort()
+  }, [reload])
 
   function updateFilters(update: Partial<CertificateFilters>) {
     setFilters((current) => ({ ...current, ...update }))
@@ -41,7 +51,7 @@ export default function CertificadosPage() {
   function download(item: Certificate) {
     if (item.status !== 'completed') return
     try {
-      downloadCertificate(item, profile.name)
+      downloadCertificate(item, item.holderName ?? profile.name)
       setDownloads((current) => [
         ...current,
         { certificateId: item.id, downloadedAt: new Date().toISOString() },
@@ -55,6 +65,9 @@ export default function CertificadosPage() {
   return (
     <div className="flex min-w-0 flex-col gap-5 lg:gap-6">
       <CertificatesHero />
+      {status === 'loading' && <p role="status" className="rounded-[22px] border border-ink-200/70 bg-panel p-6 text-sm text-ink-500 shadow-card">Carregando certificados...</p>}
+      {status === 'error' && <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-[22px] border border-ink-200/70 bg-panel p-6 shadow-card"><p className="text-sm text-ink-700">Não foi possível carregar seus certificados.</p><button type="button" onClick={() => { setStatus('loading'); setReload((current) => current + 1) }} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-brand-blue-700 px-4 text-xs font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"><RefreshCw className="h-4 w-4" aria-hidden="true" /> Tentar novamente</button></div>}
+      {status === 'ready' && <>
       <CertificateStats
         summary={summary}
         downloads={downloads.length}
@@ -100,14 +113,10 @@ export default function CertificadosPage() {
       </p>
       {selected && (
         <CertificateDialog
-          title={selected.status === 'completed' ? 'Seu certificado' : 'Certificado em andamento'}
+          title={selected.status === 'completed' ? 'Seu certificado' : selected.awaitingRelease ? 'Aguardando liberação' : 'Certificado em andamento'}
           onClose={() => setSelected(null)}
         >
           <CertificateDetails item={selected} onDownload={download} />
-          <p className="text-xs leading-5 text-ink-500">
-            Prévia demonstrativa. A emissão e a verificação de certificados serão disponibilizadas
-            com a integração à plataforma.
-          </p>
           <p role="status" className="text-xs text-brand-blue-400">
             {announcement}
           </p>
@@ -121,7 +130,7 @@ export default function CertificadosPage() {
           <p className="text-sm text-ink-500">
             {panel === 'hours'
               ? `${summary.hours} horas de aprendizado em ${summary.completed} cursos concluídos.`
-              : `${downloads.length} downloads solicitados. Os registros iniciais são demonstrativos.`}
+              : `${downloads.length} downloads solicitados nesta visita.`}
           </p>
           <ul className="divide-y divide-ink-100">
             {panel === 'hours'
@@ -160,6 +169,7 @@ export default function CertificadosPage() {
           </ul>
         </CertificateDialog>
       )}
+      </>}
     </div>
   )
 }

@@ -133,8 +133,8 @@ export default function CertificateList({
                   <span className="text-xs font-bold leading-5 text-ink-900">{item.title}</span>
                   <span className="text-[11px] leading-5 text-ink-500">
                     {item.status === 'completed'
-                      ? `Concluído em ${formatCertificateDate(item.issuedAt)}`
-                      : `Progresso ${item.progress}%`}{' '}
+                      ? `Emitido em ${formatCertificateDate(item.issuedAt)}`
+                      : item.awaitingRelease ? 'Aguardando liberação' : `Progresso ${item.progress}%`}{' '}
                     · {item.hours} horas
                   </span>
                   {item.status === 'in_progress' && (
@@ -155,7 +155,7 @@ export default function CertificateList({
                 title={
                   item.status === 'completed'
                     ? 'Baixar PDF'
-                    : 'Disponível após a conclusão do curso'
+                    : 'Disponível após aprovação e liberação do curso'
                 }
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-ink-200 text-ink-500 hover:bg-brand-blue-500/10 hover:text-brand-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 disabled:cursor-not-allowed disabled:opacity-30"
               >
@@ -169,7 +169,7 @@ export default function CertificateList({
           <Award className="h-10 w-10 text-ink-400" aria-hidden="true" />
           <h3 className="text-sm font-bold text-ink-900">Nenhum certificado encontrado</h3>
           <p className="max-w-sm text-xs leading-5 text-ink-500">
-            Ajuste a busca ou os filtros. Cursos em andamento ainda não possuem data de emissão.
+            Certificados emitidos aparecem aqui. Ajuste a busca ou os filtros, ou conclua uma avaliação disponível.
           </p>
           <button type="button" onClick={onReset} className={certificateButton}>
             Limpar filtros

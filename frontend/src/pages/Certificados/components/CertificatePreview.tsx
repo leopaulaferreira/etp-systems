@@ -38,7 +38,7 @@ export default function CertificatePreview({
       <span
         className={`border-b border-current pb-1 font-bold ${compact ? 'text-[5px]' : 'text-sm'}`}
       >
-        {profile.name}
+        {item.holderName ?? profile.name}
       </span>
       <span
         className={`max-w-[90%] font-bold leading-snug text-ink-900 ${compact ? 'line-clamp-2 text-[5px]' : 'text-sm'}`}
