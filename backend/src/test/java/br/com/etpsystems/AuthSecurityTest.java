@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import br.com.etpsystems.company.Empresa;
 import br.com.etpsystems.course.CursoService;
+import br.com.etpsystems.assessment.AvaliacaoService;
 import br.com.etpsystems.user.Perfil;
 import br.com.etpsystems.user.Usuario;
 import br.com.etpsystems.user.UsuarioRepository;
@@ -73,6 +74,9 @@ class AuthSecurityTest {
 
     @MockitoBean
     private ProgressoService progressos;
+
+    @MockitoBean
+    private AvaliacaoService avaliacoes;
 
     @BeforeEach
     void accounts() {
