@@ -21,6 +21,7 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -37,6 +38,21 @@ class AvaliacaoApiIntegrationTest {
     @Autowired private UsuarioRepository usuarios;
     @Autowired private CursoRepository cursos;
     @Autowired private PasswordEncoder passwords;
+    @Autowired private JdbcTemplate jdbc;
+
+    @Test
+    void eachPilotQuestionHasAtLeastFourOptions() {
+        List<Integer> optionCounts = jdbc.queryForList("""
+                SELECT COUNT(o.id) FROM questoes q
+                JOIN avaliacoes a ON a.id = q.avaliacao_id
+                JOIN cursos c ON c.id = a.curso_id
+                LEFT JOIN alternativas o ON o.questao_id = q.id
+                WHERE c.titulo IN ('LGPD na Prática', 'Fundamentos de Segurança da Informação',
+                                   'Computação em Nuvem: Conceitos e Aplicações')
+                GROUP BY q.id
+                """, Integer.class);
+        assertThat(optionCounts).hasSize(15).allMatch(count -> count >= 4);
+    }
 
     @Test
     void gradesOnlyEnrolledUserAndPersistsAttemptsWithoutLeakingAnswersEarly() throws Exception {
@@ -67,6 +83,10 @@ class AvaliacaoApiIntegrationTest {
             JsonNode assessment = JSON.readTree(get(client, "/api/colaborador/avaliacoes", firstToken).body()).get(0);
             String path = "/api/colaborador/avaliacoes/" + assessment.path("id").asText() + "/tentativas";
             assertThat(assessment.path("questions").size()).isEqualTo(5);
+            for (JsonNode question : assessment.path("questions")) {
+                assertThat(question.path("options").size()).isGreaterThanOrEqualTo(4);
+                assertThat(question.path("optionIds").size()).isEqualTo(question.path("options").size());
+            }
             assertThat(assessment.path("questions").get(0).path("correctOption").isNull()).isTrue();
             assertThat(post(client, path, firstToken, "{\"respostas\":[]}").statusCode()).isEqualTo(400);
 
@@ -81,7 +101,7 @@ class AvaliacaoApiIntegrationTest {
                 right.add(Map.of("questaoId", questionId,
                         "alternativaId", question.path("optionIds").get(correctIndex).asText()));
                 wrong.add(Map.of("questaoId", questionId,
-                        "alternativaId", question.path("optionIds").get((correctIndex + 1) % 3).asText()));
+                        "alternativaId", question.path("optionIds").get((correctIndex + 1) % question.path("optionIds").size()).asText()));
             }
             String duplicate = JSON.writeValueAsString(Map.of("respostas", List.of(wrong.get(0), wrong.get(0),
                     wrong.get(1), wrong.get(2), wrong.get(3))));
