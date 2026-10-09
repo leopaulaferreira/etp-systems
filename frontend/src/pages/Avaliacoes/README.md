@@ -4,7 +4,7 @@ A página `/avaliacoes` usa a API autenticada do colaborador. Exibe apenas avali
 
 `assessmentApi.ts` valida as respostas de `GET /api/colaborador/avaliacoes` e envia tentativas completas por `POST /api/colaborador/avaliacoes/{id}/tentativas`. A API calcula e persiste nota, aprovação e respostas; o frontend apenas mostra o resultado. O gabarito não chega ao navegador antes da aprovação ou da última tentativa. Uma tentativa só é consumida no envio. As escolhas em edição ficam em memória e se perdem ao sair da página ou recarregar.
 
-O diálogo, filtros, indicadores e gráfico foram reaproveitados. O gráfico utiliza as notas registradas pela API. A busca e os filtros continuam locais. Durante a avaliação, **Voltar às aulas** leva de volta ao curso; o botão de avaliação da página de estudo permite retomar as respostas ainda em memória. Em caso de falha ao carregar, há uma ação para tentar novamente; em falha no envio, as escolhas atuais são preservadas para nova tentativa de envio.
+O diálogo, filtros, indicadores e gráfico foram reaproveitados. O gráfico utiliza as notas registradas pela API. A busca e os filtros continuam locais. Durante a avaliação, **Voltar às aulas** retorna à aula de origem quando a avaliação foi aberta pela página de estudo; o botão de avaliação permite retomar as respostas ainda em memória. Em caso de falha ao carregar, há uma ação para tentar novamente; em falha no envio, as escolhas atuais são preservadas para nova tentativa de envio.
 
 Os cursos piloto têm cinco questões com quatro alternativas cada, nota mínima de 80% e duas tentativas. Aprovação e conclusão manual do curso são informações separadas. Não há emissão de certificado nesta fase.
 

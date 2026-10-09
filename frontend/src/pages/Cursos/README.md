@@ -19,7 +19,7 @@ quando a API está indisponível. O destaque pertence ao catálogo.
 - Com a API ativa, “Inscrever-se no curso” registra a inscrição da conta atual. Cursos já inscritos mostram “Acessar Meus Cursos”.
 
 Busca, filtros e ordenação são locais e reiniciam ao sair da página ou recarregar.
-O diálogo permite inscrição em cursos reais. Após a inscrição, a página `/cursos/:id/estudar` é acessível por Meus Cursos e mostra as aulas, vídeos ou resumos disponíveis e o caminho para a avaliação. LGPD na Prática tem duas videoaulas sem o antigo resumo em texto; os outros dois cursos piloto continuam com resumo. Os demais cursos exibem um estado de conteúdo em preparação. No modo de
+O diálogo permite inscrição em cursos reais. Após a inscrição, a página `/cursos/:id/estudar` é acessível por Meus Cursos e mostra **uma aula por vez**, seja vídeo ou texto. A navegação usa **Aula anterior**, **Próxima aula** e a lista lateral; `?aula=N` identifica a aula aberta, permite voltar a ela pela avaliação e funciona também após recarregar a página. LGPD na Prática tem duas videoaulas sem o antigo resumo em texto; os outros dois cursos piloto continuam com resumo. Os demais cursos exibem um estado de conteúdo em preparação. No modo de
 catálogo local, a inscrição fica indisponível para não criar uma confirmação fictícia.
 Com a API ativa, a página omite contagens de alunos porque esse dado ainda não existe no banco.
 Se a consulta falhar, aparece um aviso com ação para tentar novamente.

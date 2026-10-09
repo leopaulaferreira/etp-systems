@@ -29,6 +29,8 @@ export default function AvaliacoesPage() {
   const filtered = useMemo(() => selectAssessments(items, filters), [items, filters])
   const summary = useMemo(() => assessmentSummary(items), [items])
   const courseId = searchParams.get('curso')
+  const lessonNumber = Number(searchParams.get('aula'))
+  const lessonQuery = Number.isSafeInteger(lessonNumber) && lessonNumber > 0 ? `?aula=${lessonNumber}` : ''
   const selected = items.find((item) => item.id === selectedId) ??
     (selectedId === null ? items.find((item) => item.courseId === courseId) : undefined)
 
@@ -95,7 +97,7 @@ export default function AvaliacoesPage() {
           key={selected.id}
           item={selected}
           onClose={() => { setSelectedId(null); if (courseId) setSearchParams({}, { replace: true }) }}
-          onReviewLesson={selected.courseId ? () => navigate(`/cursos/${encodeURIComponent(selected.courseId!)}/estudar`) : undefined}
+          onReviewLesson={selected.courseId ? () => navigate(`/cursos/${encodeURIComponent(selected.courseId!)}/estudar${lessonQuery}`) : undefined}
           onStart={() => updateSelected(startAssessment)}
           onAnswer={(questionId, option) =>
             updateSelected((item) => answerAssessment(item, questionId, option))

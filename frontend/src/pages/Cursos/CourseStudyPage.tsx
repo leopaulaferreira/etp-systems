@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, ClipboardCheck, Play, VideoOff } from 'lucide-react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useAssessments } from '../../assessments/AssessmentContext'
 import PageHero from '../../components/ui/PageHero'
 import type { CatalogCourse } from '../../mocks/cursos.mock'
@@ -9,6 +9,8 @@ import { fetchLessons, type Lesson } from '../Avaliacoes/assessmentApi'
 import { latestScore, remainingAttempts } from '../Avaliacoes/assessment'
 
 const panel = 'rounded-[22px] border border-ink-200/70 bg-panel shadow-card'
+const lessonNavSecondary = 'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-ink-200 bg-panel-alt px-4 py-2.5 text-sm font-bold text-ink-700 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto'
+const lessonNavPrimary = 'inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 sm:w-auto'
 
 function VideoSlot({ lesson }: { lesson: Lesson }) {
   const localVideo = lesson.videoUrl && /^\/videos\/[a-z0-9/_-]+\.mp4$/i.test(lesson.videoUrl)
@@ -25,19 +27,21 @@ function VideoSlot({ lesson }: { lesson: Lesson }) {
 
 export default function CourseStudyPage() {
   const { id } = useParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [course, setCourse] = useState<CatalogCourse | null>(null)
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [revision, setRevision] = useState(0)
+  const lessonHeadingRef = useRef<HTMLHeadingElement>(null)
+  const focusNextLesson = useRef(false)
   const { assessments, status: assessmentStatus } = useAssessments()
   const assessment = assessments.find((item) => item.courseId === id)
+  const requestedLesson = Number(searchParams.get('aula'))
+  const activeIndex = lessons.length && Number.isSafeInteger(requestedLesson) && requestedLesson > 0
+    ? Math.min(requestedLesson - 1, lessons.length - 1) : 0
+  const activeLesson = lessons[activeIndex]
   const hasVideo = lessons.some((lesson) => Boolean(lesson.videoUrl))
-  const hasText = lessons.some((lesson) => Boolean(lesson.content.trim()))
-  const studySteps = [
-    ...(hasText ? ['Leia o resumo da aula'] : []),
-    hasVideo ? 'Assista às videoaulas' : 'Assista ao vídeo quando disponível',
-    'Faça a avaliação',
-  ]
+  const assessmentHref = `/avaliacoes?curso=${encodeURIComponent(assessment?.courseId ?? id ?? '')}&aula=${activeIndex + 1}`
 
   useEffect(() => {
     if (!id) return
@@ -51,6 +55,19 @@ export default function CourseStudyPage() {
     return () => controller.abort()
   }, [id, revision])
 
+  useEffect(() => {
+    if (!focusNextLesson.current || status !== 'ready') return
+    lessonHeadingRef.current?.focus({ preventScroll: true })
+    lessonHeadingRef.current?.scrollIntoView({ block: 'start' })
+    focusNextLesson.current = false
+  }, [activeIndex, status])
+
+  function showLesson(index: number) {
+    if (index < 0 || index >= lessons.length || index === activeIndex) return
+    focusNextLesson.current = true
+    setSearchParams({ aula: String(index + 1) })
+  }
+
   return <div className="flex min-w-0 flex-col gap-5 lg:gap-6">
     <PageHero eyebrow="Seu espaço de estudo" icon={BookOpen} artworkIcon={Play}
       title={course?.title ?? 'Aula do curso'}
@@ -60,15 +77,19 @@ export default function CourseStudyPage() {
     {(!id || status === 'error') && <div role="alert" className={`${panel} flex flex-wrap items-center justify-between gap-3 p-6 text-sm text-ink-700`}><span>Não foi possível abrir a aula. Confira sua inscrição e tente novamente.</span><button type="button" onClick={() => { setStatus('loading'); setRevision((value) => value + 1) }} className="rounded-xl bg-brand-blue-700 px-4 py-2 font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Tentar novamente</button></div>}
     {status === 'ready' && <div className={`grid min-w-0 grid-cols-1 items-start gap-5 ${lessons.length ? 'xl:grid-cols-[minmax(0,1fr)_300px]' : ''}`}>
       <section aria-label="Aulas" className="flex min-w-0 flex-col gap-5">
-        {lessons.length ? lessons.map((lesson, index) => <article key={lesson.id} className={`${panel} flex flex-col gap-5 p-5 sm:p-7`}>
-          <div className="flex flex-col gap-1.5"><span className="text-[10px] font-extrabold uppercase tracking-wider text-brand-blue-400">Aula {index + 1}</span><h2 className="text-xl font-extrabold tracking-tight text-ink-900">{lesson.title}</h2></div>
-          <VideoSlot lesson={lesson} />
-          {lesson.content.trim() && <div className="flex flex-col gap-4 border-t border-ink-100 pt-5"><h3 className="text-sm font-extrabold text-ink-900">Resumo da aula</h3>{lesson.content.split(/\n\n/).map((paragraph, position) => <p key={position} className="text-sm leading-7 text-ink-700">{paragraph}</p>)}</div>}
-        </article>) : <section className={`${panel} p-6 sm:p-8`}><h2 className="text-lg font-extrabold text-ink-900">Conteúdo em preparação</h2><p className="mt-2 text-sm leading-6 text-ink-500">Este curso ainda não tem aula ou avaliação publicada. Você pode acompanhar seu avanço manualmente em Meus Cursos.</p></section>}
+        {activeLesson ? <article key={activeLesson.id} className={`${panel} flex flex-col gap-5 p-5 sm:p-7`}>
+          <div className="flex flex-col gap-1.5"><span className="text-[10px] font-extrabold uppercase tracking-wider text-brand-blue-400">Aula {activeIndex + 1} de {lessons.length}</span><h2 ref={lessonHeadingRef} tabIndex={-1} className="rounded text-xl font-extrabold tracking-tight text-ink-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">{activeLesson.title}</h2></div>
+          <VideoSlot lesson={activeLesson} />
+          {activeLesson.content.trim() && <div className="flex flex-col gap-4 border-t border-ink-100 pt-5"><h3 className="text-sm font-extrabold text-ink-900">Resumo da aula</h3>{activeLesson.content.split(/\n\n/).map((paragraph, position) => <p key={position} className="text-sm leading-7 text-ink-700">{paragraph}</p>)}</div>}
+          {lessons.length > 1 && <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink-100 pt-5">
+            <button type="button" onClick={() => showLesson(activeIndex - 1)} disabled={activeIndex === 0} className={lessonNavSecondary}><ArrowLeft className="h-4 w-4" aria-hidden="true" /> Aula anterior</button>
+            {activeIndex < lessons.length - 1 ? <button type="button" onClick={() => showLesson(activeIndex + 1)} className={lessonNavPrimary}>Próxima aula <ArrowRight className="h-4 w-4" aria-hidden="true" /></button> : assessment && <Link to={assessmentHref} className={lessonNavPrimary}>Ir para avaliação <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>}
+          </div>}
+        </article> : <section className={`${panel} p-6 sm:p-8`}><h2 className="text-lg font-extrabold text-ink-900">Conteúdo em preparação</h2><p className="mt-2 text-sm leading-6 text-ink-500">Este curso ainda não tem aula ou avaliação publicada. Você pode acompanhar seu avanço manualmente em Meus Cursos.</p></section>}
       </section>
       {lessons.length > 0 && <aside className="flex min-w-0 flex-col gap-5" aria-label="Roteiro do curso">
-        <section className={`${panel} p-5`}><h2 className="text-sm font-extrabold text-ink-900">Roteiro de estudo</h2><ol className="mt-4 flex flex-col gap-4 text-xs text-ink-700">{studySteps.map((step, index) => <li key={step} className="flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-blue-500/10 font-extrabold text-brand-blue-400">{index + 1}</span>{step}</li>)}</ol></section>
-        {lessons.length > 0 && <section className={`${panel} p-5`}><div className="flex items-center gap-2"><ClipboardCheck className="h-5 w-5 text-brand-blue-400" aria-hidden="true" /><h2 className="text-sm font-extrabold text-ink-900">Avaliação do curso</h2></div>{assessment ? <><p className="mt-3 text-xs leading-5 text-ink-500">{assessment.questions.length} questões · Nota mínima {assessment.minimumScore}% · {remainingAttempts(assessment)} tentativas restantes</p>{latestScore(assessment) !== null && <p className="mt-3 text-xs font-bold text-ink-700">Última nota: {latestScore(assessment)}%</p>}<Link to={`/avaliacoes?curso=${encodeURIComponent(assessment.courseId ?? '')}`} className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Ir para avaliação <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></> : <p className="mt-3 text-xs leading-5 text-ink-500">{assessmentStatus === 'loading' ? 'Carregando avaliação...' : 'A avaliação deste curso ainda não está disponível.'}</p>}</section>}
+        <section className={`${panel} p-5`}><h2 className="text-sm font-extrabold text-ink-900">Aulas do curso</h2><ol className="mt-4 flex flex-col gap-2">{lessons.map((lesson, index) => <li key={lesson.id}><button type="button" onClick={() => showLesson(index)} aria-current={index === activeIndex ? 'step' : undefined} className={`flex min-h-11 w-full items-center gap-3 rounded-xl border px-3 py-2 text-left text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 ${index === activeIndex ? 'border-brand-blue-500/25 bg-brand-blue-500/10 text-brand-blue-400' : 'border-transparent text-ink-700 hover:border-ink-200 hover:bg-ink-100'}`}><span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-blue-500/10 font-extrabold">{index + 1}</span><span className="min-w-0">{lesson.title}</span></button></li>)}</ol></section>
+        <section className={`${panel} p-5`}><div className="flex items-center gap-2"><ClipboardCheck className="h-5 w-5 text-brand-blue-400" aria-hidden="true" /><h2 className="text-sm font-extrabold text-ink-900">Avaliação do curso</h2></div>{assessment ? <><p className="mt-3 text-xs leading-5 text-ink-500">{assessment.questions.length} questões · Nota mínima {assessment.minimumScore}% · {remainingAttempts(assessment)} tentativas restantes</p>{latestScore(assessment) !== null && <p className="mt-3 text-xs font-bold text-ink-700">Última nota: {latestScore(assessment)}%</p>}<Link to={assessmentHref} className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Ir para avaliação <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></> : <p className="mt-3 text-xs leading-5 text-ink-500">{assessmentStatus === 'loading' ? 'Carregando avaliação...' : 'A avaliação deste curso ainda não está disponível.'}</p>}</section>
       </aside>}
     </div>}
   </div>
