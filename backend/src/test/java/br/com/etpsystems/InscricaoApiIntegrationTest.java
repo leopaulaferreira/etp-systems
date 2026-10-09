@@ -61,8 +61,25 @@ class InscricaoApiIntegrationTest {
             assertThat(mine.size()).isEqualTo(1);
             assertThat(mine.get(0).path("id").asText()).isEqualTo(cursoId.toString());
             assertThat(mine.get(0).path("enrolledAt").asText()).isNotBlank();
+            assertThat(mine.get(0).path("progress").asDouble()).isZero();
             assertThat(JSON.readTree(get(client, "/api/colaborador/meus-cursos", otherToken).body()).size())
                     .isZero();
+            String progressPath = "/api/colaborador/meus-cursos/" + cursoId + "/progresso";
+            assertThat(put(client, progressPath, otherToken, 50).statusCode()).isEqualTo(404);
+            assertThat(put(client, progressPath, firstToken, -1).statusCode()).isEqualTo(400);
+            assertThat(put(client, progressPath, firstToken, 101).statusCode()).isEqualTo(400);
+            JsonNode partial = JSON.readTree(put(client, progressPath, firstToken, 45).body());
+            assertThat(partial.path("progress").asDouble()).isEqualTo(45);
+            assertThat(partial.path("completedAt").isNull()).isTrue();
+            JsonNode completed = JSON.readTree(put(client, progressPath, firstToken, 100).body());
+            assertThat(completed.path("progress").asDouble()).isEqualTo(100);
+            assertThat(completed.path("completedAt").asText()).isNotBlank();
+            assertThat(JSON.readTree(get(client, "/api/colaborador/meus-cursos", firstToken).body())
+                    .get(0).path("completedAt").asText()).isEqualTo(completed.path("completedAt").asText());
+            assertThat(JSON.readTree(put(client, progressPath, firstToken, 100).body())
+                    .path("completedAt").asText()).isEqualTo(completed.path("completedAt").asText());
+            assertThat(JSON.readTree(put(client, progressPath, firstToken, 30).body())
+                    .path("completedAt").isNull()).isTrue();
             assertThat(post(client, "/api/colaborador/inscricoes/cursos/" + UUID.randomUUID(), firstToken)
                     .statusCode()).isEqualTo(404);
         }
@@ -94,6 +111,14 @@ class InscricaoApiIntegrationTest {
     private HttpResponse<String> post(HttpClient client, String path, String token) throws Exception {
         return client.send(HttpRequest.newBuilder(uri(path)).header("Authorization", "Bearer " + token)
                 .POST(HttpRequest.BodyPublishers.noBody()).build(), HttpResponse.BodyHandlers.ofString());
+    }
+
+    private HttpResponse<String> put(HttpClient client, String path, String token, int percentual) throws Exception {
+        return client.send(HttpRequest.newBuilder(uri(path))
+                .header("Authorization", "Bearer " + token)
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString("{\"percentual\":" + percentual + "}"))
+                .build(), HttpResponse.BodyHandlers.ofString());
     }
 
     private URI uri(String path) {

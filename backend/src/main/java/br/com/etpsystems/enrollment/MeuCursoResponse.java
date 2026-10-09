@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import br.com.etpsystems.course.Curso;
+import br.com.etpsystems.progress.ProgressoCurso;
 
 public record MeuCursoResponse(
         UUID id,
@@ -11,11 +12,17 @@ public record MeuCursoResponse(
         String description,
         String icon,
         double durationHours,
-        Instant enrolledAt
+        Instant enrolledAt,
+        double progress,
+        Instant updatedAt,
+        Instant completedAt
 ) {
-    static MeuCursoResponse from(Inscricao inscricao) {
+    public static MeuCursoResponse from(Inscricao inscricao, ProgressoCurso progresso) {
         Curso curso = inscricao.getCurso();
         return new MeuCursoResponse(curso.getId(), curso.getTitulo(), curso.getDescricao(),
-                curso.getIcone(), curso.getDuracaoMinutos() / 60.0, inscricao.getInscritoEm());
+                curso.getIcone(), curso.getDuracaoMinutos() / 60.0, inscricao.getInscritoEm(),
+                progresso == null ? 0 : progresso.getPercentualProgresso().doubleValue(),
+                progresso == null ? null : progresso.getAtualizadoEm(),
+                progresso == null ? null : progresso.getConcluidoEm());
     }
 }
