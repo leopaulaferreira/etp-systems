@@ -1,5 +1,6 @@
 import { MapPinned, BookCheck, TimerReset, BadgeCheck, ArrowRight, type LucideIcon } from 'lucide-react'
 import { progressOverview, type ProgressItem } from '../../../mocks/dashboard.mock'
+import { Link } from 'react-router-dom'
 
 /** Mesmo esquema de cores de MetricCard (StatsGrid), já que cobrem as mesmas 4 métricas. */
 const accentConfig: Record<ProgressItem['icon'], { icon: LucideIcon; badgeClass: string; barClass: string }> = {
@@ -14,13 +15,13 @@ export default function ProgressOverviewCard() {
     <section className="flex h-full flex-col gap-4 rounded-[22px] border border-ink-200/70 bg-panel p-5 shadow-card sm:p-6">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-[18px] font-extrabold tracking-[-0.015em] text-ink-900">Meu progresso</h2>
-        <button
-          type="button"
+        <Link
+          to="/relatorios"
           className="group flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 text-[13px] font-bold text-brand-blue-400 transition-colors duration-150 hover:bg-brand-blue-500/10 hover:text-brand-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
         >
           Ver relatório
           <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" strokeWidth={2.5} aria-hidden="true" />
-        </button>
+        </Link>
       </div>
 
       <ul className="flex flex-col divide-y divide-ink-100">

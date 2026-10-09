@@ -8,6 +8,7 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { continueLearning } from '../../../mocks/dashboard.mock'
+import { Link } from 'react-router-dom'
 
 export default function ContinueLearningCard() {
   const data = continueLearning
@@ -18,17 +19,17 @@ export default function ContinueLearningCard() {
         <h2 className="text-[19px] font-extrabold tracking-[-0.015em] text-ink-900 sm:text-xl">
           Continuar aprendendo
         </h2>
-        <button
-          type="button"
+        <Link
+          to="/trilhas"
           className="group flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 text-[13px] font-bold text-brand-blue-400 transition-colors duration-150 hover:bg-brand-blue-500/10 hover:text-brand-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
         >
-          <span className="hidden sm:inline">Ver minhas trilhas</span>
+          <span className="hidden sm:inline">Explorar trilhas</span>
           <ArrowRight
             className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
             strokeWidth={2.5}
             aria-hidden="true"
           />
-        </button>
+        </Link>
       </div>
 
       <div className="grid gap-5 md:grid-cols-[190px_minmax(0,1fr)] md:gap-6">
@@ -85,8 +86,8 @@ export default function ContinueLearningCard() {
                 <span className="truncate">{data.lastActivity}</span>
               </span>
             </div>
-            <button
-              type="button"
+            <Link
+              to="/meus-cursos"
               className="group inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-2.5 text-[13px] font-extrabold text-white shadow-[0_10px_22px_-12px_rgba(29,78,216,0.8)] transition-[transform,background-color,box-shadow] duration-200 hover:-translate-y-0.5 hover:bg-[#17399c] hover:shadow-[0_14px_26px_-12px_rgba(29,78,216,0.9)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 focus-visible:ring-offset-2 motion-reduce:transform-none"
             >
               <span>{data.ctaLabel}</span>
@@ -95,7 +96,7 @@ export default function ContinueLearningCard() {
                 strokeWidth={2.5}
                 aria-hidden="true"
               />
-            </button>
+            </Link>
           </div>
         </div>
       </div>

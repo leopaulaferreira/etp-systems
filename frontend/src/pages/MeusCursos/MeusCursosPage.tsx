@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { RefreshCw } from 'lucide-react'
 import { fetchCourses } from '../Cursos/courseApi'
 import type { CourseItem } from '../../mocks/meus-cursos.mock'
@@ -12,7 +13,8 @@ import { courseThumbnail, fetchMyCourses, formatCourseDuration, updateCourseProg
 import './meus-cursos.css'
 
 export default function MeusCursosPage() {
-  const [activeTab, setActiveTab] = useState<CourseTab>('ongoing')
+  const [searchParams] = useSearchParams()
+  const [activeTab, setActiveTab] = useState<CourseTab>(searchParams.get('aba') === 'concluidos' ? 'completed' : 'ongoing')
   const [courses, setCourses] = useState<CourseItem[]>([])
   const [suggestions, setSuggestions] = useState<CourseItem[]>([])
   const [saved, setSaved] = useState<CourseItem[]>([])

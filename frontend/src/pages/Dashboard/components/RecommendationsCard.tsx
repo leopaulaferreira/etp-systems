@@ -10,6 +10,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { recommendations, type Recommendation, type RecommendationType } from '../../../mocks/dashboard.mock'
+import { Link } from 'react-router-dom'
 
 /** Mesmo ícone + cor usados em Trilhas para os mesmos temas (shield/cloud/lock), por consistência entre páginas. */
 const thumbnailConfig: Record<Recommendation['thumbnail'], { icon: LucideIcon; tile: string; iconClass: string }> = {
@@ -30,13 +31,13 @@ export default function RecommendationsCard() {
     <section className="flex flex-col gap-4 rounded-[22px] border border-ink-200/70 bg-panel p-5 shadow-card sm:p-6">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-[18px] font-extrabold tracking-[-0.015em] text-ink-900">Recomendações para você</h2>
-        <button
-          type="button"
+        <Link
+          to="/cursos"
           className="group flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 text-[13px] font-bold text-brand-blue-400 transition-colors duration-150 hover:bg-brand-blue-500/10 hover:text-brand-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
         >
           Ver todas
           <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" strokeWidth={2.5} aria-hidden="true" />
-        </button>
+        </Link>
       </div>
 
       <ul className="flex flex-col divide-y divide-ink-100">
@@ -45,8 +46,8 @@ export default function RecommendationsCard() {
           const LevelIcon = levelIcons[item.level]
           return (
             <li key={item.id} className="first:[&>button]:pt-0 last:[&>button]:pb-0">
-              <button
-                type="button"
+              <Link
+                to={item.type === 'TRILHA' ? '/trilhas?categoria=Seguran%C3%A7a' : `/cursos?busca=${encodeURIComponent(item.title)}`}
                 className="group -mx-2 flex w-full items-center gap-3 rounded-xl px-2 py-3.5 text-left transition-[background-color,transform] duration-150 hover:translate-x-0.5 hover:bg-ink-100/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-brand-blue-400 motion-reduce:transform-none"
               >
                 <span className={`relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border ${tile}`}>
@@ -74,7 +75,7 @@ export default function RecommendationsCard() {
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-ink-200/80 bg-panel-alt text-ink-400 transition-[transform,background-color,border-color,color] duration-200 group-hover:translate-x-0.5 group-hover:border-brand-blue-500/40 group-hover:bg-brand-blue-500/10 group-hover:text-brand-blue-400">
                   <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.2} aria-hidden="true" />
                 </span>
-              </button>
+              </Link>
             </li>
           )
         })}

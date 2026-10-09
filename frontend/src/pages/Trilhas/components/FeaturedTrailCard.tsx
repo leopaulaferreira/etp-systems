@@ -1,6 +1,7 @@
 import { ShieldCheck, Layers3, Clock3, ArrowRight, LockKeyhole, Network, Sparkles } from 'lucide-react'
 import { levelIcons } from './TrailCard'
 import { featuredLearningPath } from '../../../mocks/trilhas.mock'
+import { Link } from 'react-router-dom'
 
 export default function FeaturedTrailCard() {
   const data = featuredLearningPath
@@ -61,17 +62,17 @@ export default function FeaturedTrailCard() {
       </div>
 
       <div className="relative shrink-0 md:col-start-2 md:row-start-2 md:justify-self-start xl:col-start-3 xl:row-start-1 xl:justify-self-auto xl:self-center">
-        <button
-          type="button"
+        <Link
+          to="/cursos?categoria=Seguran%C3%A7a"
           className="group inline-flex min-h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-brand-blue-600 px-5 py-3 text-sm font-extrabold text-white shadow-[0_12px_28px_-14px_rgba(37,99,235,0.9)] transition-[transform,background-color,box-shadow] duration-200 hover:-translate-y-0.5 hover:bg-brand-blue-500 hover:shadow-[0_16px_32px_-14px_rgba(37,99,235,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-navy-900 motion-reduce:transform-none"
         >
-          <span>{data.ctaLabel}</span>
+          <span>Explorar cursos de Segurança</span>
           <ArrowRight
             className="h-4 w-4 text-brand-cyan-400 transition-transform duration-200 group-hover:translate-x-0.5"
             strokeWidth={2.5}
             aria-hidden="true"
           />
-        </button>
+        </Link>
       </div>
     </section>
   )

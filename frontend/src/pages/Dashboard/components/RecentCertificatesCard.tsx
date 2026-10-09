@@ -1,18 +1,19 @@
-import { Award, Download, ArrowRight } from 'lucide-react'
+import { Award, ArrowUpRight, ArrowRight } from 'lucide-react'
 import { recentCertificates } from '../../../mocks/dashboard.mock'
+import { Link } from 'react-router-dom'
 
 export default function RecentCertificatesCard() {
   return (
     <section className="flex h-full flex-col gap-4 rounded-[22px] border border-ink-200/70 bg-panel p-5 shadow-card sm:p-6">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-[18px] font-extrabold tracking-[-0.015em] text-ink-900">Certificados recentes</h2>
-        <button
-          type="button"
+        <Link
+          to="/certificados"
           className="group flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 text-[13px] font-bold text-brand-blue-400 transition-colors duration-150 hover:bg-brand-blue-500/10 hover:text-brand-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
         >
           Ver todos
           <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" strokeWidth={2.5} aria-hidden="true" />
-        </button>
+        </Link>
       </div>
 
       <ul className="flex flex-col divide-y divide-ink-100">
@@ -33,13 +34,13 @@ export default function RecentCertificatesCard() {
               <span className="truncate text-[14px] font-bold text-ink-900">{certificate.title}</span>
               <span className="text-[11px] font-medium text-ink-500">Concluído em {certificate.completedAt}</span>
             </span>
-            <button
-              type="button"
-              aria-label={`Baixar certificado ${certificate.title}`}
+            <Link
+              to="/certificados"
+              aria-label={`Ver certificados: ${certificate.title}`}
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-ink-200/80 bg-panel-alt text-ink-400 transition-[transform,background-color,border-color,color] duration-150 hover:-translate-y-0.5 hover:border-brand-blue-500/40 hover:bg-brand-blue-500/10 hover:text-brand-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
             >
-              <Download className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-            </button>
+              <ArrowUpRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+            </Link>
           </li>
         ))}
       </ul>

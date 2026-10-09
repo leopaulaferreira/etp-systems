@@ -1,4 +1,5 @@
 import { MapPinned, BookCheck, BadgeCheck, TimerReset, ArrowUpRight, type LucideIcon } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { type MetricAccent, type MetricCardData } from '../../../mocks/dashboard.mock'
 
 const icons: Record<MetricCardData['icon'], LucideIcon> = {
@@ -22,6 +23,12 @@ type MetricCardProps = {
 export default function MetricCard({ data }: MetricCardProps) {
   const Icon = icons[data.icon]
   const accent = accentClasses[data.accent]
+  const destination = {
+    trilhas: '/trilhas',
+    cursos: '/meus-cursos?aba=concluidos',
+    certificados: '/certificados',
+    horas: '/relatorios',
+  }[data.icon]
 
   return (
     <div className="group relative flex min-h-[152px] overflow-hidden rounded-[20px] border border-ink-200/70 bg-panel p-5 shadow-card transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-1 hover:border-brand-blue-500/50 hover:shadow-[0_20px_38px_-22px_rgba(37,99,235,0.45)] motion-reduce:transform-none">
@@ -40,15 +47,15 @@ export default function MetricCard({ data }: MetricCardProps) {
           </div>
         </div>
 
-        <button
-          type="button"
+        <Link
+          to={destination}
           className="mt-auto flex items-center justify-between border-t border-ink-100/90 pt-3 text-[13px] font-bold text-brand-blue-400 transition-colors duration-150 hover:text-brand-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
         >
           {data.ctaLabel}
           <span className="flex h-7 w-7 items-center justify-center rounded-full border border-ink-200/80 bg-panel-alt text-ink-400 transition-[transform,background-color,border-color,color] duration-200 group-hover:translate-x-0.5 group-hover:border-brand-blue-500/40 group-hover:bg-brand-blue-500/10 group-hover:text-brand-blue-400">
             <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2.2} aria-hidden="true" />
           </span>
-        </button>
+        </Link>
       </div>
     </div>
   )

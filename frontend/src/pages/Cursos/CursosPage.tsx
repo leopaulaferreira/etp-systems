@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { BookOpen, ChevronDown, RefreshCw, SearchX } from 'lucide-react'
 import { catalogCourses, courseCategories, featuredCourse, type CatalogCourse } from '../../mocks/cursos.mock'
 import { initialFilters, selectCourses, type CatalogFilters } from './catalog'
@@ -15,8 +16,13 @@ import FeaturedCourseCard from './components/FeaturedCourseCard'
 const PAGE_SIZE = 8
 
 export default function CursosPage() {
+  const [searchParams] = useSearchParams()
   const { reload: reloadAssessments } = useAssessments()
-  const [filters, setFilters] = useState<CatalogFilters>(initialFilters)
+  const [filters, setFilters] = useState<CatalogFilters>(() => ({
+    ...initialFilters,
+    query: searchParams.get('busca') ?? '',
+    category: searchParams.get('categoria') ?? 'Todas',
+  }))
   const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [courses, setCourses] = useState<CatalogCourse[]>([])

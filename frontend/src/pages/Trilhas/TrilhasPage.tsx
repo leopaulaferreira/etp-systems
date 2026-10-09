@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { ArrowRight } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
 import TrilhasHero from './components/TrilhasHero'
 import TrilhasFilters from './components/TrilhasFilters'
 import FeaturedTrailCard from './components/FeaturedTrailCard'
@@ -13,7 +14,11 @@ import {
 } from '../../mocks/trilhas.mock'
 
 export default function TrilhasPage() {
-  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('Todas')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const initialCategory = searchParams.get('categoria')
+  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>(
+    categoryFilters.find((category) => category === initialCategory) ?? 'Todas',
+  )
   const [selectedLevel, setSelectedLevel] = useState<LevelFilter>('Todos')
 
   const filteredPaths = useMemo(
@@ -43,9 +48,10 @@ export default function TrilhasPage() {
 
       <TrailGrid paths={filteredPaths} />
 
-      <div className="flex justify-center pb-1 pt-0.5">
+      {(selectedCategory !== 'Todas' || selectedLevel !== 'Todos') && <div className="flex justify-center pb-1 pt-0.5">
         <button
           type="button"
+          onClick={() => { setSelectedCategory('Todas'); setSelectedLevel('Todos'); setSearchParams({}, { replace: true }) }}
           className="group flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold text-brand-blue-400 transition-colors duration-150 hover:bg-brand-blue-500/10 hover:text-brand-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
         >
           Ver todas as trilhas
@@ -55,7 +61,7 @@ export default function TrilhasPage() {
             aria-hidden="true"
           />
         </button>
-      </div>
+      </div>}
     </div>
   )
 }

@@ -44,7 +44,7 @@ export const continueLearning: ContinueLearning = {
   modulesCompleted: 8,
   modulesTotal: 12,
   lastActivity: 'Retomar: Introdução à Criptografia',
-  ctaLabel: 'Continuar agora',
+  ctaLabel: 'Ver meus cursos',
 }
 
 export type RecommendationLevel = 'Iniciante' | 'Intermediário' | 'Avançado'

@@ -16,6 +16,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { type LearningPath, type LearningPathIconKey, type LearningPathLevel } from '../../../mocks/trilhas.mock'
+import { Link } from 'react-router-dom'
 
 const iconConfig: Record<LearningPathIconKey, { icon: LucideIcon; tileClass: string; iconClass: string }> = {
   cloud: { icon: CloudCog, tileClass: 'border-orange-400/20 bg-orange-400/10', iconClass: 'bg-orange-500 text-white' },
@@ -43,8 +44,9 @@ export default function TrailCard({ path }: TrailCardProps) {
   const LevelIcon = levelIcons[path.level]
 
   return (
-    <button
-      type="button"
+    <Link
+      to={`/cursos?categoria=${encodeURIComponent(path.category)}`}
+      aria-label={`Explorar cursos de ${path.category}: ${path.title}`}
       className="group relative flex min-h-[204px] w-full overflow-hidden rounded-[20px] border border-ink-200/70 bg-panel p-5 text-left shadow-card transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-1 hover:border-brand-blue-500/50 hover:shadow-[0_20px_38px_-22px_rgba(37,99,235,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/35 focus-visible:ring-offset-2 focus-visible:ring-offset-surface motion-reduce:transform-none"
     >
       <div className="flex h-full w-full flex-col">
@@ -87,6 +89,6 @@ export default function TrailCard({ path }: TrailCardProps) {
           </span>
         </div>
       </div>
-    </button>
+    </Link>
   )
 }
