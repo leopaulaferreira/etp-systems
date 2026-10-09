@@ -1,6 +1,6 @@
 # Backend do ETP Systems
 
-API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. As Fases 1–4 entregam a base, as entidades centrais, o catálogo de cursos e autenticação com BCrypt, JWT e perfis.
+API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. As Fases 1–6 entregam a base, as entidades centrais, o catálogo, a autenticação e as inscrições em cursos.
 
 ## Estrutura
 
@@ -14,19 +14,21 @@ src/main/java/br/com/etpsystems/
 ├── course/Categoria.java
 ├── course/Curso.java, CursoController.java, CursoService.java,
 │   CursoRepository.java e CursoResponse.java
+├── enrollment/    # Inscrições em cursos e consulta de Meus Cursos
 ├── track/Trilha.java
 └── user/          # Usuario, Perfil e repositório
 ```
 
-Os módulos `enrollment`, `progress`, `assessment`, `certificate`, `report` e `ai` serão criados à medida que suas regras forem implementadas. Cada domínio agrupa controller, service, repository, entity e DTO quando necessários.
+Os módulos `progress`, `assessment`, `certificate`, `report` e `ai` serão criados à medida que suas regras forem implementadas. Cada domínio agrupa controller, service, repository, entity e DTO quando necessários.
 
-As migrações em `src/main/resources/db/migration/` criam o schema (V1), acrescentam os campos do catálogo (V2), incluem 24 cursos e 5 categorias iniciais (V3) e normalizam os perfis de usuário (V4). Em bancos criados antes do Flyway, a V1 é registrada como baseline e as demais migrações são aplicadas. O arquivo [`../database/schema.sql`](../database/schema.sql) permanece como referência histórica. Com `spring.jpa.hibernate.ddl-auto=validate`, a aplicação verifica o mapeamento na inicialização e não altera as tabelas por conta própria.
+As migrações em `src/main/resources/db/migration/` criam o schema (V1), acrescentam os campos do catálogo (V2), incluem 24 cursos e 5 categorias iniciais (V3), normalizam os perfis (V4) e permitem inscrições em cursos sem perder as inscrições em trilhas (V5). Em bancos criados antes do Flyway, a V1 é registrada como baseline e as demais migrações são aplicadas. O arquivo [`../database/schema.sql`](../database/schema.sql) permanece como referência histórica. Com `spring.jpa.hibernate.ddl-auto=validate`, a aplicação verifica o mapeamento na inicialização e não altera as tabelas por conta própria.
 
 ## Modelo atual
 
 - Um `Usuario` pertence a zero ou uma `Empresa`; uma empresa pode ter vários usuários.
 - Um `Curso` pertence a zero ou uma `Categoria`; uma categoria pode classificar vários cursos.
 - Uma `Trilha` pode pertencer a uma empresa e contém vários cursos; um curso pode participar de várias trilhas pela tabela `trilhas_cursos`.
+- Uma `Inscricao` vincula um colaborador a um curso ou uma trilha. A V5 impede destinos vazios ou duplos e inscrições repetidas no mesmo curso.
 - As associações são navegáveis apenas pelo lado necessário nesta fase. Isso evita coleções grandes e carregamentos circulares em `Empresa`, `Categoria` e `Curso`.
 - Os identificadores são UUIDs armazenados como `CHAR(36)`. As datas continuam preenchidas pelo MySQL.
 
@@ -94,7 +96,7 @@ A resposta contém `accessToken`, `tokenType: "Bearer"`, `expiresIn` em segundos
 | `GET /api/cursos` e `GET /api/cursos/{id}` | Públicas durante a integração gradual |
 | Health check, Swagger e OpenAPI (`GET`) | Públicos |
 | `/api/empresa/**` | Reservadas ao perfil `EMPRESA`; funcionalidades entram nas próximas fases |
-| `/api/colaborador/**` | Reservadas ao perfil `COLABORADOR`; funcionalidades entram nas próximas fases |
+| `/api/colaborador/**` | Reservadas ao perfil `COLABORADOR`; inscrições e Meus Cursos já estão disponíveis |
 | Demais rotas | Bloqueadas por padrão |
 
 Entradas inválidas retornam 400; credenciais ou tokens inválidos retornam 401; falta de permissão retorna 403. As falhas de credenciais usam a mesma mensagem para usuário inexistente e senha errada. A validação JWT verifica assinatura HS256, emissor, expiração, UUID do usuário e perfil.
@@ -103,6 +105,13 @@ A API usa Bearer sem cookies de sessão. O token expira após o prazo configurad
 
 A Fase 4 não inclui cadastro público, confirmação/recuperação por e-mail nem login Google/Microsoft. A Fase 5 conecta a tela de login à API: o React valida a sessão por `/api/auth/me` ao recarregar e trata expiração e falhas de conexão. Consulte o [guia do frontend](../frontend/README.md).
 
+## Inscrições e Meus Cursos — Fase 6
+
+- `POST /api/colaborador/inscricoes/cursos/{cursoId}` inscreve o colaborador identificado pelo JWT. Repetir a chamada retorna a inscrição existente sem duplicá-la; curso inexistente retorna 404.
+- `GET /api/colaborador/meus-cursos` lista apenas os cursos inscritos pelo colaborador autenticado, em ordem da inscrição mais recente. A resposta contém dados básicos do curso e `enrolledAt`, sem entidades JPA ou informações de outros usuários.
+- O banco conserva as inscrições antigas em trilhas. A API para iniciar novas inscrições em trilhas fica para a integração dessa tela.
+- Progresso, aulas concluídas e certificados continuam nas fases seguintes; a Fase 6 não inventa percentuais.
+
 ## Verificação
 
 - `GET /actuator/health` retorna `{"status":"UP"}` quando a aplicação e o banco estão saudáveis.
@@ -110,7 +119,7 @@ A Fase 4 não inclui cadastro público, confirmação/recuperação por e-mail n
 - `GET /v3/api-docs` fornece o documento OpenAPI JSON.
 - `GET /api/cursos` retorna o catálogo na ordem de exibição; `GET /api/cursos/{id}` retorna um curso pelo UUID, com 404 para curso ausente.
 - `mvn -f backend/pom.xml verify` executa build e testes de saúde, documentação, login, tokens, permissões e CORS sem exigir MySQL. Os testes usam uma chave JWT própria, que não é empacotada na aplicação.
-- Com MySQL ativo e as variáveis locais carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml verify` inclui os testes de entidades, catálogo e autenticação com banco real. Sem essa variável, os três testes de banco são ignorados.
+- Com MySQL ativo e as variáveis locais carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml verify` inclui os testes de entidades, catálogo, autenticação e inscrições com banco real. Sem essa variável, os testes de banco são ignorados.
 - `AuthDatabaseIntegrationTest` cria contas e empresa temporárias com identificadores únicos, valida BCrypt/login e inicialização repetida, e remove os registros ao terminar. `DomainMappingIntegrationTest` reverte suas inserções por transação. As migrações Flyway permanecem aplicadas.
 
-O Actuator expõe somente o endpoint de health. Login e catálogo já estão integrados ao frontend. A página Cursos recorre ao mock local em falhas de disponibilidade; respostas 401 encerram a sessão. Os demais domínios serão integrados nas próximas fases.
+O Actuator expõe somente o endpoint de health. Login, catálogo e Meus Cursos já estão integrados ao frontend. A página Cursos recorre ao mock local em falhas de disponibilidade, mas não oferece inscrição nesse modo; respostas 401 encerram a sessão. Os demais domínios serão integrados nas próximas fases.

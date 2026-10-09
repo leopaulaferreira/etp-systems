@@ -130,6 +130,8 @@ cookies HttpOnly exigirá adaptar o backend e a proteção CSRF.
 
 O catálogo envia Bearer nas consultas e conserva a alternativa local para falhas
 de disponibilidade. Um 401 encaminha para autenticação, sem ativar esse fallback.
+Quando a API está disponível, o catálogo permite a inscrição real em cursos.
+`/meus-cursos` consulta os cursos da conta pelo JWT; progresso e conclusões aguardam a próxima fase.
 Cadastro, recuperação por e-mail e login Google/Microsoft continuam indisponíveis;
 os textos da tela explicam isso sem aceitar credenciais fictícias.
 
@@ -155,5 +157,5 @@ ambos os perfis, senha incorreta, recarga, logout, expiração, falha de rede e 
 - [x] **Avaliações** (`/avaliacoes`) — resumo, filtros, questões interativas, resultados e gráficos ([documentação](src/pages/Avaliacoes/README.md))
 - [ ] Demais páginas (Trilhas, Meus Cursos, Certificados, Relatórios, Perfil, Configurações) — hoje são placeholders (`ComingSoonPage`)
 
-Login e catálogo de cursos usam a API real. Os demais domínios continuam com os
+Login, catálogo de cursos e inscrições usam a API real. Os demais domínios continuam com os
 dados de `src/mocks/` enquanto suas APIs são implementadas.

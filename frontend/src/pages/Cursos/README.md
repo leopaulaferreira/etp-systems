@@ -16,10 +16,11 @@ quando a API está indisponível. O destaque pertence ao catálogo.
 - O destaque fica oculto durante uma busca ou filtro para não exibir conteúdo fora dos resultados.
 - Estado vazio com ação para limpar a seleção e voltar ao catálogo completo.
 - “Ver curso” abre os dados do item em um diálogo com foco controlado e fechamento por Escape.
-- “Acessar Meus Cursos” navega para `/meus-cursos`.
+- Com a API ativa, “Inscrever-se no curso” registra a inscrição da conta atual. Cursos já inscritos mostram “Acessar Meus Cursos”.
 
 Busca, filtros e ordenação são locais e reiniciam ao sair da página ou recarregar.
-O diálogo é uma apresentação do curso: não realiza matrícula nem reproduz aulas.
+O diálogo permite inscrição em cursos reais, mas não reproduz aulas. No modo de
+catálogo local, a inscrição fica indisponível para não criar uma confirmação fictícia.
 Com a API ativa, a página omite contagens de alunos porque esse dado ainda não existe no banco.
 Se a consulta falhar, aparece um aviso com ação para tentar novamente.
 
