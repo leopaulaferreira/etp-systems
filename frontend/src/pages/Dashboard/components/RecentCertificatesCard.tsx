@@ -1,8 +1,8 @@
 import { Award, ArrowUpRight, ArrowRight } from 'lucide-react'
-import { recentCertificates } from '../../../mocks/dashboard.mock'
 import { Link } from 'react-router-dom'
+import type { DashboardData } from '../dashboardApi'
 
-export default function RecentCertificatesCard() {
+export default function RecentCertificatesCard({ items }: { items: DashboardData['recentCertificates'] }) {
   return (
     <section className="flex h-full flex-col gap-4 rounded-[22px] border border-ink-200/70 bg-panel p-5 shadow-card sm:p-6">
       <div className="flex items-center justify-between gap-3">
@@ -17,7 +17,8 @@ export default function RecentCertificatesCard() {
       </div>
 
       <ul className="flex flex-col divide-y divide-ink-100">
-        {recentCertificates.map((certificate) => (
+        {items.length === 0 && <li className="py-4 text-sm text-ink-500">Seus certificados aparecerão aqui após a aprovação nos cursos.</li>}
+        {items.map((certificate) => (
           <li
             key={certificate.id}
             className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-3.5 transition-colors duration-150 first:pt-0 last:pb-0 hover:bg-ink-100/60"
@@ -32,7 +33,7 @@ export default function RecentCertificatesCard() {
             </span>
             <span className="flex min-w-0 flex-1 flex-col gap-0.5">
               <span className="truncate text-[14px] font-bold text-ink-900">{certificate.title}</span>
-              <span className="text-[11px] font-medium text-ink-500">Concluído em {certificate.completedAt}</span>
+              <span className="text-[11px] font-medium text-ink-500">Emitido em {new Date(certificate.issuedAt).toLocaleDateString('pt-BR')}</span>
             </span>
             <Link
               to="/certificados"

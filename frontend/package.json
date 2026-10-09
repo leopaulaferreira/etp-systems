@@ -14,6 +14,7 @@
     "test:cursos": "node --experimental-strip-types --test tests/cursos.test.mjs tests/course-api.test.mjs",
     "test:meus-cursos": "node --experimental-strip-types --test tests/my-courses-api.test.mjs",
     "test:certificados": "node --experimental-strip-types --test tests/certificados.test.mjs",
+    "test:dashboard": "node --experimental-strip-types --test tests/dashboard.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

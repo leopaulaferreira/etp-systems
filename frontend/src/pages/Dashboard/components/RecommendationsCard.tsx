@@ -2,6 +2,7 @@ import {
   ShieldCheck,
   CloudCog,
   Fingerprint,
+  BookOpen,
   ArrowRight,
   Clock3,
   SignalLow,
@@ -9,28 +10,24 @@ import {
   SignalHigh,
   type LucideIcon,
 } from 'lucide-react'
-import { recommendations, type Recommendation, type RecommendationType } from '../../../mocks/dashboard.mock'
 import { Link } from 'react-router-dom'
+import type { DashboardData } from '../dashboardApi'
 
-/** Mesmo ícone + cor usados em Trilhas para os mesmos temas (shield/cloud/lock), por consistência entre páginas. */
-const thumbnailConfig: Record<Recommendation['thumbnail'], { icon: LucideIcon; tile: string; iconClass: string }> = {
-  seguranca: { icon: ShieldCheck, tile: 'border-indigo-400/20 bg-indigo-400/10', iconClass: 'bg-indigo-600 text-white' },
-  nuvem: { icon: CloudCog, tile: 'border-orange-400/20 bg-orange-400/10', iconClass: 'bg-orange-500 text-white' },
-  dados: { icon: Fingerprint, tile: 'border-teal-400/20 bg-teal-400/10', iconClass: 'bg-teal-600 text-white' },
+const thumbnailConfig: Record<string, { icon: LucideIcon; tile: string; iconClass: string }> = {
+  security: { icon: ShieldCheck, tile: 'border-indigo-400/20 bg-indigo-400/10', iconClass: 'bg-indigo-600 text-white' },
+  cloud: { icon: CloudCog, tile: 'border-orange-400/20 bg-orange-400/10', iconClass: 'bg-orange-500 text-white' },
+  analytics: { icon: Fingerprint, tile: 'border-teal-400/20 bg-teal-400/10', iconClass: 'bg-teal-600 text-white' },
 }
 
-const typeBadgeClasses: Record<RecommendationType, string> = {
-  CURSO: 'border-blue-400/20 bg-blue-400/10 text-blue-400',
-  TRILHA: 'border-violet-400/20 bg-violet-400/10 text-violet-400',
-}
+const fallbackThumbnail = { icon: BookOpen, tile: 'border-blue-400/20 bg-blue-400/10', iconClass: 'bg-blue-600 text-white' }
 
-const levelIcons = { Iniciante: SignalLow, Intermediário: SignalMedium, Avançado: SignalHigh }
+const levelIcons: Record<string, LucideIcon> = { Iniciante: SignalLow, Intermediário: SignalMedium, Avançado: SignalHigh }
 
-export default function RecommendationsCard() {
+export default function RecommendationsCard({ items }: { items: DashboardData['recommendations'] }) {
   return (
     <section className="flex flex-col gap-4 rounded-[22px] border border-ink-200/70 bg-panel p-5 shadow-card sm:p-6">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-[18px] font-extrabold tracking-[-0.015em] text-ink-900">Recomendações para você</h2>
+        <h2 className="text-[18px] font-extrabold tracking-[-0.015em] text-ink-900">Explore o catálogo</h2>
         <Link
           to="/cursos"
           className="group flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 text-[13px] font-bold text-brand-blue-400 transition-colors duration-150 hover:bg-brand-blue-500/10 hover:text-brand-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
@@ -41,13 +38,14 @@ export default function RecommendationsCard() {
       </div>
 
       <ul className="flex flex-col divide-y divide-ink-100">
-        {recommendations.map((item) => {
-          const { icon: Icon, tile, iconClass } = thumbnailConfig[item.thumbnail]
-          const LevelIcon = levelIcons[item.level]
+        {items.length === 0 && <li className="py-4 text-sm text-ink-500">Você já está inscrito nos cursos disponíveis.</li>}
+        {items.map((item) => {
+          const { icon: Icon, tile, iconClass } = thumbnailConfig[item.icon] ?? fallbackThumbnail
+          const LevelIcon = levelIcons[item.level] ?? SignalLow
           return (
-            <li key={item.id} className="first:[&>button]:pt-0 last:[&>button]:pb-0">
+            <li key={item.id} className="first:[&>a]:pt-0 last:[&>a]:pb-0">
               <Link
-                to={item.type === 'TRILHA' ? '/trilhas?categoria=Seguran%C3%A7a' : `/cursos?busca=${encodeURIComponent(item.title)}`}
+                to={`/cursos?busca=${encodeURIComponent(item.title)}`}
                 className="group -mx-2 flex w-full items-center gap-3 rounded-xl px-2 py-3.5 text-left transition-[background-color,transform] duration-150 hover:translate-x-0.5 hover:bg-ink-100/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-brand-blue-400 motion-reduce:transform-none"
               >
                 <span className={`relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border ${tile}`}>
@@ -59,8 +57,8 @@ export default function RecommendationsCard() {
                 <span className="flex min-w-0 flex-1 flex-col gap-1.5">
                   <span className="line-clamp-2 text-[14px] font-bold leading-snug text-ink-900">{item.title}</span>
                   <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] font-semibold text-ink-500">
-                    <span className={`rounded-md border px-1.5 py-0.5 text-[9px] font-extrabold tracking-wide ${typeBadgeClasses[item.type]}`}>
-                      {item.type}
+                    <span className="rounded-md border border-blue-400/20 bg-blue-400/10 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wide text-blue-400">
+                      CURSO
                     </span>
                     <span className="flex items-center gap-1">
                       <LevelIcon className="h-3.5 w-3.5 text-ink-400" strokeWidth={2} aria-hidden="true" />
@@ -68,7 +66,7 @@ export default function RecommendationsCard() {
                     </span>
                     <span className="flex items-center gap-1">
                       <Clock3 className="h-3.5 w-3.5 text-ink-400" strokeWidth={2} aria-hidden="true" />
-                      {item.durationHours}h
+                      {Number(item.durationHours.toFixed(1)).toLocaleString('pt-BR')}h
                     </span>
                   </span>
                 </span>

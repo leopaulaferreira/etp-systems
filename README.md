@@ -139,7 +139,8 @@ recarregar, respeita os perfis Colaborador e Empresa e é encerrada no logout ou
 - visão geral da aprendizagem;
 - indicadores de progresso;
 - acesso rápido às principais áreas;
-- estrutura preparada para indicadores provenientes da API.
+- indicadores reais de cursos, avaliações, certificados e horas certificadas;
+- sugestões do catálogo e acesso ao curso em andamento.
 
 ---
 
