@@ -1,6 +1,6 @@
 # Backend do ETP Systems
 
-API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. As Fases 1–9 entregam a base, catálogo, autenticação, inscrições, progresso, avaliações e certificados de cursos piloto.
+API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. As Fases 1–10 entregam a base, catálogo, autenticação, inscrições, progresso, avaliações, certificados e indicadores do colaborador.
 
 ## Estrutura
 
@@ -18,6 +18,7 @@ src/main/java/br/com/etpsystems/
 ├── progress/      # Atualização e persistência do progresso em cursos
 ├── assessment/    # Aulas, questões, alternativas, tentativas e notas
 ├── certificate/   # Emissão e consulta de certificados
+├── dashboard/     # Resumo e indicadores do colaborador
 ├── track/Trilha.java
 └── user/          # Usuario, Perfil e repositório
 ```
@@ -145,6 +146,10 @@ Uma aprovação na avaliação emite automaticamente um certificado apenas se `c
 
 As respostas incluem UUID, nome do titular, curso, título, descrição, duração, código único e data de emissão. O PDF é gerado pelo frontend com esses dados; não há validação pública de códigos nesta fase. Quando LGPD estiver pronta, uma nova migração deve habilitar o curso e emitir certificados para aprovações anteriores.
 
+## Dashboard — Fase 10
+
+`GET /api/colaborador/dashboard` reúne somente dados do colaborador autenticado: cursos inscritos, em andamento e concluídos, avaliações disponíveis e aprovadas, certificados, horas certificadas, curso para continuar, cursos do catálogo ainda não inscritos e os três resultados/certificados mais recentes. Os valores são calculados a partir dos registros existentes; nenhuma tabela ou meta artificial foi criada. **Horas certificadas** somam a duração dos cursos certificados; o sistema ainda não mede tempo efetivo de estudo. Trilhas, relatórios históricos e indicadores de empresa permanecem para fases posteriores.
+
 ## Verificação
 
 - `GET /actuator/health` retorna `{"status":"UP"}` quando a aplicação e o banco estão saudáveis.
@@ -152,7 +157,7 @@ As respostas incluem UUID, nome do titular, curso, título, descrição, duraç�
 - `GET /v3/api-docs` fornece o documento OpenAPI JSON.
 - `GET /api/cursos` retorna o catálogo na ordem de exibição; `GET /api/cursos/{id}` retorna um curso pelo UUID, com 404 para curso ausente.
 - `mvn -f backend/pom.xml verify` executa build e testes de saúde, documentação, login, tokens, permissões e CORS sem exigir MySQL. Os testes usam uma chave JWT própria, que não é empacotada na aplicação.
-- Com MySQL ativo e as variáveis locais carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml verify` inclui os testes de entidades, catálogo, autenticação, inscrições, progresso, avaliações e certificados com banco real. Sem essa variável, os testes de banco são ignorados.
+- Com MySQL ativo e as variáveis locais carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml verify` inclui os testes de entidades, catálogo, autenticação, inscrições, progresso, avaliações, certificados e dashboard com banco real. Sem essa variável, os testes de banco são ignorados.
 - `AuthDatabaseIntegrationTest` cria contas e empresa temporárias com identificadores únicos, valida BCrypt/login e inicialização repetida, e remove os registros ao terminar. `DomainMappingIntegrationTest` reverte suas inserções por transação. As migrações Flyway permanecem aplicadas.
 
 O Actuator expõe somente o endpoint de health. Login, catálogo, Meus Cursos, aulas e avaliações estão integrados ao frontend. A página Cursos recorre ao mock local em falhas de disponibilidade, mas não oferece inscrição nesse modo; respostas 401 encerram a sessão. Os demais domínios serão integrados nas próximas fases.

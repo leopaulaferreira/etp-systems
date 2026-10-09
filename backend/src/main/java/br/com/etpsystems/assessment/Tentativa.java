@@ -64,6 +64,7 @@ public class Tentativa {
     }
 
     public int getNota() { return nota; }
+    public Avaliacao getAvaliacao() { return avaliacao; }
     public boolean isAprovado() { return aprovado; }
     public Instant getConcluidoEm() { return concluidoEm; }
     public List<Resposta> getRespostas() { return respostas; }

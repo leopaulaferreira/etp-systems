@@ -51,9 +51,21 @@ class CertificadoApiIntegrationTest {
             String other = login(client, otherEmail);
             String base = "/api/colaborador/certificados";
             assertThat(get(client, base, null).statusCode()).isEqualTo(401);
+            assertThat(get(client, "/api/colaborador/dashboard", null).statusCode()).isEqualTo(401);
+            assertThat(JSON.readTree(get(client, "/api/colaborador/dashboard", owner).body())
+                    .path("enrolledCourses").asInt()).isZero();
             assertThat(JSON.readTree(get(client, base, owner).body()).size()).isZero();
             assertThat(post(client, "/api/colaborador/inscricoes/cursos/" + courseId, owner, null)
                     .statusCode()).isEqualTo(200);
+            assertThat(put(client, "/api/colaborador/meus-cursos/" + courseId + "/progresso", owner,
+                    "{\"percentual\":40}").statusCode()).isEqualTo(200);
+            JsonNode before = JSON.readTree(get(client, "/api/colaborador/dashboard", owner).body());
+            assertThat(before.path("ongoingCourses").asInt()).isEqualTo(1);
+            assertThat(before.path("completedCourses").asInt()).isZero();
+            assertThat(before.path("continueCourse").path("id").asText()).isEqualTo(courseId.toString());
+            assertThat(before.path("continueCourse").path("progress").asInt()).isEqualTo(40);
+            assertThat(before.path("availableAssessments").asInt()).isEqualTo(1);
+            assertThat(before.path("recommendations").toString()).doesNotContain(courseId.toString());
             JsonNode assessment = JSON.readTree(get(client, "/api/colaborador/avaliacoes", owner).body()).get(0);
             String assessmentId = assessment.path("id").asText();
             List<Map<String, String>> answers = jdbc.query("""
@@ -76,6 +88,17 @@ class CertificadoApiIntegrationTest {
             assertThat(issued.get(0).path("holderName").asText()).isEqualTo("Titular");
             assertThat(issued.get(0).path("courseId").asText()).isEqualTo(courseId.toString());
             assertThat(issued.get(0).path("issuedAt").asText()).isNotEmpty();
+            JsonNode dashboard = JSON.readTree(get(client, "/api/colaborador/dashboard", owner).body());
+            assertThat(dashboard.path("completedCourses").asInt()).isEqualTo(1);
+            assertThat(dashboard.path("ongoingCourses").asInt()).isZero();
+            assertThat(dashboard.path("passedAssessments").asInt()).isEqualTo(1);
+            assertThat(dashboard.path("certificates").asInt()).isEqualTo(1);
+            assertThat(dashboard.path("certifiedHours").asDouble()).isPositive();
+            assertThat(dashboard.path("continueCourse").isNull()).isTrue();
+            assertThat(dashboard.path("recentAssessments").size()).isEqualTo(1);
+            assertThat(dashboard.path("recentCertificates").size()).isEqualTo(1);
+            assertThat(JSON.readTree(get(client, "/api/colaborador/dashboard", other).body())
+                    .path("certificates").asInt()).isZero();
             JsonNode myCourses = JSON.readTree(get(client, "/api/colaborador/meus-cursos", owner).body());
             assertThat(myCourses.get(0).path("progress").asInt()).isEqualTo(100);
             assertThat(myCourses.get(0).path("completedAt").isNull()).isFalse();
