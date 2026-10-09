@@ -31,6 +31,13 @@ export default function CourseStudyPage() {
   const [revision, setRevision] = useState(0)
   const { assessments, status: assessmentStatus } = useAssessments()
   const assessment = assessments.find((item) => item.courseId === id)
+  const hasVideo = lessons.some((lesson) => Boolean(lesson.videoUrl))
+  const hasText = lessons.some((lesson) => Boolean(lesson.content.trim()))
+  const studySteps = [
+    ...(hasText ? ['Leia o resumo da aula'] : []),
+    hasVideo ? 'Assista às videoaulas' : 'Assista ao vídeo quando disponível',
+    'Faça a avaliação',
+  ]
 
   useEffect(() => {
     if (!id) return
@@ -47,7 +54,7 @@ export default function CourseStudyPage() {
   return <div className="flex min-w-0 flex-col gap-5 lg:gap-6">
     <PageHero eyebrow="Seu espaço de estudo" icon={BookOpen} artworkIcon={Play}
       title={course?.title ?? 'Aula do curso'}
-      description="Revise o conteúdo, assista ao vídeo quando disponível e teste o que aprendeu." />
+      description={hasVideo ? 'Assista às aulas do curso e teste o que aprendeu.' : 'Revise o conteúdo, assista ao vídeo quando disponível e teste o que aprendeu.'} />
     <Link to="/meus-cursos" className="inline-flex min-h-10 items-center gap-2 self-start rounded-xl px-2 text-xs font-bold text-brand-blue-400 hover:bg-brand-blue-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"><ArrowLeft className="h-4 w-4" aria-hidden="true" /> Voltar para Meus Cursos</Link>
     {id && status === 'loading' && <p role="status" className={`${panel} p-6 text-sm text-ink-500`}>Carregando aula...</p>}
     {(!id || status === 'error') && <div role="alert" className={`${panel} flex flex-wrap items-center justify-between gap-3 p-6 text-sm text-ink-700`}><span>Não foi possível abrir a aula. Confira sua inscrição e tente novamente.</span><button type="button" onClick={() => { setStatus('loading'); setRevision((value) => value + 1) }} className="rounded-xl bg-brand-blue-700 px-4 py-2 font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Tentar novamente</button></div>}
@@ -56,11 +63,11 @@ export default function CourseStudyPage() {
         {lessons.length ? lessons.map((lesson, index) => <article key={lesson.id} className={`${panel} flex flex-col gap-5 p-5 sm:p-7`}>
           <div className="flex flex-col gap-1.5"><span className="text-[10px] font-extrabold uppercase tracking-wider text-brand-blue-400">Aula {index + 1}</span><h2 className="text-xl font-extrabold tracking-tight text-ink-900">{lesson.title}</h2></div>
           <VideoSlot lesson={lesson} />
-          <div className="flex flex-col gap-4 border-t border-ink-100 pt-5"><h3 className="text-sm font-extrabold text-ink-900">Resumo da aula</h3>{lesson.content.split(/\n\n/).map((paragraph, position) => <p key={position} className="text-sm leading-7 text-ink-700">{paragraph}</p>)}</div>
+          {lesson.content.trim() && <div className="flex flex-col gap-4 border-t border-ink-100 pt-5"><h3 className="text-sm font-extrabold text-ink-900">Resumo da aula</h3>{lesson.content.split(/\n\n/).map((paragraph, position) => <p key={position} className="text-sm leading-7 text-ink-700">{paragraph}</p>)}</div>}
         </article>) : <section className={`${panel} p-6 sm:p-8`}><h2 className="text-lg font-extrabold text-ink-900">Conteúdo em preparação</h2><p className="mt-2 text-sm leading-6 text-ink-500">Este curso ainda não tem aula ou avaliação publicada. Você pode acompanhar seu avanço manualmente em Meus Cursos.</p></section>}
       </section>
       {lessons.length > 0 && <aside className="flex min-w-0 flex-col gap-5" aria-label="Roteiro do curso">
-        <section className={`${panel} p-5`}><h2 className="text-sm font-extrabold text-ink-900">Roteiro de estudo</h2><ol className="mt-4 flex flex-col gap-4 text-xs text-ink-700"><li className="flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-blue-500/10 font-extrabold text-brand-blue-400">1</span>Leia o resumo da aula</li><li className="flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-blue-500/10 font-extrabold text-brand-blue-400">2</span>Assista ao vídeo quando disponível</li><li className="flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-blue-500/10 font-extrabold text-brand-blue-400">3</span>Faça a avaliação</li></ol></section>
+        <section className={`${panel} p-5`}><h2 className="text-sm font-extrabold text-ink-900">Roteiro de estudo</h2><ol className="mt-4 flex flex-col gap-4 text-xs text-ink-700">{studySteps.map((step, index) => <li key={step} className="flex items-center gap-3"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-blue-500/10 font-extrabold text-brand-blue-400">{index + 1}</span>{step}</li>)}</ol></section>
         {lessons.length > 0 && <section className={`${panel} p-5`}><div className="flex items-center gap-2"><ClipboardCheck className="h-5 w-5 text-brand-blue-400" aria-hidden="true" /><h2 className="text-sm font-extrabold text-ink-900">Avaliação do curso</h2></div>{assessment ? <><p className="mt-3 text-xs leading-5 text-ink-500">{assessment.questions.length} questões · Nota mínima {assessment.minimumScore}% · {remainingAttempts(assessment)} tentativas restantes</p>{latestScore(assessment) !== null && <p className="mt-3 text-xs font-bold text-ink-700">Última nota: {latestScore(assessment)}%</p>}<Link to={`/avaliacoes?curso=${encodeURIComponent(assessment.courseId ?? '')}`} className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Ir para avaliação <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></> : <p className="mt-3 text-xs leading-5 text-ink-500">{assessmentStatus === 'loading' ? 'Carregando avaliação...' : 'A avaliação deste curso ainda não está disponível.'}</p>}</section>}
       </aside>}
     </div>}

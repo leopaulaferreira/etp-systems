@@ -19,7 +19,7 @@ quando a API está indisponível. O destaque pertence ao catálogo.
 - Com a API ativa, “Inscrever-se no curso” registra a inscrição da conta atual. Cursos já inscritos mostram “Acessar Meus Cursos”.
 
 Busca, filtros e ordenação são locais e reiniciam ao sair da página ou recarregar.
-O diálogo permite inscrição em cursos reais. Após a inscrição, a página `/cursos/:id/estudar` é acessível por Meus Cursos e mostra aula, resumo, espaço de vídeo e caminho para a avaliação quando houver conteúdo. Os outros cursos exibem um estado de conteúdo em preparação. No modo de
+O diálogo permite inscrição em cursos reais. Após a inscrição, a página `/cursos/:id/estudar` é acessível por Meus Cursos e mostra as aulas, vídeos ou resumos disponíveis e o caminho para a avaliação. LGPD na Prática tem duas videoaulas sem o antigo resumo em texto; os outros dois cursos piloto continuam com resumo. Os demais cursos exibem um estado de conteúdo em preparação. No modo de
 catálogo local, a inscrição fica indisponível para não criar uma confirmação fictícia.
 Com a API ativa, a página omite contagens de alunos porque esse dado ainda não existe no banco.
 Se a consulta falhar, aparece um aviso com ação para tentar novamente.
@@ -42,4 +42,4 @@ Os testes verificam dados da API, busca, filtros combinados, ordenação sem alt
 e duração fracionada. No navegador, confira também o carregamento de 8/16/24 cards,
 o estado vazio, a navegação por teclado nos detalhes e as larguras de celular a desktop.
 
-Para vídeo futuro, use um MP4 em `frontend/public/videos/` e associe sua URL à aula por uma nova migração do backend. Enquanto `videoUrl` for nulo, a página mantém um espaço visual com orientação para ler o resumo. Também são aceitos embeds de `www.youtube-nocookie.com` no formato `/embed/ID`.
+Para outro vídeo, use um MP4 em `frontend/public/videos/` e associe sua URL à aula por uma nova migração do backend. Enquanto `videoUrl` for nulo, a página mantém um espaço visual com orientação para ler o resumo. Também são aceitos embeds de `www.youtube-nocookie.com` no formato `/embed/ID`.

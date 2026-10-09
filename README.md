@@ -186,9 +186,10 @@ O módulo de avaliações permite:
 - feedback das respostas;
 - indicadores de desempenho.
 
-As tentativas e notas são registradas no backend. Três cursos piloto já incluem uma
-aula curta e avaliação; os demais cursos aguardam conteúdo. A página da aula deixa
-espaço para um vídeo futuro. O progresso do curso ainda é informado manualmente.
+As tentativas e notas são registradas no backend. Três cursos piloto já incluem
+avaliações; LGPD na Prática tem duas videoaulas, enquanto os outros dois têm aula
+em texto. Os demais cursos aguardam conteúdo. O progresso ainda é informado
+manualmente pelo colaborador.
 
 ---
 
