@@ -131,7 +131,7 @@ cookies HttpOnly exigirá adaptar o backend e a proteção CSRF.
 O catálogo envia Bearer nas consultas e conserva a alternativa local para falhas
 de disponibilidade. Um 401 encaminha para autenticação, sem ativar esse fallback.
 Quando a API está disponível, o catálogo permite a inscrição real em cursos.
-`/meus-cursos` consulta os cursos da conta pelo JWT; progresso e conclusões aguardam a próxima fase.
+`/meus-cursos` consulta os cursos da conta pelo JWT e permite atualizar manualmente o percentual de progresso. Cursos em 100% aparecem na aba Concluídos.
 Cadastro, recuperação por e-mail e login Google/Microsoft continuam indisponíveis;
 os textos da tela explicam isso sem aceitar credenciais fictícias.
 

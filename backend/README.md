@@ -1,6 +1,6 @@
 # Backend do ETP Systems
 
-API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. As Fases 1–6 entregam a base, as entidades centrais, o catálogo, a autenticação e as inscrições em cursos.
+API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. As Fases 1–7 entregam a base, as entidades centrais, o catálogo, a autenticação, as inscrições e o progresso em cursos.
 
 ## Estrutura
 
@@ -15,13 +15,14 @@ src/main/java/br/com/etpsystems/
 ├── course/Curso.java, CursoController.java, CursoService.java,
 │   CursoRepository.java e CursoResponse.java
 ├── enrollment/    # Inscrições em cursos e consulta de Meus Cursos
+├── progress/      # Atualização e persistência do progresso em cursos
 ├── track/Trilha.java
 └── user/          # Usuario, Perfil e repositório
 ```
 
-Os módulos `progress`, `assessment`, `certificate`, `report` e `ai` serão criados à medida que suas regras forem implementadas. Cada domínio agrupa controller, service, repository, entity e DTO quando necessários.
+Os módulos `assessment`, `certificate`, `report` e `ai` serão criados à medida que suas regras forem implementadas. Cada domínio agrupa controller, service, repository, entity e DTO quando necessários.
 
-As migrações em `src/main/resources/db/migration/` criam o schema (V1), acrescentam os campos do catálogo (V2), incluem 24 cursos e 5 categorias iniciais (V3), normalizam os perfis (V4) e permitem inscrições em cursos sem perder as inscrições em trilhas (V5). Em bancos criados antes do Flyway, a V1 é registrada como baseline e as demais migrações são aplicadas. O arquivo [`../database/schema.sql`](../database/schema.sql) permanece como referência histórica. Com `spring.jpa.hibernate.ddl-auto=validate`, a aplicação verifica o mapeamento na inicialização e não altera as tabelas por conta própria.
+As migrações em `src/main/resources/db/migration/` criam o schema (V1), acrescentam os campos do catálogo (V2), incluem 24 cursos e 5 categorias iniciais (V3), normalizam os perfis (V4), permitem inscrições em cursos sem perder as inscrições em trilhas (V5) e registram a data de conclusão do progresso (V6). Em bancos criados antes do Flyway, a V1 é registrada como baseline e as demais migrações são aplicadas. O arquivo [`../database/schema.sql`](../database/schema.sql) permanece como referência histórica. Com `spring.jpa.hibernate.ddl-auto=validate`, a aplicação verifica o mapeamento na inicialização e não altera as tabelas por conta própria.
 
 ## Modelo atual
 
@@ -29,6 +30,7 @@ As migrações em `src/main/resources/db/migration/` criam o schema (V1), acresc
 - Um `Curso` pertence a zero ou uma `Categoria`; uma categoria pode classificar vários cursos.
 - Uma `Trilha` pode pertencer a uma empresa e contém vários cursos; um curso pode participar de várias trilhas pela tabela `trilhas_cursos`.
 - Uma `Inscricao` vincula um colaborador a um curso ou uma trilha. A V5 impede destinos vazios ou duplos e inscrições repetidas no mesmo curso.
+- Um `ProgressoCurso` guarda percentual, atualização e conclusão por usuário e curso. O percentual só pode ser alterado pelo colaborador inscrito.
 - As associações são navegáveis apenas pelo lado necessário nesta fase. Isso evita coleções grandes e carregamentos circulares em `Empresa`, `Categoria` e `Curso`.
 - Os identificadores são UUIDs armazenados como `CHAR(36)`. As datas continuam preenchidas pelo MySQL.
 
@@ -112,6 +114,12 @@ A Fase 4 não inclui cadastro público, confirmação/recuperação por e-mail n
 - O banco conserva as inscrições antigas em trilhas. A API para iniciar novas inscrições em trilhas fica para a integração dessa tela.
 - Progresso, aulas concluídas e certificados continuam nas fases seguintes; a Fase 6 não inventa percentuais.
 
+## Progresso — Fase 7
+
+`PUT /api/colaborador/meus-cursos/{cursoId}/progresso` recebe `{ "percentual": 45 }` e exige JWT de `COLABORADOR` inscrito no curso. Aceita valores entre 0 e 100, com até duas casas decimais; valor inválido retorna 400 e curso não inscrito retorna 404. A chamada grava o percentual na tabela `progresso_cursos`. Ao chegar a 100%, registra a data de conclusão; ao voltar para menos de 100%, remove essa data. Repetir 100% preserva a data original.
+
+`GET /api/colaborador/meus-cursos` e a resposta do `PUT` incluem `progress`, `updatedAt` e `completedAt`. Cursos sem registro de progresso aparecem com 0% e datas nulas. O avanço é **informado manualmente pelo colaborador**, pois ainda não há aulas rastreadas no backend. A conclusão nesta fase não emite certificado automaticamente.
+
 ## Verificação
 
 - `GET /actuator/health` retorna `{"status":"UP"}` quando a aplicação e o banco estão saudáveis.
@@ -119,7 +127,7 @@ A Fase 4 não inclui cadastro público, confirmação/recuperação por e-mail n
 - `GET /v3/api-docs` fornece o documento OpenAPI JSON.
 - `GET /api/cursos` retorna o catálogo na ordem de exibição; `GET /api/cursos/{id}` retorna um curso pelo UUID, com 404 para curso ausente.
 - `mvn -f backend/pom.xml verify` executa build e testes de saúde, documentação, login, tokens, permissões e CORS sem exigir MySQL. Os testes usam uma chave JWT própria, que não é empacotada na aplicação.
-- Com MySQL ativo e as variáveis locais carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml verify` inclui os testes de entidades, catálogo, autenticação e inscrições com banco real. Sem essa variável, os testes de banco são ignorados.
+- Com MySQL ativo e as variáveis locais carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml verify` inclui os testes de entidades, catálogo, autenticação, inscrições e progresso com banco real. Sem essa variável, os testes de banco são ignorados.
 - `AuthDatabaseIntegrationTest` cria contas e empresa temporárias com identificadores únicos, valida BCrypt/login e inicialização repetida, e remove os registros ao terminar. `DomainMappingIntegrationTest` reverte suas inserções por transação. As migrações Flyway permanecem aplicadas.
 
 O Actuator expõe somente o endpoint de health. Login, catálogo e Meus Cursos já estão integrados ao frontend. A página Cursos recorre ao mock local em falhas de disponibilidade, mas não oferece inscrição nesse modo; respostas 401 encerram a sessão. Os demais domínios serão integrados nas próximas fases.
