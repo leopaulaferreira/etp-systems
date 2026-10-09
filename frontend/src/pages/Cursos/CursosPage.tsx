@@ -4,6 +4,7 @@ import { catalogCourses, courseCategories, featuredCourse, type CatalogCourse } 
 import { initialFilters, selectCourses, type CatalogFilters } from './catalog'
 import { fetchCourseDetails, fetchCourses } from './courseApi'
 import { ApiError } from '../../api/client'
+import { enrollCourse, fetchMyCourses } from '../MeusCursos/myCoursesApi'
 import CatalogCourseCard from './components/CatalogCourseCard'
 import CatalogToolbar from './components/CatalogToolbar'
 import CourseCatalogDialog from './components/CourseCatalogDialog'
@@ -22,6 +23,9 @@ export default function CursosPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [details, setDetails] = useState<CatalogCourse | null>(null)
   const [detailStatus, setDetailStatus] = useState<'ready' | 'loading' | 'error'>('ready')
+  const [enrolledIds, setEnrolledIds] = useState<Set<string>>(new Set())
+  const [enrollingId, setEnrollingId] = useState<string | null>(null)
+  const [enrollError, setEnrollError] = useState(false)
   const filteredCourses = useMemo(() => selectCourses(courses, filters), [courses, filters])
   const visibleCourses = filteredCourses.slice(0, visibleCount)
   const selectedCourse = details?.id === selectedId ? details : courses.find((course) => course.id === selectedId)
@@ -59,6 +63,15 @@ export default function CursosPage() {
     return () => controller.abort()
   }, [selectedId, source])
 
+  useEffect(() => {
+    if (source !== 'api') return
+    const controller = new AbortController()
+    fetchMyCourses(controller.signal)
+      .then((items) => setEnrolledIds((current) => new Set([...current, ...items.map((item) => item.id)])))
+      .catch(() => { /* A inscrição continua disponível se a consulta inicial falhar. */ })
+    return () => controller.abort()
+  }, [source])
+
   function updateFilters(update: Partial<CatalogFilters>) {
     setFilters((current) => ({ ...current, ...update }))
     setVisibleCount(PAGE_SIZE)
@@ -66,8 +79,22 @@ export default function CursosPage() {
 
   function openCourse(course: CatalogCourse) {
     setDetails(null)
+    setEnrollError(false)
     setDetailStatus(source === 'api' ? 'loading' : 'ready')
     setSelectedId(course.id)
+  }
+
+  async function handleEnroll(course: CatalogCourse) {
+    setEnrollingId(course.id)
+    setEnrollError(false)
+    try {
+      await enrollCourse(course.id)
+      setEnrolledIds((current) => new Set([...current, course.id]))
+    } catch {
+      setEnrollError(true)
+    } finally {
+      setEnrollingId(null)
+    }
   }
 
   function resetFilters() {
@@ -156,7 +183,17 @@ export default function CursosPage() {
         </div>}
       </section>
       {selectedCourse && (
-        <CourseCatalogDialog course={selectedCourse} loading={detailStatus === 'loading'} error={detailStatus === 'error'} onClose={() => { setSelectedId(null); setDetails(null); setDetailStatus('ready') }} />
+        <CourseCatalogDialog
+          course={selectedCourse}
+          loading={detailStatus === 'loading'}
+          error={detailStatus === 'error'}
+          enrollmentAvailable={source === 'api'}
+          enrolled={enrolledIds.has(selectedCourse.id)}
+          enrolling={enrollingId === selectedCourse.id}
+          enrollError={enrollError}
+          onEnroll={() => handleEnroll(selectedCourse)}
+          onClose={() => { setSelectedId(null); setDetails(null); setDetailStatus('ready') }}
+        />
       )}
     </div>
   )

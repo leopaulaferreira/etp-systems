@@ -5,9 +5,22 @@ import type { CatalogCourse } from '../../../mocks/cursos.mock'
 import CourseArtwork from './CourseArtwork'
 import CourseMetadata from './CourseMetadata'
 
-type CourseCatalogDialogProps = { course: CatalogCourse; loading?: boolean; error?: boolean; onClose: () => void }
+type CourseCatalogDialogProps = {
+  course: CatalogCourse
+  loading?: boolean
+  error?: boolean
+  enrollmentAvailable: boolean
+  enrolled: boolean
+  enrolling: boolean
+  enrollError: boolean
+  onEnroll: () => void
+  onClose: () => void
+}
 
-export default function CourseCatalogDialog({ course, loading = false, error = false, onClose }: CourseCatalogDialogProps) {
+export default function CourseCatalogDialog({
+  course, loading = false, error = false, enrollmentAvailable, enrolled,
+  enrolling, enrollError, onEnroll, onClose,
+}: CourseCatalogDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   useEffect(() => {
     const dialog = dialogRef.current
@@ -80,14 +93,21 @@ export default function CourseCatalogDialog({ course, loading = false, error = f
         </div>
         <div className="flex items-start gap-3 rounded-xl border border-ink-200 bg-panel-alt p-4 text-sm leading-6 text-ink-500">
           <BookOpen className="mt-1 h-5 w-5 shrink-0 text-brand-blue-400" aria-hidden="true" />
-          <p>Já está estudando? Acompanhe seus conteúdos em Meus Cursos.</p>
+          <p>{enrolled ? 'Inscrição confirmada. Acompanhe este curso em Meus Cursos.'
+            : 'Inscreva-se para adicionar este conteúdo a Meus Cursos.'}</p>
         </div>
-        <Link
-          to="/meus-cursos"
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-3 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"
-        >
-          Acessar Meus Cursos <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </Link>
+        {enrollError && <p role="alert" className="text-sm text-rose-400">Não foi possível concluir a inscrição. Tente novamente.</p>}
+        {enrolled ? (
+          <Link to="/meus-cursos" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-3 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">
+            Acessar Meus Cursos <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        ) : enrollmentAvailable ? (
+          <button type="button" onClick={onEnroll} disabled={enrolling} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-3 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 disabled:cursor-wait disabled:opacity-60">
+            {enrolling ? 'Inscrevendo...' : 'Inscrever-se no curso'} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </button>
+        ) : (
+          <p role="status" className="text-xs text-ink-500">Inscrições indisponíveis enquanto a API estiver offline.</p>
+        )}
       </div>
     </dialog>
   )

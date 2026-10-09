@@ -8,6 +8,7 @@ type CourseListCardProps = {
   savedIds: Set<string>
   onOpen: (course: CourseItem) => void
   onToggleSave: (course: CourseItem) => void
+  emptyMessage?: string
 }
 
 export default function CourseListCard({
@@ -16,6 +17,7 @@ export default function CourseListCard({
   savedIds,
   onOpen,
   onToggleSave,
+  emptyMessage = 'Salve os conteúdos que deseja estudar para encontrá-los nesta lista.',
 }: CourseListCardProps) {
   return (
     <section
@@ -48,7 +50,7 @@ export default function CourseListCard({
           <BookOpen className="h-8 w-8 text-brand-blue-400" aria-hidden="true" />
           <p className="text-sm font-bold text-ink-700">Nenhum curso por aqui ainda</p>
           <p className="max-w-xs text-sm leading-6 text-ink-500">
-            Salve os conteúdos que deseja estudar para encontrá-los nesta lista.
+            {emptyMessage}
           </p>
         </div>
       )}

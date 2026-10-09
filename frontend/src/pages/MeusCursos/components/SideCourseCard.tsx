@@ -9,6 +9,7 @@ type SideCourseCardProps = {
   actionLabel: string
   courses: CourseItem[]
   onOpen: (course: CourseItem) => void
+  emptyMessage?: string
 } & ({ onAction: () => void; to?: never } | { to: string; onAction?: never })
 
 const actionClass =
@@ -19,6 +20,7 @@ export default function SideCourseCard({
   actionLabel,
   courses,
   onOpen,
+  emptyMessage = 'Salve cursos para estudar depois.',
   onAction,
   to,
 }: SideCourseCardProps) {
@@ -56,7 +58,7 @@ export default function SideCourseCard({
       ) : (
         <div className="flex flex-col items-center gap-3 py-8 text-center text-sm text-ink-500">
           <Bookmark className="h-7 w-7 text-brand-blue-400" aria-hidden="true" />
-          <p>Salve cursos para estudar depois.</p>
+          <p>{emptyMessage}</p>
         </div>
       )}
       {to ? (
