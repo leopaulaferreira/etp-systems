@@ -177,8 +177,8 @@ facilitando a criação de jornadas de aprendizagem estruturadas.
 
 O módulo de avaliações permite:
 
-- avaliações pendentes, em andamento, concluídas ou agendadas;
-- questões de múltipla escolha e verdadeiro/falso;
+- avaliações de cursos em que o colaborador se inscreveu;
+- questões de múltipla escolha;
 - controle de tentativas;
 - cálculo de notas;
 - nota mínima para aprovação;
@@ -186,8 +186,9 @@ O módulo de avaliações permite:
 - feedback das respostas;
 - indicadores de desempenho.
 
-Atualmente essa lógica funciona no frontend com dados fictícios e será integrada
-ao backend.
+As tentativas e notas são registradas no backend. Três cursos piloto já incluem uma
+aula curta e avaliação; os demais cursos aguardam conteúdo. A página da aula deixa
+espaço para um vídeo futuro. O progresso do curso ainda é informado manualmente.
 
 ---
 
@@ -246,4 +247,4 @@ TutorService
 
 ## Backend
 
-As Fases 1–4 do backend estão disponíveis em [`backend/`](backend/README.md): Spring Boot, MySQL, Docker, migrações, entidades centrais, API de cursos, login com BCrypt/JWT e autorização por perfil. Consulte o guia para configurar as contas locais, usar o Swagger e executar os testes.
+As Fases 1–8 do backend estão disponíveis em [`backend/`](backend/README.md): Spring Boot, MySQL, Docker, migrações, catálogo, login com BCrypt/JWT, inscrições, progresso e avaliações. Consulte o guia para configurar as contas locais, usar o Swagger e executar os testes.

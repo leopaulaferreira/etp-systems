@@ -1,6 +1,6 @@
 # Backend do ETP Systems
 
-API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. As Fases 1–7 entregam a base, as entidades centrais, o catálogo, a autenticação, as inscrições e o progresso em cursos.
+API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. As Fases 1–8 entregam a base, catálogo, autenticação, inscrições, progresso e avaliações de cursos piloto.
 
 ## Estrutura
 
@@ -16,13 +16,14 @@ src/main/java/br/com/etpsystems/
 │   CursoRepository.java e CursoResponse.java
 ├── enrollment/    # Inscrições em cursos e consulta de Meus Cursos
 ├── progress/      # Atualização e persistência do progresso em cursos
+├── assessment/    # Aulas, questões, alternativas, tentativas e notas
 ├── track/Trilha.java
 └── user/          # Usuario, Perfil e repositório
 ```
 
-Os módulos `assessment`, `certificate`, `report` e `ai` serão criados à medida que suas regras forem implementadas. Cada domínio agrupa controller, service, repository, entity e DTO quando necessários.
+Os módulos `certificate`, `report` e `ai` serão criados à medida que suas regras forem implementadas. Cada domínio agrupa controller, service, repository, entity e DTO quando necessários.
 
-As migrações em `src/main/resources/db/migration/` criam o schema (V1), acrescentam os campos do catálogo (V2), incluem 24 cursos e 5 categorias iniciais (V3), normalizam os perfis (V4), permitem inscrições em cursos sem perder as inscrições em trilhas (V5) e registram a data de conclusão do progresso (V6). Em bancos criados antes do Flyway, a V1 é registrada como baseline e as demais migrações são aplicadas. O arquivo [`../database/schema.sql`](../database/schema.sql) permanece como referência histórica. Com `spring.jpa.hibernate.ddl-auto=validate`, a aplicação verifica o mapeamento na inicialização e não altera as tabelas por conta própria.
+As migrações em `src/main/resources/db/migration/` criam o schema (V1), acrescentam o catálogo (V2–V3), normalizam os perfis (V4), permitem inscrições em cursos (V5), registram a conclusão do progresso (V6) e criam aulas e avaliações piloto (V7–V8). Em bancos criados antes do Flyway, a V1 é registrada como baseline e as demais migrações são aplicadas. O arquivo [`../database/schema.sql`](../database/schema.sql) permanece como referência histórica. Com `spring.jpa.hibernate.ddl-auto=validate`, a aplicação verifica o mapeamento na inicialização e não altera as tabelas por conta própria.
 
 ## Modelo atual
 
@@ -31,6 +32,7 @@ As migrações em `src/main/resources/db/migration/` criam o schema (V1), acresc
 - Uma `Trilha` pode pertencer a uma empresa e contém vários cursos; um curso pode participar de várias trilhas pela tabela `trilhas_cursos`.
 - Uma `Inscricao` vincula um colaborador a um curso ou uma trilha. A V5 impede destinos vazios ou duplos e inscrições repetidas no mesmo curso.
 - Um `ProgressoCurso` guarda percentual, atualização e conclusão por usuário e curso. O percentual só pode ser alterado pelo colaborador inscrito.
+- Uma `Avaliacao` pertence a um curso e contém questões com alternativas. Cada `Tentativa` pertence ao colaborador e guarda suas respostas, nota e aprovação.
 - As associações são navegáveis apenas pelo lado necessário nesta fase. Isso evita coleções grandes e carregamentos circulares em `Empresa`, `Categoria` e `Curso`.
 - Os identificadores são UUIDs armazenados como `CHAR(36)`. As datas continuam preenchidas pelo MySQL.
 
@@ -98,7 +100,7 @@ A resposta contém `accessToken`, `tokenType: "Bearer"`, `expiresIn` em segundos
 | `GET /api/cursos` e `GET /api/cursos/{id}` | Públicas durante a integração gradual |
 | Health check, Swagger e OpenAPI (`GET`) | Públicos |
 | `/api/empresa/**` | Reservadas ao perfil `EMPRESA`; funcionalidades entram nas próximas fases |
-| `/api/colaborador/**` | Reservadas ao perfil `COLABORADOR`; inscrições e Meus Cursos já estão disponíveis |
+| `/api/colaborador/**` | Reservadas ao perfil `COLABORADOR`; inscrições, progresso, aulas e avaliações estão disponíveis |
 | Demais rotas | Bloqueadas por padrão |
 
 Entradas inválidas retornam 400; credenciais ou tokens inválidos retornam 401; falta de permissão retorna 403. As falhas de credenciais usam a mesma mensagem para usuário inexistente e senha errada. A validação JWT verifica assinatura HS256, emissor, expiração, UUID do usuário e perfil.
@@ -118,7 +120,19 @@ A Fase 4 não inclui cadastro público, confirmação/recuperação por e-mail n
 
 `PUT /api/colaborador/meus-cursos/{cursoId}/progresso` recebe `{ "percentual": 45 }` e exige JWT de `COLABORADOR` inscrito no curso. Aceita valores entre 0 e 100, com até duas casas decimais; valor inválido retorna 400 e curso não inscrito retorna 404. A chamada grava o percentual na tabela `progresso_cursos`. Ao chegar a 100%, registra a data de conclusão; ao voltar para menos de 100%, remove essa data. Repetir 100% preserva a data original.
 
-`GET /api/colaborador/meus-cursos` e a resposta do `PUT` incluem `progress`, `updatedAt` e `completedAt`. Cursos sem registro de progresso aparecem com 0% e datas nulas. O avanço é **informado manualmente pelo colaborador**, pois ainda não há aulas rastreadas no backend. A conclusão nesta fase não emite certificado automaticamente.
+`GET /api/colaborador/meus-cursos` e a resposta do `PUT` incluem `progress`, `updatedAt` e `completedAt`. Cursos sem registro de progresso aparecem com 0% e datas nulas. O avanço é **informado manualmente pelo colaborador**, pois a leitura e os vídeos das aulas ainda não são rastreados. A conclusão nesta fase não emite certificado automaticamente.
+
+## Aulas e avaliações — Fase 8
+
+Três cursos já existentes receberam uma aula curta e uma avaliação de cinco questões: **LGPD na Prática**, **Fundamentos de Segurança da Informação** e **Computação em Nuvem: Conceitos e Aplicações**. Os demais cursos seguem no catálogo, mas suas páginas de estudo indicam que o conteúdo está em preparação. As avaliações aparecem somente para quem se inscreveu no curso correspondente.
+
+- `GET /api/colaborador/cursos/{cursoId}/aulas` lista as aulas de um curso inscrito. `videoUrl` é nulo até que o vídeo seja adicionado.
+- `GET /api/colaborador/avaliacoes` lista questões, opções e histórico de tentativas dos cursos inscritos.
+- `POST /api/colaborador/avaliacoes/{id}/tentativas` recebe `{"respostas":[{"questaoId":"<uuid>","alternativaId":"<uuid>"}]}` com uma resposta válida para cada questão. O servidor calcula e grava a nota; resposta incompleta ou opção de outra questão retorna 400. Curso não inscrito retorna 404. Avaliação aprovada ou duas tentativas usadas retornam 409.
+
+A nota mínima é 80%. O gabarito e as explicações só são enviados após aprovação ou após esgotar as duas tentativas. Antes disso, o frontend recebe apenas perguntas e opções. As respostas em edição ainda ficam somente na página; a tentativa passa a existir no banco quando o colaborador envia todas as respostas. O progresso manual da Fase 7 e a aprovação na avaliação são dados independentes; esta fase não emite certificado.
+
+Para adicionar um vídeo mais tarde, coloque um MP4 em `frontend/public/videos/` e crie uma **nova migração Flyway** que preencha `aulas.video_url` com `/videos/nome-do-video.mp4`. A página também aceita URLs de incorporação `https://www.youtube-nocookie.com/embed/ID`. Não edite migrações já aplicadas, pois o Flyway verifica o checksum. A aplicação não armazena arquivos de vídeo no MySQL.
 
 ## Verificação
 
@@ -127,7 +141,7 @@ A Fase 4 não inclui cadastro público, confirmação/recuperação por e-mail n
 - `GET /v3/api-docs` fornece o documento OpenAPI JSON.
 - `GET /api/cursos` retorna o catálogo na ordem de exibição; `GET /api/cursos/{id}` retorna um curso pelo UUID, com 404 para curso ausente.
 - `mvn -f backend/pom.xml verify` executa build e testes de saúde, documentação, login, tokens, permissões e CORS sem exigir MySQL. Os testes usam uma chave JWT própria, que não é empacotada na aplicação.
-- Com MySQL ativo e as variáveis locais carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml verify` inclui os testes de entidades, catálogo, autenticação, inscrições e progresso com banco real. Sem essa variável, os testes de banco são ignorados.
+- Com MySQL ativo e as variáveis locais carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml verify` inclui os testes de entidades, catálogo, autenticação, inscrições, progresso e avaliações com banco real. Sem essa variável, os testes de banco são ignorados.
 - `AuthDatabaseIntegrationTest` cria contas e empresa temporárias com identificadores únicos, valida BCrypt/login e inicialização repetida, e remove os registros ao terminar. `DomainMappingIntegrationTest` reverte suas inserções por transação. As migrações Flyway permanecem aplicadas.
 
-O Actuator expõe somente o endpoint de health. Login, catálogo e Meus Cursos já estão integrados ao frontend. A página Cursos recorre ao mock local em falhas de disponibilidade, mas não oferece inscrição nesse modo; respostas 401 encerram a sessão. Os demais domínios serão integrados nas próximas fases.
+O Actuator expõe somente o endpoint de health. Login, catálogo, Meus Cursos, aulas e avaliações estão integrados ao frontend. A página Cursos recorre ao mock local em falhas de disponibilidade, mas não oferece inscrição nesse modo; respostas 401 encerram a sessão. Os demais domínios serão integrados nas próximas fases.
