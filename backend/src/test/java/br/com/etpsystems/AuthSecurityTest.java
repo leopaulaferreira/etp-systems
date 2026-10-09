@@ -34,6 +34,7 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import br.com.etpsystems.enrollment.InscricaoService;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,6 +66,9 @@ class AuthSecurityTest {
     private UsuarioRepository usuarios;
     @MockitoBean
     private CursoService cursos;
+
+    @MockitoBean
+    private InscricaoService inscricoes;
 
     @BeforeEach
     void accounts() {

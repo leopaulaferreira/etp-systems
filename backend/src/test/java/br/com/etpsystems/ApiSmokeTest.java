@@ -9,6 +9,7 @@ import java.net.http.HttpResponse;
 
 import br.com.etpsystems.course.CursoService;
 import br.com.etpsystems.user.UsuarioRepository;
+import br.com.etpsystems.enrollment.InscricaoService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -26,6 +27,9 @@ class ApiSmokeTest {
 
     @MockitoBean
     private UsuarioRepository usuarioRepository;
+
+    @MockitoBean
+    private InscricaoService inscricaoService;
 
     @LocalServerPort
     private int port;
