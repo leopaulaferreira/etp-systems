@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAssessments } from '../../assessments/AssessmentContext'
 import type { Assessment, AssessmentStatus } from '../../types/assessment'
 import {
@@ -19,6 +19,7 @@ import AssessmentList from './components/AssessmentList'
 import AssessmentStats from './components/AssessmentStats'
 
 export default function AvaliacoesPage() {
+  const navigate = useNavigate()
   const { assessments: items, setAssessments: setItems, status, reload } = useAssessments()
   const [searchParams, setSearchParams] = useSearchParams()
   const [filters, setFilters] = useState<Filters>(initialFilters)
@@ -94,6 +95,7 @@ export default function AvaliacoesPage() {
           key={selected.id}
           item={selected}
           onClose={() => { setSelectedId(null); if (courseId) setSearchParams({}, { replace: true }) }}
+          onReviewLesson={selected.courseId ? () => navigate(`/cursos/${encodeURIComponent(selected.courseId!)}/estudar`) : undefined}
           onStart={() => updateSelected(startAssessment)}
           onAnswer={(questionId, option) =>
             updateSelected((item) => answerAssessment(item, questionId, option))

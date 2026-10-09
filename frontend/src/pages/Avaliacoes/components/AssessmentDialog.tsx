@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import {
   ArrowLeft,
   ArrowRight,
+  BookOpen,
   CalendarDays,
   CheckCircle2,
   ClipboardCheck,
@@ -24,6 +25,7 @@ import AssessmentIcon from './AssessmentIcon'
 type AssessmentDialogProps = {
   item: Assessment
   onClose: () => void
+  onReviewLesson?: () => void
   onStart: () => void
   onAnswer: (questionId: string, option: number) => void
   onSubmit: () => void
@@ -38,6 +40,7 @@ const secondary =
 export default function AssessmentDialog({
   item,
   onClose,
+  onReviewLesson,
   onStart,
   onAnswer,
   onSubmit,
@@ -47,12 +50,10 @@ export default function AssessmentDialog({
   const dialogRef = useRef<HTMLDialogElement>(null)
   const questionRef = useRef<HTMLSpanElement>(null)
   const resultRef = useRef<HTMLHeadingElement>(null)
-  const [questionIndex, setQuestionIndex] = useState(() =>
-    Math.max(
-      0,
-      item.questions.findIndex((question) => !isAnswered(question, item.answers)),
-    ),
-  )
+  const [questionIndex, setQuestionIndex] = useState(() => {
+    const unanswered = item.questions.findIndex((question) => !isAnswered(question, item.answers))
+    return unanswered >= 0 ? unanswered : Math.max(0, item.questions.length - 1)
+  })
   const question = item.questions[questionIndex]
   const answered = item.questions.filter((question) => isAnswered(question, item.answers)).length
   const score = latestScore(item)
@@ -138,6 +139,9 @@ export default function AssessmentDialog({
           <p className="mt-2 text-xs leading-5 text-ink-500">
             {item.courseType} · {item.course}
           </p>
+          {onReviewLesson && <button type="button" onClick={onReviewLesson} className={`${secondary} mt-4`}>
+            <BookOpen className="h-4 w-4" aria-hidden="true" /> Voltar às aulas do curso
+          </button>}
         </div>
         {(item.status === 'pending' || item.status === 'scheduled') && (
           <>
@@ -249,7 +253,7 @@ export default function AssessmentDialog({
                 ))}
               </div>
             </fieldset>
-            <p className="text-xs leading-5 text-ink-500">Suas escolhas ficam nesta página até o envio. Ao sair, será preciso responder novamente.</p>
+            <p className="text-xs leading-5 text-ink-500">Você pode rever as aulas e voltar à avaliação sem perder as respostas desta sessão. Recarregar a página descarta respostas ainda não enviadas.</p>
             {submitError && <p role="alert" className="text-xs font-semibold text-rose-400">Não foi possível enviar a avaliação. Confira sua conexão e tente novamente.</p>}
             {questionIndex === item.questions.length - 1 && answered < item.questions.length && (
               <p role="status" className="text-xs font-semibold text-amber-300">
@@ -266,6 +270,9 @@ export default function AssessmentDialog({
                 <ArrowLeft className="h-4 w-4" aria-hidden="true" />
                 Anterior
               </button>
+              {onReviewLesson && <button type="button" onClick={onReviewLesson} className={secondary}>
+                <BookOpen className="h-4 w-4" aria-hidden="true" /> Voltar às aulas
+              </button>}
               {questionIndex < item.questions.length - 1 ? (
                 <button
                   type="button"
