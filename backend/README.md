@@ -1,6 +1,6 @@
 # Backend do ETP Systems
 
-API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. As Fases 1–8 entregam a base, catálogo, autenticação, inscrições, progresso e avaliações de cursos piloto.
+API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. As Fases 1–9 entregam a base, catálogo, autenticação, inscrições, progresso, avaliações e certificados de cursos piloto.
 
 ## Estrutura
 
@@ -17,13 +17,14 @@ src/main/java/br/com/etpsystems/
 ├── enrollment/    # Inscrições em cursos e consulta de Meus Cursos
 ├── progress/      # Atualização e persistência do progresso em cursos
 ├── assessment/    # Aulas, questões, alternativas, tentativas e notas
+├── certificate/   # Emissão e consulta de certificados
 ├── track/Trilha.java
 └── user/          # Usuario, Perfil e repositório
 ```
 
-Os módulos `certificate`, `report` e `ai` serão criados à medida que suas regras forem implementadas. Cada domínio agrupa controller, service, repository, entity e DTO quando necessários.
+Os módulos `report` e `ai` serão criados à medida que suas regras forem implementadas. Cada domínio agrupa controller, service, repository, entity e DTO quando necessários.
 
-As migrações em `src/main/resources/db/migration/` criam o schema (V1), acrescentam o catálogo (V2–V3), normalizam os perfis (V4), permitem inscrições em cursos (V5), registram a conclusão do progresso (V6), criam aulas e avaliações piloto (V7–V8), associam as duas primeiras videoaulas de LGPD (V9) e acrescentam a quarta alternativa às questões existentes (V10). Em bancos criados antes do Flyway, a V1 é registrada como baseline e as demais migrações são aplicadas. O arquivo [`../database/schema.sql`](../database/schema.sql) permanece como referência histórica. Com `spring.jpa.hibernate.ddl-auto=validate`, a aplicação verifica o mapeamento na inicialização e não altera as tabelas por conta própria.
+As migrações em `src/main/resources/db/migration/` criam o schema (V1), acrescentam o catálogo (V2–V3), normalizam os perfis (V4), permitem inscrições em cursos (V5), registram a conclusão do progresso (V6), criam aulas e avaliações piloto (V7–V8), associam as duas primeiras videoaulas de LGPD (V9), acrescentam a quarta alternativa às questões (V10), habilitam a emissão de certificados (V11) e alinham o progresso de cursos já certificados (V12). Em bancos criados antes do Flyway, a V1 é registrada como baseline e as demais migrações são aplicadas. O arquivo [`../database/schema.sql`](../database/schema.sql) permanece como referência histórica. Com `spring.jpa.hibernate.ddl-auto=validate`, a aplicação verifica o mapeamento na inicialização e não altera as tabelas por conta própria.
 
 ## Modelo atual
 
@@ -33,6 +34,7 @@ As migrações em `src/main/resources/db/migration/` criam o schema (V1), acresc
 - Uma `Inscricao` vincula um colaborador a um curso ou uma trilha. A V5 impede destinos vazios ou duplos e inscrições repetidas no mesmo curso.
 - Um `ProgressoCurso` guarda percentual, atualização e conclusão por usuário e curso. O percentual só pode ser alterado pelo colaborador inscrito.
 - Uma `Avaliacao` pertence a um curso e contém questões com alternativas. Cada `Tentativa` pertence ao colaborador e guarda suas respostas, nota e aprovação.
+- Um `Certificado` vincula usuário e curso, com código único e data de emissão. Há no máximo um por usuário e curso.
 - As associações são navegáveis apenas pelo lado necessário nesta fase. Isso evita coleções grandes e carregamentos circulares em `Empresa`, `Categoria` e `Curso`.
 - Os identificadores são UUIDs armazenados como `CHAR(36)`. As datas continuam preenchidas pelo MySQL.
 
@@ -120,7 +122,7 @@ A Fase 4 não inclui cadastro público, confirmação/recuperação por e-mail n
 
 `PUT /api/colaborador/meus-cursos/{cursoId}/progresso` recebe `{ "percentual": 45 }` e exige JWT de `COLABORADOR` inscrito no curso. Aceita valores entre 0 e 100, com até duas casas decimais; valor inválido retorna 400 e curso não inscrito retorna 404. A chamada grava o percentual na tabela `progresso_cursos`. Ao chegar a 100%, registra a data de conclusão; ao voltar para menos de 100%, remove essa data. Repetir 100% preserva a data original.
 
-`GET /api/colaborador/meus-cursos` e a resposta do `PUT` incluem `progress`, `updatedAt` e `completedAt`. Cursos sem registro de progresso aparecem com 0% e datas nulas. O avanço é **informado manualmente pelo colaborador**, pois a leitura e os vídeos das aulas ainda não são rastreados. A conclusão nesta fase não emite certificado automaticamente.
+`GET /api/colaborador/meus-cursos` e a resposta do `PUT` incluem `progress`, `updatedAt` e `completedAt`. Cursos sem registro de progresso aparecem com 0% e datas nulas. O avanço é **informado manualmente pelo colaborador**, pois a leitura e os vídeos das aulas ainda não são rastreados. Marcar 100% manualmente não emite certificado.
 
 ## Aulas e avaliações — Fase 8
 
@@ -130,9 +132,18 @@ Três cursos já existentes receberam aulas e uma avaliação de cinco questões
 - `GET /api/colaborador/avaliacoes` lista questões, opções e histórico de tentativas dos cursos inscritos.
 - `POST /api/colaborador/avaliacoes/{id}/tentativas` recebe `{"respostas":[{"questaoId":"<uuid>","alternativaId":"<uuid>"}]}` com uma resposta válida para cada questão. O servidor calcula e grava a nota; resposta incompleta ou opção de outra questão retorna 400. Curso não inscrito retorna 404. Avaliação aprovada ou duas tentativas usadas retornam 409.
 
-A nota mínima é 80%. Cada questão dos três cursos piloto tem quatro alternativas. O gabarito e as explicações só são enviados após aprovação ou após esgotar as duas tentativas. Antes disso, o frontend recebe apenas perguntas e opções. As respostas em edição ficam em memória no frontend enquanto o usuário navega na sessão; a tentativa passa a existir no banco quando o colaborador envia todas as respostas. O progresso manual da Fase 7 e a aprovação na avaliação são dados independentes; esta fase não emite certificado.
+A nota mínima é 80%. Cada questão dos três cursos piloto tem quatro alternativas. O gabarito e as explicações só são enviados após aprovação ou após esgotar as duas tentativas. Antes disso, o frontend recebe apenas perguntas e opções. As respostas em edição ficam em memória no frontend enquanto o usuário navega na sessão; a tentativa passa a existir no banco quando o colaborador envia todas as respostas. O progresso manual da Fase 7 e a aprovação na avaliação são dados independentes.
 
 Para adicionar outro vídeo, coloque um MP4 em `frontend/public/videos/` e crie uma **nova migração Flyway** que preencha `aulas.video_url` com `/videos/nome-do-video.mp4`. A página também aceita URLs de incorporação `https://www.youtube-nocookie.com/embed/ID`. Não edite migrações já aplicadas, pois o Flyway verifica o checksum. A aplicação não armazena arquivos de vídeo no MySQL. A terceira aula de LGPD e a revisão das questões ficam para quando o vídeo final estiver disponível.
+
+## Certificados — Fase 9
+
+Uma aprovação na avaliação emite automaticamente um certificado apenas se `cursos.certificacao_habilitada` estiver ativo. A V11 habilita os cursos piloto de Segurança da Informação e Computação em Nuvem e recupera aprovações anteriores desses cursos; a V12 sincroniza o progresso dos certificados recuperados. LGPD na Prática permanece desabilitado até a terceira videoaula e a revisão das questões. A emissão é transacional com a tentativa e a restrição única impede duplicações. A aprovação também conclui o progresso do curso; um curso já certificado não pode voltar a ficar em andamento. O percentual manual de progresso não autoriza a emissão.
+
+- `GET /api/colaborador/certificados` lista somente os certificados do colaborador autenticado.
+- `GET /api/colaborador/certificados/{id}` consulta um certificado próprio; outro usuário recebe 404.
+
+As respostas incluem UUID, nome do titular, curso, título, descrição, duração, código único e data de emissão. O PDF é gerado pelo frontend com esses dados; não há validação pública de códigos nesta fase. Quando LGPD estiver pronta, uma nova migração deve habilitar o curso e emitir certificados para aprovações anteriores.
 
 ## Verificação
 
@@ -141,7 +152,7 @@ Para adicionar outro vídeo, coloque um MP4 em `frontend/public/videos/` e crie 
 - `GET /v3/api-docs` fornece o documento OpenAPI JSON.
 - `GET /api/cursos` retorna o catálogo na ordem de exibição; `GET /api/cursos/{id}` retorna um curso pelo UUID, com 404 para curso ausente.
 - `mvn -f backend/pom.xml verify` executa build e testes de saúde, documentação, login, tokens, permissões e CORS sem exigir MySQL. Os testes usam uma chave JWT própria, que não é empacotada na aplicação.
-- Com MySQL ativo e as variáveis locais carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml verify` inclui os testes de entidades, catálogo, autenticação, inscrições, progresso e avaliações com banco real. Sem essa variável, os testes de banco são ignorados.
+- Com MySQL ativo e as variáveis locais carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml verify` inclui os testes de entidades, catálogo, autenticação, inscrições, progresso, avaliações e certificados com banco real. Sem essa variável, os testes de banco são ignorados.
 - `AuthDatabaseIntegrationTest` cria contas e empresa temporárias com identificadores únicos, valida BCrypt/login e inicialização repetida, e remove os registros ao terminar. `DomainMappingIntegrationTest` reverte suas inserções por transação. As migrações Flyway permanecem aplicadas.
 
 O Actuator expõe somente o endpoint de health. Login, catálogo, Meus Cursos, aulas e avaliações estão integrados ao frontend. A página Cursos recorre ao mock local em falhas de disponibilidade, mas não oferece inscrição nesse modo; respostas 401 encerram a sessão. Os demais domínios serão integrados nas próximas fases.

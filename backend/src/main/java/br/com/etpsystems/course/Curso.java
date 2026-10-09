@@ -57,6 +57,9 @@ public class Curso {
     @Column(name = "destaque", nullable = false)
     private boolean destaque;
 
+    @Column(name = "certificacao_habilitada", nullable = false)
+    private boolean certificacaoHabilitada;
+
     @Column(name = "ordem_exibicao", nullable = false)
     private int ordemExibicao = 1000;
 
@@ -103,6 +106,8 @@ public class Curso {
     public boolean isDestaque() {
         return destaque;
     }
+
+    public boolean isCertificacaoHabilitada() { return certificacaoHabilitada; }
 
     public int getOrdemExibicao() {
         return ordemExibicao;

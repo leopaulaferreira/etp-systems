@@ -9,6 +9,7 @@ import java.net.http.HttpResponse;
 
 import br.com.etpsystems.course.CursoService;
 import br.com.etpsystems.assessment.AvaliacaoService;
+import br.com.etpsystems.certificate.CertificadoService;
 import br.com.etpsystems.user.UsuarioRepository;
 import br.com.etpsystems.enrollment.InscricaoService;
 import br.com.etpsystems.progress.ProgressoService;
@@ -38,6 +39,9 @@ class ApiSmokeTest {
 
     @MockitoBean
     private AvaliacaoService avaliacaoService;
+
+    @MockitoBean
+    private CertificadoService certificadoService;
 
     @LocalServerPort
     private int port;

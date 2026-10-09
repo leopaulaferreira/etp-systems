@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import br.com.etpsystems.enrollment.InscricaoRepository;
+import br.com.etpsystems.certificate.CertificadoService;
 import br.com.etpsystems.user.Usuario;
 import br.com.etpsystems.user.UsuarioRepository;
 import org.springframework.http.HttpStatus;
@@ -20,14 +21,17 @@ public class AvaliacaoService {
     private final TentativaRepository tentativas;
     private final InscricaoRepository inscricoes;
     private final UsuarioRepository usuarios;
+    private final CertificadoService certificados;
 
     public AvaliacaoService(AulaRepository aulas, AvaliacaoRepository avaliacoes,
-            TentativaRepository tentativas, InscricaoRepository inscricoes, UsuarioRepository usuarios) {
+            TentativaRepository tentativas, InscricaoRepository inscricoes, UsuarioRepository usuarios,
+            CertificadoService certificados) {
         this.aulas = aulas;
         this.avaliacoes = avaliacoes;
         this.tentativas = tentativas;
         this.inscricoes = inscricoes;
         this.usuarios = usuarios;
+        this.certificados = certificados;
     }
 
     @Transactional(readOnly = true)
@@ -79,6 +83,9 @@ public class AvaliacaoService {
         Tentativa tentativa = new Tentativa(avaliacao, usuario, nota);
         escolhas.forEach(tentativa::responder);
         tentativas.save(tentativa);
+        if (tentativa.isAprovado()) {
+            certificados.emitirSeHabilitado(usuario, avaliacao.getCurso(), tentativa.getConcluidoEm());
+        }
         anteriores.add(tentativa);
         return AvaliacaoResponse.from(avaliacao, anteriores);
     }
