@@ -43,14 +43,14 @@ export function isAnswered(question: AssessmentQuestion, answers: Record<string,
 
 export function calculateScore(item: Assessment, answers: Record<string, number>) {
   const correct = item.questions.filter(
-    (question) => answers[question.id] === question.correctOption,
+    (question) => question.correctOption !== undefined && answers[question.id] === question.correctOption,
   ).length
   return item.questions.length ? Math.round((correct / item.questions.length) * 100) : 0
 }
 
 export function latestScore(item: Assessment) {
   const latest = item.attempts.at(-1)
-  return latest ? calculateScore(item, latest.answers) : null
+  return latest ? (latest.score ?? calculateScore(item, latest.answers)) : null
 }
 
 export function remainingAttempts(item: Assessment) {

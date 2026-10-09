@@ -27,6 +27,8 @@ type AssessmentDialogProps = {
   onStart: () => void
   onAnswer: (questionId: string, option: number) => void
   onSubmit: () => void
+  submitting: boolean
+  submitError: boolean
 }
 const primary =
   'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 disabled:cursor-not-allowed disabled:opacity-40'
@@ -39,6 +41,8 @@ export default function AssessmentDialog({
   onStart,
   onAnswer,
   onSubmit,
+  submitting,
+  submitError,
 }: AssessmentDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const questionRef = useRef<HTMLSpanElement>(null)
@@ -245,10 +249,8 @@ export default function AssessmentDialog({
                 ))}
               </div>
             </fieldset>
-            <p className="text-xs leading-5 text-ink-500">
-              Você pode pausar e voltar. As respostas ficam disponíveis enquanto estiver nesta
-              página.
-            </p>
+            <p className="text-xs leading-5 text-ink-500">Suas escolhas ficam nesta página até o envio. Ao sair, será preciso responder novamente.</p>
+            {submitError && <p role="alert" className="text-xs font-semibold text-rose-400">Não foi possível enviar a avaliação. Confira sua conexão e tente novamente.</p>}
             {questionIndex === item.questions.length - 1 && answered < item.questions.length && (
               <p role="status" className="text-xs font-semibold text-amber-300">
                 Responda todas as questões antes de concluir.
@@ -276,10 +278,10 @@ export default function AssessmentDialog({
                 <button
                   type="button"
                   onClick={onSubmit}
-                  disabled={answered !== item.questions.length}
+                  disabled={submitting || answered !== item.questions.length}
                   className={primary}
                 >
-                  Concluir avaliação <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+                  {submitting ? 'Enviando...' : 'Concluir avaliação'} <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -310,7 +312,7 @@ export default function AssessmentDialog({
                 </p>
               </div>
             </div>
-            <div>
+            {item.questions.every((question) => question.correctOption !== undefined) ? <div>
               <h3 className="mb-4 text-base font-bold">Confira suas respostas</h3>
               <ol className="flex flex-col gap-4">
                 {item.questions.map((question, index) => {
@@ -340,7 +342,7 @@ export default function AssessmentDialog({
                       </p>
                       {!correct && (
                         <p className="text-xs leading-6 text-emerald-300">
-                          Resposta correta: {question.options[question.correctOption]}
+                          Resposta correta: {question.options[question.correctOption!]}
                         </p>
                       )}
                       <p className="mt-2 text-xs leading-6 text-ink-500">{question.explanation}</p>
@@ -348,7 +350,7 @@ export default function AssessmentDialog({
                   )
                 })}
               </ol>
-            </div>
+            </div> : <p className="rounded-xl border border-ink-200 bg-panel-alt p-4 text-sm leading-6 text-ink-500">Revise a aula antes de tentar novamente. A correção detalhada aparece após a aprovação ou ao terminar as tentativas.</p>}
             {!passed && !remainingAttempts(item) && (
               <p className="text-sm text-amber-300">
                 Você utilizou todas as tentativas desta avaliação.

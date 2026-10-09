@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useAssessments } from '../../assessments/AssessmentContext'
 import type { Assessment, AssessmentStatus } from '../../types/assessment'
 import {
@@ -7,9 +8,9 @@ import {
   initialFilters,
   selectAssessments,
   startAssessment,
-  submitAssessment,
   type AssessmentFilters as Filters,
 } from './assessment'
+import { sendAttempt } from './assessmentApi'
 import AssessmentDialog from './components/AssessmentDialog'
 import AssessmentFilters from './components/AssessmentFilters'
 import AssessmentHero from './components/AssessmentHero'
@@ -18,12 +19,17 @@ import AssessmentList from './components/AssessmentList'
 import AssessmentStats from './components/AssessmentStats'
 
 export default function AvaliacoesPage() {
-  const { assessments: items, setAssessments: setItems } = useAssessments()
+  const { assessments: items, setAssessments: setItems, status, reload } = useAssessments()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [filters, setFilters] = useState<Filters>(initialFilters)
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState(false)
   const filtered = useMemo(() => selectAssessments(items, filters), [items, filters])
   const summary = useMemo(() => assessmentSummary(items), [items])
-  const selected = items.find((item) => item.id === selectedId)
+  const courseId = searchParams.get('curso')
+  const selected = items.find((item) => item.id === selectedId) ??
+    (selectedId === null ? items.find((item) => item.courseId === courseId) : undefined)
 
   function focusSection(id: string) {
     const section = document.getElementById(id)
@@ -37,12 +43,29 @@ export default function AvaliacoesPage() {
   }
 
   function updateSelected(update: (item: Assessment) => Assessment) {
-    setItems((current) => current.map((item) => (item.id === selectedId ? update(item) : item)))
+    setItems((current) => current.map((item) => (item.id === selected?.id ? update(item) : item)))
+  }
+
+  async function handleSubmit() {
+    if (!selected || submitting) return
+    setSubmitting(true)
+    setSubmitError(false)
+    try {
+      const updated = await sendAttempt(selected)
+      setItems((current) => current.map((item) => item.id === updated.id ? updated : item))
+    } catch {
+      setSubmitError(true)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
     <div className="flex min-w-0 flex-col gap-5 lg:gap-6">
       <AssessmentHero />
+      {status === 'loading' && <p role="status" className="rounded-[22px] border border-ink-200/70 bg-panel p-6 text-sm text-ink-500">Carregando avaliações...</p>}
+      {status === 'error' && <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-[22px] border border-ink-200/70 bg-panel p-6 text-sm text-ink-700"><span>Não foi possível carregar suas avaliações.</span><button type="button" onClick={reload} className="rounded-xl bg-brand-blue-700 px-4 py-2 font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Tentar novamente</button></div>}
+      {status === 'ready' && <>
       <AssessmentStats
         summary={summary}
         selectedStatus={filters.status}
@@ -65,19 +88,19 @@ export default function AvaliacoesPage() {
         </div>
         <AssessmentInsights items={items} onOpen={(item) => setSelectedId(item.id)} />
       </div>
+      </>}
       {selected && (
         <AssessmentDialog
           key={selected.id}
           item={selected}
-          onClose={() => setSelectedId(null)}
+          onClose={() => { setSelectedId(null); if (courseId) setSearchParams({}, { replace: true }) }}
           onStart={() => updateSelected(startAssessment)}
           onAnswer={(questionId, option) =>
             updateSelected((item) => answerAssessment(item, questionId, option))
           }
-          onSubmit={() => {
-            const completedAt = new Date().toISOString()
-            updateSelected((item) => submitAssessment(item, completedAt))
-          }}
+          onSubmit={() => { void handleSubmit() }}
+          submitting={submitting}
+          submitError={submitError}
         />
       )}
     </div>

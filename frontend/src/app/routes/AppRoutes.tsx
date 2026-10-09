@@ -16,6 +16,7 @@ import { homeForRole } from '../../auth/auth'
 
 const AjudaPage = lazy(() => import('../../pages/Ajuda/AjudaPage'))
 const LoginPage = lazy(() => import('../../pages/Login/LoginPage'))
+const CourseStudyPage = lazy(() => import('../../pages/Cursos/CourseStudyPage'))
 const EmpresaPage = lazy(() => import('../../pages/Empresa/EmpresaPage'))
 
 const ColaboradoresPage = lazy(() => import('../../pages/Empresa/ColaboradoresPage'))
@@ -38,6 +39,7 @@ export default function AppRoutes() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/trilhas" element={<TrilhasPage />} />
             <Route path="/cursos" element={<CursosPage />} />
+            <Route path="/cursos/:id/estudar" element={<Suspense fallback={<p role="status" className="text-sm text-ink-500">Carregando aula...</p>}><CourseStudyPage /></Suspense>} />
             <Route path="/meus-cursos" element={<MeusCursosPage />} />
             <Route path="/avaliacoes" element={<AvaliacoesPage />} />
             <Route path="/certificados" element={<CertificadosPage />} />

@@ -6,17 +6,21 @@ export type AssessmentQuestion = {
   kind: QuestionKind
   prompt: string
   options: string[]
-  correctOption: number
-  explanation: string
+  optionIds?: string[]
+  correctOption?: number
+  explanation?: string
 }
 
 export type AssessmentAttempt = {
   answers: Record<string, number>
   completedAt: string
+  score?: number
+  passed?: boolean
 }
 
 export type Assessment = {
   id: string
+  courseId?: string
   title: string
   course: string
   courseType: 'Curso' | 'Trilha'

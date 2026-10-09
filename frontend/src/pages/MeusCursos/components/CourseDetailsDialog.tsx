@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Bookmark, CalendarDays, Clock3, History, X } from 'lucide-react'
+import { Bookmark, BookOpen, CalendarDays, Clock3, History, X } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { type CourseItem } from '../../../mocks/meus-cursos.mock'
 import CourseBadge from './CourseBadge'
 import CourseProgress from './CourseProgress'
@@ -124,6 +125,8 @@ export default function CourseDetailsDialog({
             </p>
           )}
         </div>
+        {editable && <Link to={`/cursos/${course.id}/estudar`} onClick={onClose}
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"><BookOpen className="h-4 w-4" aria-hidden="true" /> Abrir aula</Link>}
         {editable && (
           <form onSubmit={(event) => { event.preventDefault(); void saveProgress() }}
             className="flex flex-col gap-3 rounded-xl border border-ink-200 bg-panel-alt p-4">

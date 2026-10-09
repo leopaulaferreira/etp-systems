@@ -25,7 +25,7 @@ export default function AssessmentInsights({
       item.attempts.map((attempt) => ({
         id: `${item.id}-${attempt.completedAt}`,
         date: attempt.completedAt,
-        score: calculateScore(item, attempt.answers),
+        score: attempt.score ?? calculateScore(item, attempt.answers),
       })),
     )
     .sort((a, b) => a.date.localeCompare(b.date))
