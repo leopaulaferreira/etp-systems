@@ -95,11 +95,11 @@ export function createAuthSession(storage: () => SessionStorage = () => window.s
     return result.user
   }
 
-  async function request(path: string, signal?: AbortSignal, method: 'GET' | 'POST' = 'GET'): Promise<unknown> {
+  async function request(path: string, signal?: AbortSignal, method: 'GET' | 'POST' | 'PUT' = 'GET', body?: unknown): Promise<unknown> {
     const current = credentials
     if (current && current.expiresAt <= now()) { logout(true); throw new ApiError(401) }
     try {
-      return await requestJson(path, { token: current?.accessToken, signal, method })
+      return await requestJson(path, { token: current?.accessToken, signal, method, body })
     } catch (error) {
       // Uma resposta de uma sessão antiga não pode encerrar um login mais recente.
       if (current && current === credentials && error instanceof ApiError && error.status === 401) logout(true)

@@ -8,7 +8,7 @@ type CourseTabsProps = {
 }
 
 const tabs: { id: CourseTab; label: string; icon: typeof Clock3 }[] = [
-  { id: 'ongoing', label: 'Inscritos', icon: Clock3 },
+  { id: 'ongoing', label: 'A estudar', icon: Clock3 },
   { id: 'completed', label: 'Concluídos', icon: CheckCircle2 },
   { id: 'saved', label: 'Salvos', icon: Bookmark },
 ]

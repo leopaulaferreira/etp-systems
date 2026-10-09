@@ -7,7 +7,8 @@ import CourseTabs, { type CourseTab } from './components/CourseTabs'
 import SideCourseCard from './components/SideCourseCard'
 import MeusCursosHero from './components/MeusCursosHero'
 import CourseDetailsDialog from './components/CourseDetailsDialog'
-import { courseThumbnail, fetchMyCourses, formatCourseDuration } from './myCoursesApi'
+import ContinueCourseCard from './components/ContinueCourseCard'
+import { courseThumbnail, fetchMyCourses, formatCourseDuration, updateCourseProgress } from './myCoursesApi'
 import './meus-cursos.css'
 
 export default function MeusCursosPage() {
@@ -22,6 +23,9 @@ export default function MeusCursosPage() {
   const savedIds = new Set(saved.map((course) => course.id))
   const courseIds = new Set(courses.map((course) => course.id))
   const explore = suggestions.filter((course) => !courseIds.has(course.id)).slice(0, 3)
+  const ongoingCourses = courses.filter((course) => course.progress !== 100)
+  const completedCourses = courses.filter((course) => course.progress === 100)
+  const continueCourse = ongoingCourses.find((course) => (course.progress ?? 0) > 0)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -59,6 +63,14 @@ export default function MeusCursosPage() {
     document.getElementById('course-tab-saved')?.focus()
   }
 
+  async function handleUpdateProgress(course: CourseItem, percentual: number) {
+    const updated = await updateCourseProgress(course.id, percentual)
+    setCourses((current) => current.map((item) => item.id === course.id ? updated : item))
+    setSaved((current) => current.map((item) => item.id === course.id ? updated : item))
+    setSelectedCourse(updated)
+    setAnnouncement(`${updated.title}: progresso atualizado para ${percentual}%.`)
+  }
+
   const listProps = { savedIds, onOpen: setSelectedCourse, onToggleSave: toggleSave }
   return (
     <div className="flex min-w-0 flex-col gap-5 lg:gap-6">
@@ -79,7 +91,13 @@ export default function MeusCursosPage() {
           </div>
         ) : activeTab === 'ongoing' ? (
           <div className="grid min-w-0 grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
-            <CourseListCard title="Cursos inscritos" courses={courses} emptyMessage="Inscreva-se em um curso no catálogo para começar a estudar." {...listProps} />
+            <div className="flex min-w-0 flex-col gap-5">
+              {continueCourse && <ContinueCourseCard course={continueCourse} isSaved={savedIds.has(continueCourse.id)}
+                onOpen={setSelectedCourse} onToggleSave={toggleSave} />}
+              <CourseListCard title="Cursos a estudar" courses={ongoingCourses}
+                emptyMessage={courses.length ? 'Você concluiu todos os cursos inscritos.'
+                  : 'Inscreva-se em um curso no catálogo para começar a estudar.'} {...listProps} />
+            </div>
             <aside className="flex min-w-0 flex-col gap-5" aria-label="Cursos salvos e sugestões">
               <SideCourseCard title="Cursos salvos" actionLabel="Ver todos os salvos" courses={saved}
                 onOpen={setSelectedCourse} onAction={showSaved} />
@@ -88,7 +106,7 @@ export default function MeusCursosPage() {
             </aside>
           </div>
         ) : activeTab === 'completed' ? (
-          <CourseListCard title="Cursos concluídos" courses={[]}
+          <CourseListCard title="Cursos concluídos" courses={completedCourses}
             emptyMessage="Você ainda não concluiu nenhum curso." {...listProps} />
         ) : (
           <div className="grid min-w-0 grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
@@ -99,8 +117,10 @@ export default function MeusCursosPage() {
         )}
       </div>
       {selectedCourse && (
-        <CourseDetailsDialog course={selectedCourse} isSaved={savedIds.has(selectedCourse.id)}
-          onClose={() => setSelectedCourse(null)} onToggleSave={toggleSave} />
+        <CourseDetailsDialog key={selectedCourse.id} course={selectedCourse}
+          editable={courseIds.has(selectedCourse.id)} isSaved={savedIds.has(selectedCourse.id)}
+          onClose={() => setSelectedCourse(null)} onToggleSave={toggleSave}
+          onUpdateProgress={handleUpdateProgress} />
       )}
     </div>
   )

@@ -35,7 +35,7 @@ export default function CourseThumbnail({ thumbnail, size = 'medium' }: CourseTh
       {size === 'large' && (
         <>
           <span className="absolute left-4 top-4 text-[9px] font-extrabold uppercase tracking-[0.18em] text-white/60">
-            Conhecimento que protege
+            Aprendizado em andamento
           </span>
           <span className="absolute bottom-7 left-5 h-px w-16 bg-gradient-to-r from-brand-cyan-400/60 to-transparent" />
         </>

@@ -18,6 +18,7 @@ export type CourseItem = {
   lastLesson?: string
   duration?: string
   completedAt?: string
+  updatedAt?: string
 }
 
 export const continueCourse: CourseItem = {

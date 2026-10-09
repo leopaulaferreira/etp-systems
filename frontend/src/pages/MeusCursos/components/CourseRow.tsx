@@ -29,13 +29,13 @@ export default function CourseRow({ course, isSaved, onOpen, onToggleSave }: Cou
           {completed
             ? 'Concluído em'
             : hasStarted
-              ? 'Última aula'
+              ? 'Atualizado em'
               : course.type === 'TRILHA'
                 ? 'Conteúdo'
                 : 'Duração'}
         </span>
         <span className="text-ink-700">
-          {completed ? course.completedAt : hasStarted ? course.lastLesson : course.duration}
+          {completed ? course.completedAt : hasStarted ? course.updatedAt : course.duration}
         </span>
       </div>
       <div className="my-course-actions flex items-center gap-1.5">

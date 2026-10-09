@@ -6,7 +6,7 @@ export class ApiError extends Error {
   }
 }
 
-type RequestOptions = { method?: 'GET' | 'POST'; body?: unknown; token?: string; signal?: AbortSignal }
+type RequestOptions = { method?: 'GET' | 'POST' | 'PUT'; body?: unknown; token?: string; signal?: AbortSignal }
 
 export async function requestJson(path: string, options: RequestOptions = {}): Promise<unknown> {
   const headers: Record<string, string> = { Accept: 'application/json' }
