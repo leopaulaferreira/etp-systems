@@ -18,6 +18,7 @@ export type ReportData = {
   months: { month: number; label: string; certificates: number; courses: number; assessments: number }[]
   courses: CourseItem[]
   recentAttempts: { id: string; course: string; score: number; passed: boolean; completedAt: string }[]
+  assessmentsByCourse: { name: string; count: number }[]
   trails: LearningPath[]
 }
 
@@ -61,6 +62,9 @@ export function buildReport(courses: CourseItem[], certificates: Certificate[], 
     months,
     courses: [...courses].sort((first, second) => (second.progress ?? 0) - (first.progress ?? 0) || first.title.localeCompare(second.title, 'pt-BR')),
     recentAttempts: attempts.slice(0, 5),
+    assessmentsByCourse: [...new Set(attempts.map((attempt) => attempt.course))]
+      .map((name) => ({ name, count: attempts.filter((attempt) => attempt.course === name).length }))
+      .sort((first, second) => second.count - first.count || first.name.localeCompare(second.name, 'pt-BR')),
     trails: trails.filter((trail) => trail.enrolled),
   }
 }
