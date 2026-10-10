@@ -31,19 +31,6 @@ export default function AjudaPage() {
   return (
     <div className="flex min-w-0 flex-col gap-5 lg:gap-6">
       <PageHero eyebrow="Estamos por aqui" icon={Headset} title="Central de Ajuda" description="Encontre respostas rápidas ou fale com o suporte." />
-      <div className="w-full max-w-xl">
-        <Input
-          id="help-search"
-          type="search"
-          tone="dark"
-          aria-label="Buscar uma dúvida"
-          placeholder="Buscar uma dúvida..."
-          value={query}
-          onChange={(event) => { setQuery(event.target.value); setOpenQuestion(null) }}
-          icon={<Search className="h-4 w-4" aria-hidden="true" />}
-          trailing={query && <button type="button" onClick={() => { setQuery(''); document.getElementById('help-search')?.focus() }} aria-label="Limpar busca" className="rounded-lg p-1 text-ink-500 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"><X className="h-4 w-4" aria-hidden="true" /></button>}
-        />
-      </div>
       <div role="group" aria-label="Categorias de ajuda" className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         {helpCategories.map(({ id, label }) => {
           const Icon = categoryIcons[id]
@@ -58,11 +45,26 @@ export default function AjudaPage() {
       </div>
       <section aria-labelledby="help-faq-title" className="min-w-0 overflow-hidden rounded-[22px] border border-ink-200 bg-panel shadow-card">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink-200 px-5 py-4 sm:px-6">
-          <div>
-            <h2 id="help-faq-title" className="text-base font-extrabold text-ink-900">Dúvidas frequentes</h2>
-            <p role="status" className="mt-1 text-xs text-ink-500">{questions.length} {questions.length === 1 ? 'resposta encontrada' : 'respostas encontradas'}</p>
+          <div className="flex flex-wrap items-center gap-3">
+            <div>
+              <h2 id="help-faq-title" className="text-base font-extrabold text-ink-900">Dúvidas frequentes</h2>
+              <p role="status" className="mt-1 text-xs text-ink-500">{questions.length} {questions.length === 1 ? 'resposta encontrada' : 'respostas encontradas'}</p>
+            </div>
+            {filtered && <Button type="button" variant="ghost" onClick={clearFilters}>Limpar filtros</Button>}
           </div>
-          {filtered && <Button type="button" variant="ghost" onClick={clearFilters}>Limpar filtros</Button>}
+          <div className="w-full sm:w-[min(40%,360px)]">
+            <Input
+              id="help-search"
+              type="search"
+              tone="dark"
+              aria-label="Buscar uma dúvida"
+              placeholder="Buscar uma dúvida..."
+              value={query}
+              onChange={(event) => { setQuery(event.target.value); setOpenQuestion(null) }}
+              icon={<Search className="h-4 w-4" aria-hidden="true" />}
+              trailing={query && <button type="button" onClick={() => { setQuery(''); document.getElementById('help-search')?.focus() }} aria-label="Limpar busca" className="rounded-lg p-1 text-ink-500 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"><X className="h-4 w-4" aria-hidden="true" /></button>}
+            />
+          </div>
         </div>
         {questions.length ? questions.map((item) => {
           const expanded = openQuestion === item.id
