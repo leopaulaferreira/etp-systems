@@ -19,6 +19,7 @@ server:
 etp:
   demo:
     enabled: ${ETP_DEMO_ENABLED:false}
+    company-data-enabled: ${ETP_DEMO_COMPANY_DATA_ENABLED:false}
     password: ${ETP_DEMO_PASSWORD:}
     colaborador-email: ${ETP_DEMO_COLABORADOR_EMAIL:etp@gmail.com}
     empresa-email: ${ETP_DEMO_EMPRESA_EMAIL:rhetp@gmail.com}

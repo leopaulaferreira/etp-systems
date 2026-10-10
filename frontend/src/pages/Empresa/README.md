@@ -41,9 +41,9 @@ autenticado e validar as permissões em todas as consultas.
 
 ## Preparação para dados reais
 
-As páginas existentes podem receber respostas de consultas somente leitura do backend. O filtro da empresa deve usar o vínculo do usuário autenticado, nunca o identificador fixo `etp` deste mock. Colaboradores sem cursos, notas ou certificados precisam aparecer com valores vazios coerentes. A área/departamento, hoje usada na busca e no resumo individual, ainda não existe no banco; será opcional na modelagem da Fase 11. Os nomes de trilhas presentes em `company.mock.ts` são apenas rótulos ilustrativos.
+As páginas existentes podem receber respostas de consultas somente leitura do backend. O filtro da empresa deve usar o vínculo do usuário autenticado, nunca o identificador fixo `etp` deste mock. Colaboradores sem cursos, notas ou certificados precisam aparecer com valores vazios coerentes. A área/departamento já é opcional no banco (migração V13). Os nomes de trilhas presentes em `company.mock.ts` são apenas rótulos ilustrativos.
 
-Para validar o painel com dados reais, o ambiente de desenvolvimento precisará de mais de um colaborador vinculado à empresa da conta RH e de outra empresa para testar isolamento. Progresso de 100% informado manualmente, aprovação na avaliação e emissão do certificado são eventos distintos. A integração deve mostrar cada medida com seu nome correto e preservar a interface atual sem exibir números fictícios quando a API falhar.
+O ambiente de desenvolvimento pode cadastrar os oito colaboradores do mock no MySQL com `ETP_DEMO_COMPANY_DATA_ENABLED=true` (e `ETP_DEMO_ENABLED=true`), sem permitir login para essas contas. A página ainda lê exclusivamente o mock. Para validar a futura API, também será necessária outra empresa para testar isolamento. Progresso de 100% informado manualmente, aprovação na avaliação e emissão do certificado são eventos distintos. Algumas notas e certificados do mock não existem no backend porque os respectivos cursos não têm avaliação ou certificação habilitada. A integração deve mostrar cada medida com seu nome correto e preservar a interface atual sem exibir números fictícios quando a API falhar.
 
 ## Validação
 
