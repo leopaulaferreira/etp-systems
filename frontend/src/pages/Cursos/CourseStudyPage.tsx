@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, BookOpen, ClipboardCheck, Play, VideoOff } from 
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useAssessments } from '../../assessments/AssessmentContext'
 import PageHero from '../../components/ui/PageHero'
-import type { CatalogCourse } from '../../mocks/cursos.mock'
+import type { CatalogCourse } from './courseTypes'
 import { fetchCourseDetails } from './courseApi'
 import { fetchLessons, type Lesson } from '../Avaliacoes/assessmentApi'
 import { latestScore, remainingAttempts } from '../Avaliacoes/assessment'

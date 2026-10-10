@@ -1,4 +1,4 @@
-import type { CatalogCourse, CourseLevel } from '../../mocks/cursos.mock'
+import type { CatalogCourse, CourseLevel } from './courseTypes'
 
 export type CourseOrder = 'relevance' | 'title' | 'duration' | 'popular'
 export type CatalogFilters = {

@@ -14,7 +14,7 @@ import {
   Workflow,
   type LucideIcon,
 } from 'lucide-react'
-import type { CourseIcon } from '../../../mocks/cursos.mock'
+import type { CourseIcon } from '../courseTypes'
 
 const themes: Record<CourseIcon, { icon: LucideIcon; color: string; background: string }> = {
   cloud: {

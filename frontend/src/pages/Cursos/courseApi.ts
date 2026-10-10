@@ -1,4 +1,4 @@
-import type { CatalogCourse, CourseIcon, CourseLevel } from '../../mocks/cursos.mock'
+import type { CatalogCourse, CourseIcon, CourseLevel } from './courseTypes'
 import { authSession } from '../../auth/session.ts'
 
 const icons = new Set<CourseIcon>([

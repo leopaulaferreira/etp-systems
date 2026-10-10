@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { ArrowRight, BookOpen, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import type { CatalogCourse } from '../../../mocks/cursos.mock'
+import type { CatalogCourse } from '../courseTypes'
 import CourseArtwork from './CourseArtwork'
 import CourseMetadata from './CourseMetadata'
 

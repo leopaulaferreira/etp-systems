@@ -1,5 +1,5 @@
 import { Search, SlidersHorizontal, X } from 'lucide-react'
-import { courseLevels } from '../../../mocks/cursos.mock'
+import { courseLevels } from '../courseTypes'
 import type { CatalogFilters, CourseOrder } from '../catalog'
 
 type CatalogToolbarProps = {

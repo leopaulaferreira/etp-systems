@@ -1,5 +1,5 @@
 import { ArrowRight, Sparkles } from 'lucide-react'
-import type { CatalogCourse } from '../../../mocks/cursos.mock'
+import type { CatalogCourse } from '../courseTypes'
 import CourseArtwork from './CourseArtwork'
 import CourseMetadata from './CourseMetadata'
 

@@ -2,7 +2,7 @@
 
 Catálogo em `/cursos`, dentro do layout autenticado existente. A página consulta
 `GET /api/cursos` e busca detalhes por `GET /api/cursos/{id}`. O mock
-`../../mocks/cursos.mock.ts` contém 24 cursos e funciona como alternativa local
+O catálogo é carregado pela API de cursos; falhas exibem um estado de erro com opção de tentar novamente
 quando a API está indisponível. O destaque pertence ao catálogo.
 
 ## Funcionalidades

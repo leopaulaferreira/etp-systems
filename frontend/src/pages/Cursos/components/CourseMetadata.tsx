@@ -1,5 +1,5 @@
 import { Clock3, SignalLow, SignalMedium, SignalHigh, UsersRound } from 'lucide-react'
-import type { CatalogCourse } from '../../../mocks/cursos.mock'
+import type { CatalogCourse } from '../courseTypes'
 import { formatDuration, formatStudents } from '../catalog'
 
 const levelIcons = { Iniciante: SignalLow, Intermediário: SignalMedium, Avançado: SignalHigh }

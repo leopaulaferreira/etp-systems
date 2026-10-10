@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { catalogCourses, featuredCourse } from '../src/mocks/cursos.mock.ts'
+import { catalogCourses, featuredCourse } from './fixtures/cursos.fixture.ts'
 import { initialFilters, selectCourses, formatDuration } from '../src/pages/Cursos/catalog.ts'
 
 test('o catálogo tem 24 IDs únicos e inclui o destaque uma única vez', () => {

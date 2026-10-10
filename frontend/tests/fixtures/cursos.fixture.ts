@@ -1,38 +1,4 @@
-/** Dados locais preservados como alternativa quando a API não estiver disponível. */
-export const courseCategories = [
-  'Tecnologia',
-  'Dados',
-  'Negócios',
-  'Segurança',
-  'Produtividade',
-] as const
-export const courseLevels = ['Iniciante', 'Intermediário', 'Avançado'] as const
-export type CourseCategory = (typeof courseCategories)[number]
-export type CourseLevel = (typeof courseLevels)[number]
-export type CourseIcon =
-  | 'cloud'
-  | 'python'
-  | 'communication'
-  | 'ai'
-  | 'security'
-  | 'governance'
-  | 'workspace'
-  | 'analytics'
-  | 'code'
-  | 'leadership'
-  | 'projects'
-
-export type CatalogCourse = {
-  id: string
-  title: string
-  description: string
-  category: string
-  level: CourseLevel
-  durationHours: number
-  students?: number
-  icon: CourseIcon
-  featured?: boolean
-}
+import type { CatalogCourse } from '../../src/pages/Cursos/courseTypes.ts'
 
 export const featuredCourse: CatalogCourse = {
   id: 'fundamentos-ciberseguranca',
