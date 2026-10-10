@@ -54,6 +54,11 @@ public class Inscricao {
         this.curso = curso;
     }
 
+    public Inscricao(Usuario usuario, Trilha trilha) {
+        this.usuario = usuario;
+        this.trilha = trilha;
+    }
+
     public UUID getId() {
         return id;
     }
@@ -65,6 +70,8 @@ public class Inscricao {
     public Curso getCurso() {
         return curso;
     }
+
+    public Trilha getTrilha() { return trilha; }
 
     public Instant getInscritoEm() {
         return inscritoEm;

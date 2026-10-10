@@ -41,6 +41,18 @@ public class Trilha {
     @Column(name = "descricao", columnDefinition = "text")
     private String descricao;
 
+    @Column(name = "categoria", nullable = false, length = 50)
+    private String categoria = "Geral";
+
+    @Column(name = "nivel", nullable = false, length = 30)
+    private String nivel = "Iniciante";
+
+    @Column(name = "icone", nullable = false, length = 30)
+    private String icone = "shield";
+
+    @Column(name = "destaque", nullable = false)
+    private boolean destaque;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empresa_id")
     private Empresa empresa;
@@ -78,6 +90,11 @@ public class Trilha {
     public String getDescricao() {
         return descricao;
     }
+
+    public String getCategoria() { return categoria; }
+    public String getNivel() { return nivel; }
+    public String getIcone() { return icone; }
+    public boolean isDestaque() { return destaque; }
 
     public Empresa getEmpresa() {
         return empresa;

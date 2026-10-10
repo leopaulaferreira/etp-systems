@@ -11,6 +11,10 @@ public interface InscricaoRepository extends JpaRepository<Inscricao, UUID> {
 
     Optional<Inscricao> findByUsuario_IdAndCurso_Id(UUID usuarioId, UUID cursoId);
 
+    Optional<Inscricao> findByUsuario_IdAndTrilha_Id(UUID usuarioId, UUID trilhaId);
+
+    List<Inscricao> findByUsuario_IdAndTrilhaIsNotNull(UUID usuarioId);
+
     @EntityGraph(attributePaths = "curso")
     List<Inscricao> findByUsuario_IdAndCursoIsNotNullOrderByInscritoEmDesc(UUID usuarioId);
 

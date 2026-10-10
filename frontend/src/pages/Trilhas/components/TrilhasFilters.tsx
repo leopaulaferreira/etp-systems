@@ -1,4 +1,5 @@
-import { type CategoryFilter, type LevelFilter } from '../../../mocks/trilhas.mock'
+type CategoryFilter = string
+type LevelFilter = string
 
 type TrilhasFiltersProps = {
   categories: readonly CategoryFilter[]

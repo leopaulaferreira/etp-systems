@@ -1,10 +1,8 @@
 import { ShieldCheck, Layers3, Clock3, ArrowRight, LockKeyhole, Network, Sparkles } from 'lucide-react'
 import { levelIcons } from './TrailCard'
-import { featuredLearningPath } from '../../../mocks/trilhas.mock'
-import { Link } from 'react-router-dom'
+import type { LearningPath } from '../trailApi'
 
-export default function FeaturedTrailCard() {
-  const data = featuredLearningPath
+export default function FeaturedTrailCard({ data, onOpen }: { data: LearningPath; onOpen: (path: LearningPath) => void }) {
   const LevelIcon = levelIcons[data.level]
 
   return (
@@ -38,7 +36,7 @@ export default function FeaturedTrailCard() {
       <div className="relative flex min-w-0 flex-1 flex-col items-start gap-3.5">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-cyan-400/20 bg-brand-cyan-400/10 px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-brand-cyan-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
           <Sparkles className="h-3 w-3" strokeWidth={2.2} aria-hidden="true" />
-          {data.badge}
+          Em destaque
         </span>
         <h2 className="text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-white sm:text-[30px]">
           {data.title}
@@ -56,23 +54,24 @@ export default function FeaturedTrailCard() {
           </span>
           <span className="flex items-center gap-1.5">
             <Clock3 className="h-4 w-4 text-brand-cyan-400" strokeWidth={2} aria-hidden="true" />
-            {data.durationHours} horas
+            {Number(data.durationHours.toFixed(1)).toLocaleString('pt-BR')} horas
           </span>
         </div>
       </div>
 
       <div className="relative shrink-0 md:col-start-2 md:row-start-2 md:justify-self-start xl:col-start-3 xl:row-start-1 xl:justify-self-auto xl:self-center">
-        <Link
-          to="/cursos?categoria=Seguran%C3%A7a"
+        <button
+          type="button"
+          onClick={() => onOpen(data)}
           className="group inline-flex min-h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-brand-blue-600 px-5 py-3 text-sm font-extrabold text-white shadow-[0_12px_28px_-14px_rgba(37,99,235,0.9)] transition-[transform,background-color,box-shadow] duration-200 hover:-translate-y-0.5 hover:bg-brand-blue-500 hover:shadow-[0_16px_32px_-14px_rgba(37,99,235,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-navy-900 motion-reduce:transform-none"
         >
-          <span>Explorar cursos de Segurança</span>
+          <span>{data.enrolled ? `Continuar trilha · ${data.progress}%` : 'Explorar trilha'}</span>
           <ArrowRight
             className="h-4 w-4 text-brand-cyan-400 transition-transform duration-200 group-hover:translate-x-0.5"
             strokeWidth={2.5}
             aria-hidden="true"
           />
-        </Link>
+        </button>
       </div>
     </section>
   )
