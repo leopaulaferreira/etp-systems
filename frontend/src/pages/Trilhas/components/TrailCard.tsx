@@ -6,24 +6,16 @@ import {
   BookOpenText,
   Clock3,
   ArrowUpRight,
-  SignalLow,
-  SignalMedium,
-  SignalHigh,
   type LucideIcon,
 } from 'lucide-react'
 import { type LearningPath } from '../trailApi'
+import { levelIcons } from './trailLevels'
 
 const iconConfig: Record<LearningPath['icon'], { icon: LucideIcon; tileClass: string; iconClass: string }> = {
   cloud: { icon: CloudCog, tileClass: 'border-orange-400/20 bg-orange-400/10', iconClass: 'bg-orange-500 text-white' },
   users: { icon: UsersRound, tileClass: 'border-emerald-400/20 bg-emerald-400/10', iconClass: 'bg-emerald-500 text-white' },
   data: { icon: ChartNoAxesCombined, tileClass: 'border-blue-400/20 bg-blue-400/10', iconClass: 'bg-blue-600 text-white' },
   shield: { icon: ShieldCheck, tileClass: 'border-indigo-400/20 bg-indigo-400/10', iconClass: 'bg-indigo-600 text-white' },
-}
-
-export const levelIcons: Record<LearningPath['level'], LucideIcon> = {
-  Iniciante: SignalLow,
-  Intermediário: SignalMedium,
-  Avançado: SignalHigh,
 }
 
 type TrailCardProps = {

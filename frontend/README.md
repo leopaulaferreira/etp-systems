@@ -34,7 +34,7 @@ deve ser copiado para o frontend. No Compose, o destino é `http://backend:8080`
 - `src/auth/` e `src/api/client.ts`: sessão JWT e requisições à API.
 - `src/layouts/` e `src/components/`: layout compartilhado e controles reutilizáveis.
 - `src/pages/`: telas de colaborador, empresa, login e ajuda, organizadas por domínio.
-- `src/mocks/`: dados ilustrativos ainda usados em telas sem integração real; o Dashboard e o resumo de estudos do Perfil não dependem desses dados.
+- `tests/fixtures/`: dados de referência usados apenas nos testes de componentes e filtros.
 - `src/styles/theme.css`: tokens de cores, tipografia e sombras.
 - `public/videos/`: videoaulas servidas pelo Vite.
 
@@ -50,10 +50,12 @@ deve ser copiado para o frontend. No Compose, o destino é `http://backend:8080`
 | `/empresa/certificados` | empresa | `CompanyRecordsPage` — consulta dos certificados |
 | `/empresa/configuracoes/:section` | empresa | `CompanySettingsPage` — dados, conta e segurança |
 | `/cursos` | colaborador | `CursosPage` — catálogo com busca, filtros, ordenação e detalhes |
+| `/trilhas` | colaborador | `TrilhasPage` — trilhas, inscrição e progresso |
+| `/relatorios` | colaborador | `RelatoriosPage` — indicadores e exportação CSV da conta |
 | `/meus-cursos` | colaborador | `MeusCursosPage` — inscrições e progresso |
 | `/avaliacoes` | colaborador | `AvaliacoesPage` — filtros, atividades, notas, resultados e gráficos |
 | `/certificados` | colaborador | `CertificadosPage` — certificados emitidos e pendentes |
-| `/perfil` | colaborador | `PerfilPage` — dados pessoais locais e resumo real de estudos |
+| `/perfil` | colaborador | `PerfilPage` — perfil persistido e resumo real de estudos |
 | `/configuracoes` | colaborador | `ConfiguracoesPage` — dados pessoais, preferências de estudo e notificações |
 | `/ajuda` | autenticada | `AjudaPage` — busca e categorias de FAQ, solicitação simulada de suporte |
 
@@ -78,23 +80,14 @@ no servidor: uma cópia do JWT permanece válida até expirar. O token em
 `sessionStorage` é acessível ao JavaScript desta origem; uma futura adoção de
 cookies HttpOnly exigirá adaptar o backend e a proteção CSRF.
 
-O catálogo envia Bearer nas consultas e conserva a alternativa local para falhas
-de disponibilidade. Um 401 encaminha para autenticação, sem ativar esse fallback.
-Quando a API está disponível, o catálogo permite a inscrição real em cursos.
+O catálogo envia Bearer nas consultas. Falhas de disponibilidade mostram erro e opção de tentar novamente. Um 401 encaminha para autenticação. O catálogo permite a inscrição real em cursos.
 `/meus-cursos` consulta os cursos da conta pelo JWT e permite atualizar manualmente o percentual de progresso. Cursos em 100% aparecem na aba Concluídos.
 Cadastro, recuperação por e-mail e login Google/Microsoft continuam indisponíveis;
 os textos da tela explicam isso sem aceitar credenciais fictícias.
 
-Nome e e-mail iniciais vêm da conta real. Campos pessoais que ainda não vêm da API
-começam vazios e podem ser preenchidos localmente; exemplos antigos salvos sem edição
-são descartados. Personalizações de perfil, preferências de estudo e configurações
-locais da empresa usam chaves por usuário. Respostas
-de avaliações ainda não enviadas ficam em memória e são reiniciadas quando a conta muda. O e-mail de acesso é somente
-leitura até existir uma API para alterá-lo.
+O perfil do colaborador é carregado e salvo pela API. E-mail e empresa são somente leitura na tela de Configurações. As preferências de formato, lembretes e acessibilidade continuam locais ao navegador. As configurações de contato da empresa também continuam locais. Respostas de avaliações ainda não enviadas ficam em memória e reiniciam quando a conta muda.
 
-O [Painel da empresa](src/pages/Empresa/README.md) ainda usa dados sintéticos para
-indicadores e colaboradores. O UUID real da empresa permanece na sessão; os dados
-ilustrativos não são tratados como registros reais dessa organização.
+O [Painel da empresa](src/pages/Empresa/README.md) consulta os colaboradores da organização e seu progresso no banco. Ele atualiza os dados ao voltar para a aba.
 
 Validação: `npm run build`, `npm run lint`, `npm run test:auth` e
 `node --experimental-strip-types --test tests/*.test.mjs`. No navegador, verificar
@@ -107,8 +100,9 @@ ambos os perfis, senha incorreta, recarga, logout, expiração, falha de rede e 
 - [x] **Cursos** (`/cursos`) — catálogo de 24 cursos, busca, filtros, ordenação, carregamento progressivo e detalhes ([documentação](src/pages/Cursos/README.md))
 - [x] **Avaliações** (`/avaliacoes`) — resumo, filtros, questões interativas, resultados e gráficos ([documentação](src/pages/Avaliacoes/README.md))
 - [x] **Meus Cursos e Certificados** — integrados à API do colaborador
-- [x] **Perfil** — resumo de cursos, avaliações e certificados reais; dados pessoais e preferências locais
-- [ ] **Empresa, Relatórios e partes de Trilhas** — ainda possuem dados ilustrativos
+- [x] **Perfil** — dados pessoais persistidos e resumo de cursos, avaliações e certificados
+- [x] **Empresa** — colaboradores, progresso, notas e certificados reais
+- [x] **Trilhas** — catálogo, inscrições e progresso reais
+- [x] **Relatórios** — indicadores individuais calculados dos registros reais
 
-Login, catálogo, inscrições, progresso, avaliações, certificados e Dashboard usam a API real.
-Algumas telas fora desses fluxos ainda utilizam dados de `src/mocks/`.
+Login, catálogo, inscrições, progresso, avaliações, certificados, Dashboard, Empresa, Trilhas, Relatórios e Perfil usam a API real. Os arquivos de exemplo usados por testes ficam em `tests/fixtures/`.

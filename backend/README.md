@@ -116,7 +116,7 @@ A Fase 4 não inclui cadastro público, confirmação/recuperação por e-mail n
 
 - `POST /api/colaborador/inscricoes/cursos/{cursoId}` inscreve o colaborador identificado pelo JWT. Repetir a chamada retorna a inscrição existente sem duplicá-la; curso inexistente retorna 404.
 - `GET /api/colaborador/meus-cursos` lista apenas os cursos inscritos pelo colaborador autenticado, em ordem da inscrição mais recente. A resposta contém dados básicos do curso e `enrolledAt`, sem entidades JPA ou informações de outros usuários.
-- O banco conserva as inscrições antigas em trilhas. A API para iniciar novas inscrições em trilhas fica para a integração dessa tela.
+- `GET /api/colaborador/trilhas` lista as trilhas cadastradas e calcula o progresso com base nos cursos. `POST /api/colaborador/trilhas/{trilhaId}/inscricao` inscreve na trilha e em seus cursos sem duplicar inscrições.
 - Progresso, aulas concluídas e certificados continuam nas fases seguintes; a Fase 6 não inventa percentuais.
 
 ## Progresso — Fase 7
@@ -148,7 +148,7 @@ As respostas incluem UUID, nome do titular, curso, título, descrição, duraç�
 
 ## Dashboard — Fase 10
 
-`GET /api/colaborador/dashboard` reúne somente dados do colaborador autenticado: cursos inscritos, em andamento e concluídos, avaliações disponíveis e aprovadas, certificados, horas certificadas, curso para continuar, cursos do catálogo ainda não inscritos e os três resultados/certificados mais recentes. Os valores são calculados a partir dos registros existentes; nenhuma tabela ou meta artificial foi criada. **Horas certificadas** somam a duração dos cursos certificados; o sistema ainda não mede tempo efetivo de estudo. Trilhas e relatórios históricos permanecem para fases posteriores.
+`GET /api/colaborador/dashboard` reúne somente dados do colaborador autenticado: cursos inscritos, em andamento e concluídos, avaliações disponíveis e aprovadas, certificados, horas certificadas, curso para continuar, cursos do catálogo ainda não inscritos e os três resultados/certificados mais recentes. Os valores são calculados a partir dos registros existentes; nenhuma tabela ou meta artificial foi criada. **Horas certificadas** somam a duração dos cursos certificados; o sistema ainda não mede tempo efetivo de estudo. A página Relatórios compõe uma visão individual com os endpoints de cursos, certificados e trilhas.
 
 ## Empresa / RH — Fase 11
 
@@ -162,6 +162,10 @@ O campo **departamento/área** é opcional em `Usuario` (migração V13); regist
 
 Nos indicadores, **curso com progresso concluído** significa 100% registrado pelo colaborador, inclusive quando não há certificado. **Avaliação aprovada** e **certificado emitido** são medidas separadas; só a aprovação em curso habilitado gera certificado. Progresso é manual e horas certificadas representam carga horária do curso, não tempo de estudo medido. Colaboradores sem cursos ou sem notas aparecem com valores vazios coerentes.
 
+## Trilhas e perfil
+
+A migração V14 cria quatro trilhas globais com cursos do catálogo. A inscrição na trilha também inscreve o colaborador nos cursos relacionados, e o percentual da trilha é a média do progresso desses cursos. A migração V15 adiciona campos opcionais do perfil; `GET/PUT /api/colaborador/perfil` consulta e atualiza somente o usuário autenticado. E-mail e empresa são definidos pela conta e não podem ser alterados por esse endpoint.
+
 ## Verificação
 
 - `GET /actuator/health` retorna `{"status":"UP"}` quando a aplicação e o banco estão saudáveis.
@@ -169,7 +173,7 @@ Nos indicadores, **curso com progresso concluído** significa 100% registrado pe
 - `GET /v3/api-docs` fornece o documento OpenAPI JSON.
 - `GET /api/cursos` retorna o catálogo na ordem de exibição; `GET /api/cursos/{id}` retorna um curso pelo UUID, com 404 para curso ausente.
 - `mvn -f backend/pom.xml verify` executa build e testes de saúde, documentação, login, tokens, permissões e CORS sem exigir MySQL. Os testes usam uma chave JWT própria, que não é empacotada na aplicação.
-- Com MySQL ativo e as variáveis locais carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml verify` inclui os testes de entidades, catálogo, autenticação, inscrições, progresso, avaliações, certificados, dashboards do colaborador e da empresa com banco real. Sem essa variável, os testes de banco são ignorados.
+- Com MySQL ativo e as variáveis locais carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml verify` inclui os testes de entidades, catálogo, autenticação, inscrições, progresso, avaliações, certificados, dashboards do colaborador e da empresa com banco real, incluindo trilhas e perfil. Sem essa variável, os testes de banco são ignorados.
 - `AuthDatabaseIntegrationTest` cria contas e empresa temporárias com identificadores únicos, valida BCrypt/login e inicialização repetida, e remove os registros ao terminar. `DomainMappingIntegrationTest` reverte suas inserções por transação. As migrações Flyway permanecem aplicadas.
 
-O Actuator expõe somente o endpoint de health. Login, catálogo, Meus Cursos, aulas, avaliações, certificados e painéis do colaborador e da empresa estão integrados ao frontend. A página Cursos recorre ao mock local em falhas de disponibilidade, mas não oferece inscrição nesse modo; respostas 401 encerram a sessão. Os demais domínios serão integrados nas próximas fases.
+O Actuator expõe somente o endpoint de health. Login, catálogo, Meus Cursos, aulas, avaliações, certificados e painéis do colaborador e da empresa estão integrados ao frontend. Cursos, Trilhas, Perfil e Relatórios usam dados persistidos; em falhas de disponibilidade, exibem um estado de erro e permitem tentar novamente. O catálogo não recorre a dados fictícios. As preferências de formato e acessibilidade ainda são locais ao navegador.

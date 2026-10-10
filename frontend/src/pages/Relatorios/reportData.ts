@@ -6,6 +6,7 @@ export type ReportPeriod = 'all' | 'year'
 export type ReportData = {
   enrolled: number
   completed: number
+  totalCompleted: number
   ongoing: number
   notStarted: number
   certificates: number
@@ -39,6 +40,7 @@ export function buildReport(courses: CourseItem[], certificates: Certificate[], 
   return {
     enrolled: courses.length,
     completed: completed.length,
+    totalCompleted: courses.filter((course) => course.progress === 100).length,
     ongoing: courses.filter((course) => (course.progress ?? 0) > 0 && course.progress !== 100).length,
     notStarted: courses.filter((course) => !course.progress).length,
     certificates: issued.length,

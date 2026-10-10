@@ -1,5 +1,5 @@
 import { ShieldCheck, Layers3, Clock3, ArrowRight, LockKeyhole, Network, Sparkles } from 'lucide-react'
-import { levelIcons } from './TrailCard'
+import { levelIcons } from './trailLevels'
 import type { LearningPath } from '../trailApi'
 
 export default function FeaturedTrailCard({ data, onOpen }: { data: LearningPath; onOpen: (path: LearningPath) => void }) {
