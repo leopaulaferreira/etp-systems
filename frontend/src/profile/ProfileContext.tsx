@@ -46,7 +46,8 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 
   async function resetProfile(): Promise<CurrentUser> {
     if (!user || user.perfil !== 'COLABORADOR') return base
-    const saved = await saveProfile({ name: profile.name, phone: '', location: '', position: '',
+    const current = loaded?.id === user.id ? loaded.profile : await fetchProfile()
+    const saved = await saveProfile({ name: current.name, phone: '', location: '', position: '',
       learningFocus: '', experienceLevel: '', notificationsEnabled: true })
     setLoaded({ id: user.id, profile: saved })
     return saved
