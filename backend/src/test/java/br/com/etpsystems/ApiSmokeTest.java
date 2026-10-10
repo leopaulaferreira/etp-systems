@@ -12,6 +12,7 @@ import br.com.etpsystems.assessment.AvaliacaoService;
 import br.com.etpsystems.certificate.CertificadoService;
 import br.com.etpsystems.dashboard.DashboardService;
 import br.com.etpsystems.company.CompanyOverviewService;
+import br.com.etpsystems.track.TrilhaService;
 import br.com.etpsystems.user.UsuarioRepository;
 import br.com.etpsystems.enrollment.InscricaoService;
 import br.com.etpsystems.progress.ProgressoService;
@@ -50,6 +51,9 @@ class ApiSmokeTest {
 
     @MockitoBean
     private CompanyOverviewService companyOverviewService;
+
+    @MockitoBean
+    private TrilhaService trilhaService;
 
     @LocalServerPort
     private int port;

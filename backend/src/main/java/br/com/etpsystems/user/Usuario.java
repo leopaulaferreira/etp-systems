@@ -64,6 +64,24 @@ public class Usuario {
     @Column(name = "departamento", length = 100)
     private String departamento;
 
+    @Column(name = "telefone", length = 40)
+    private String telefone;
+
+    @Column(name = "localizacao", length = 120)
+    private String localizacao;
+
+    @Column(name = "cargo", length = 120)
+    private String cargo;
+
+    @Column(name = "foco_aprendizagem", length = 120)
+    private String focoAprendizagem;
+
+    @Column(name = "nivel_experiencia", length = 30)
+    private String nivelExperiencia;
+
+    @Column(name = "notificacoes_ativas", nullable = false)
+    private boolean notificacoesAtivas = true;
+
     @Column(name = "criado_em", insertable = false, updatable = false)
     private Instant criadoEm;
 
@@ -118,6 +136,24 @@ public class Usuario {
 
     public String getDepartamento() {
         return departamento;
+    }
+
+    public String getTelefone() { return telefone; }
+    public String getLocalizacao() { return localizacao; }
+    public String getCargo() { return cargo; }
+    public String getFocoAprendizagem() { return focoAprendizagem; }
+    public String getNivelExperiencia() { return nivelExperiencia; }
+    public boolean isNotificacoesAtivas() { return notificacoesAtivas; }
+
+    public void atualizarPerfil(String nome, String telefone, String localizacao, String cargo,
+            String focoAprendizagem, String nivelExperiencia, boolean notificacoesAtivas) {
+        this.nome = nome;
+        this.telefone = telefone;
+        this.localizacao = localizacao;
+        this.cargo = cargo;
+        this.focoAprendizagem = focoAprendizagem;
+        this.nivelExperiencia = nivelExperiencia;
+        this.notificacoesAtivas = notificacoesAtivas;
     }
 
     public Instant getCriadoEm() {

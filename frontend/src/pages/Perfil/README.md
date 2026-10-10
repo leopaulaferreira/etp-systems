@@ -1,9 +1,5 @@
 # Perfil
 
-A rota `/perfil` reúne dados demonstrativos já usados nas outras páginas:
+A identidade e os dados editáveis do colaborador vêm de `GET /api/colaborador/perfil`. As alterações de conta e notificações em Configurações usam `PUT /api/colaborador/perfil`; e-mail e empresa são definidos pela conta autenticada e não podem ser editados nessa tela. Cursos, avaliações e certificados consultam seus próprios endpoints.
 
-- Indicadores de trilhas e horas do Dashboard; certificados da página Certificados; avaliações concluídas da página Avaliações.
-- Objetivos dos cursos em andamento em Meus Cursos, conquistas do Dashboard e atividade das avaliações.
-- Os links levam às respectivas páginas e os downloads usam o gerador de PDF dos certificados.
-
-Nome e e-mail iniciais vêm da autenticação real. Os demais campos ainda partem de `mocks/user.mock.ts`. A edição em `/configuracoes` salva personalizações em `localStorage` por usuário e atualiza o nome exibido; o e-mail de acesso é somente leitura. As avaliações são compartilhadas entre páginas durante a sessão e reiniciadas quando a conta muda. A API de edição de perfil ainda não existe.
+Preferências de formato, lembretes e acessibilidade continuam ajustes locais do navegador. A plataforma ainda não envia e-mail ou push a partir desses controles.

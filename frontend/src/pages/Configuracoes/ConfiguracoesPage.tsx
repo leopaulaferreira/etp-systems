@@ -123,20 +123,22 @@ export default function ConfiguracoesPage() {
   const requestedSection = searchParams.get('secao')
   const selected = sections.find((section) => section.id === requestedSection)?.id ?? 'estudo'
   function setSelected(section: Section) { setSearchParams({ secao: section }, { replace: true }) }
-  const [account, setAccount] = useState(() => accountDraft(profile))
+  const [accountDraftState, setAccount] = useState<AccountDraft | null>(null)
+  const account = accountDraftState ?? accountDraft(profile)
   const [study, setStudy] = useState(() => readStudySettings(studyStorageKey))
   const [saved, setSaved] = useState(false)
   const [securityNotice, setSecurityNotice] = useState(false)
   const [accountError, setAccountError] = useState('')
-  const accountDirty = (Object.keys(account) as Array<keyof AccountDraft>).some((key) => account[key] !== profile[key])
+  const accountDirty = (Object.keys(account) as Array<keyof AccountDraft>).some((key) => key !== 'company' && account[key] !== profile[key])
   const dirty = accountDirty
   const editable = selected === 'conta'
 
   function changeAccount<K extends keyof AccountDraft>(key: K, value: AccountDraft[K]) {
-    setAccount((current) => ({ ...current, [key]: value }))
+    setAccount((current) => ({ ...(current ?? accountDraft(profile)), [key]: value }))
     if (key === 'notificationsEnabled') {
-      updateProfile({ notificationsEnabled: value as boolean })
-      setFeedback('Preferência de notificações aplicada.')
+      void updateProfile({ notificationsEnabled: value as boolean })
+        .then(() => setFeedback('Preferência de notificações salva.'))
+        .catch(() => setFeedback('Não foi possível salvar a preferência. Tente novamente.'))
     }
     setSaved(false)
     setAccountError('')
@@ -145,6 +147,10 @@ export default function ConfiguracoesPage() {
   function changeStudy<K extends keyof StudySettings>(key: K, value: StudySettings[K]) {
     const next = { ...study, [key]: value }
     setStudy(next)
+    if (key === 'objective' || key === 'difficulty') {
+      void updateProfile(key === 'objective' ? { learningFocus: String(value) } : { experienceLevel: String(value) })
+        .catch(() => setFeedback('Não foi possível salvar o perfil de aprendizagem.'))
+    }
     try {
       window.localStorage.setItem(studyStorageKey, JSON.stringify(next))
       setFeedback('Preferências salvas automaticamente.')
@@ -167,13 +173,14 @@ export default function ConfiguracoesPage() {
     } catch { setFeedback('Não foi possível baixar os dados. Tente novamente.') }
   }
 
-  function confirmAction() {
+  async function confirmAction() {
     if (confirmation === 'logout') {
       logout()
       navigate('/login', { replace: true })
       return
     }
-    setAccount(accountDraft(resetProfile()))
+    try { await resetProfile(); setAccount(null) }
+    catch { setFeedback('Não foi possível limpar o perfil. Tente novamente.'); setConfirmation(null); return }
     setStudy({ ...defaultStudy })
     accessibility.reset()
     try {
@@ -186,7 +193,7 @@ export default function ConfiguracoesPage() {
     setFeedback('Personalizações removidas. Preferências padrão restauradas.')
   }
 
-  function save(event: FormEvent<HTMLFormElement>) {
+  async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (accountDirty) {
       const changes = {
@@ -203,8 +210,8 @@ export default function ConfiguracoesPage() {
         setSelected('conta')
         return
       }
-      updateProfile(changes)
-      setAccount(changes)
+      try { await updateProfile(changes); setAccount(null) }
+      catch { setAccountError('Não foi possível salvar seus dados. Tente novamente.'); return }
     }
     setSaved(true)
   }
@@ -271,7 +278,7 @@ export default function ConfiguracoesPage() {
                         value={account[key]}
                         onChange={(event) => changeAccount(key, event.target.value)}
                         required={key === 'name' || key === 'email'}
-                        readOnly={key === 'email'}
+                        readOnly={key === 'email' || key === 'company'}
                         pattern={key === 'name' ? '.*\\S.*' : undefined}
                         title={key === 'name' ? 'Informe um nome válido.' : undefined}
                         maxLength={key === 'email' ? 120 : 80}
@@ -303,12 +310,12 @@ export default function ConfiguracoesPage() {
                     <LockKeyhole className="h-5 w-5 shrink-0 text-brand-blue-400" aria-hidden="true" />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-bold text-ink-900">Senha</p>
-                      <p className="text-xs text-ink-500">A autenticação atual é demonstrativa.</p>
+                      <p className="text-xs text-ink-500">Sua senha protege o acesso à conta.</p>
                     </div>
                     <button type="button" onClick={() => setSecurityNotice(true)} className="min-h-9 rounded-xl border border-ink-200 px-3 text-xs font-bold text-brand-blue-400 hover:bg-brand-blue-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Alterar senha</button>
                   </div>
                 </div>
-                {securityNotice && <p role="status" className="mt-5 rounded-xl border border-brand-blue-500/20 bg-brand-blue-500/10 p-3 text-xs leading-5 text-ink-700">A alteração de senha estará disponível após a integração da autenticação.</p>}
+                {securityNotice && <p role="status" className="mt-5 rounded-xl border border-brand-blue-500/20 bg-brand-blue-500/10 p-3 text-xs leading-5 text-ink-700">A alteração de senha ainda não está disponível nesta versão.</p>}
               </>
             )}
 
@@ -430,8 +437,8 @@ export default function ConfiguracoesPage() {
                   </div>
                   <div className="rounded-xl border border-ink-200 bg-panel-alt/60 p-4">
                     <h3 className="text-sm font-bold text-ink-900">Limpar personalizações</h3>
-                    <p className="my-3 text-xs leading-5 text-ink-500">Remove seus dados pessoais e ajustes locais, restaurando o perfil demonstrativo. Não exclui uma conta no servidor.</p>
-                    <button type="button" onClick={() => setConfirmation('reset')} className={actionClass}><Trash2 className="h-4 w-4" aria-hidden="true" />Limpar dados locais</button>
+                    <p className="my-3 text-xs leading-5 text-ink-500">Limpa os campos opcionais do perfil e restaura os ajustes deste navegador. Sua conta permanece ativa.</p>
+                    <button type="button" onClick={() => setConfirmation('reset')} className={actionClass}><Trash2 className="h-4 w-4" aria-hidden="true" />Limpar personalizações</button>
                   </div>
                 </div>
               </>
@@ -444,14 +451,14 @@ export default function ConfiguracoesPage() {
               <p role="status" className={saved ? 'mr-auto inline-flex min-h-5 items-center gap-1.5 text-xs text-emerald-400' : 'sr-only'}>
                 {saved && <><Check className="h-4 w-4" aria-hidden="true" />Alterações salvas.</>}
               </p>
-              <button type="button" onClick={() => { setAccount(accountDraft(profile)); setSaved(false); setAccountError('') }} disabled={!dirty} className="min-h-10 rounded-xl border border-ink-200 px-4 text-sm font-bold text-ink-700 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 disabled:cursor-not-allowed disabled:opacity-40">Cancelar</button>
+              <button type="button" onClick={() => { setAccount(null); setSaved(false); setAccountError('') }} disabled={!dirty} className="min-h-10 rounded-xl border border-ink-200 px-4 text-sm font-bold text-ink-700 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 disabled:cursor-not-allowed disabled:opacity-40">Cancelar</button>
               <button type="submit" disabled={!dirty} className="min-h-10 rounded-xl bg-brand-blue-600 px-5 text-sm font-bold text-white hover:bg-brand-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 disabled:cursor-not-allowed disabled:opacity-40">Salvar alterações</button>
             </div>
           )}
         </form>
       </div>
-      {confirmation && <CertificateDialog title={confirmation === 'logout' ? 'Sair sem salvar?' : 'Limpar dados deste navegador?'} onClose={() => setConfirmation(null)}>
-        <p className="text-sm leading-6 text-ink-500">{confirmation === 'logout' ? 'As alterações não salvas nos dados da conta serão descartadas.' : 'Seu perfil personalizado e suas preferências serão substituídos pelos dados demonstrativos. Essa ação não pode ser desfeita; você pode baixar uma cópia antes de continuar.'}</p>
+      {confirmation && <CertificateDialog title={confirmation === 'logout' ? 'Sair sem salvar?' : 'Limpar personalizações?'} onClose={() => setConfirmation(null)}>
+        <p className="text-sm leading-6 text-ink-500">{confirmation === 'logout' ? 'As alterações não salvas nos dados da conta serão descartadas.' : 'Os campos opcionais do perfil serão limpos no servidor e as preferências deste navegador voltarão ao padrão.'}</p>
         <div className="flex flex-wrap justify-end gap-2"><button type="button" onClick={() => setConfirmation(null)} className={actionClass}>Cancelar</button><button type="button" onClick={confirmAction} className={actionClass}>{confirmation === 'logout' ? 'Sair da conta' : 'Confirmar limpeza'}</button></div>
       </CertificateDialog>}
     </div>

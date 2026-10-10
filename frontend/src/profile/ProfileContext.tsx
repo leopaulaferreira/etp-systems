@@ -1,72 +1,58 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { currentUser, type CurrentUser } from '../mocks/user.mock'
 import { useAuth } from '../auth/AuthContext'
+import { fetchProfile, saveProfile, type CurrentUser, type EditableProfile } from './profileApi'
 
-const STORAGE_KEY = 'etp-profile-v1'
-type EditableProfile = Pick<CurrentUser, 'name' | 'email' | 'location' | 'birthDate' | 'phone' | 'position' | 'company' | 'learningFocus' | 'experienceLevel' | 'notificationsEnabled' | 'language'>
 type ProfileContextValue = {
   profile: CurrentUser
-  updateProfile: (changes: Partial<EditableProfile>) => void
-  resetProfile: () => CurrentUser
+  updateProfile: (changes: Partial<EditableProfile>) => Promise<void>
+  resetProfile: () => Promise<CurrentUser>
 }
 
 const ProfileContext = createContext<ProfileContextValue | null>(null)
-const optionalFields = ['location', 'birthDate', 'phone', 'position', 'company', 'learningFocus', 'experienceLevel'] as const
 const emptyProfile: CurrentUser = {
-  ...currentUser,
-  notificationCount: 0,
-  memberSince: '',
-  location: '', birthDate: '', phone: '', position: '', company: '',
-  learningFocus: '', experienceLevel: '',
-}
-
-function readProfile(base: CurrentUser, storageKey: string | null): CurrentUser {
-  if (!storageKey) return base
-  try {
-    const saved = window.localStorage.getItem(storageKey)
-    if (saved) {
-      const data: unknown = JSON.parse(saved)
-      if (data && typeof data === 'object') {
-        const entries = Object.entries(data).filter(([key, value]) => {
-          if (!['name', ...optionalFields, 'notificationsEnabled', 'language'].includes(key)) return false
-          if (typeof value !== typeof base[key as keyof CurrentUser]) return false
-          // A versão anterior persistia os exemplos do protótipo mesmo sem edição.
-          if (optionalFields.some((field) => field === key) && value === currentUser[key as keyof CurrentUser]) return false
-          return true
-        })
-        return { ...base, ...Object.fromEntries(entries) }
-      }
-    }
-  } catch {
-    // Armazenamento indisponível: mantém os dados da sessão em memória.
-  }
-  return base
+  name: '', role: 'Colaborador', notificationCount: 0, email: '', location: '', memberSince: '',
+  birthDate: '', phone: '', position: '', company: '', learningFocus: '', experienceLevel: '',
+  notificationsEnabled: true, language: 'Português (Brasil)',
 }
 
 export function ProfileProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
-  const base: CurrentUser = user ? { ...emptyProfile, name: user.nome, email: user.email,
-    role: user.perfil === 'EMPRESA' ? 'Empresa / RH' : 'Colaborador' } : emptyProfile
-  const storageKey = user ? `${STORAGE_KEY}:${user.id}` : null
-  const [profile, setProfile] = useState(() => readProfile(base, storageKey))
+  const [loaded, setLoaded] = useState<{ id: string; profile: CurrentUser } | null>(null)
+  const base: CurrentUser = { ...emptyProfile, name: user?.nome ?? '', email: user?.email ?? '',
+    role: user?.perfil === 'EMPRESA' ? 'Empresa / RH' : 'Colaborador' }
+  const profile = loaded && loaded.id === user?.id ? loaded.profile : base
 
   useEffect(() => {
-    if (!storageKey) return
-    try {
-      window.localStorage.setItem(storageKey, JSON.stringify(profile))
-    } catch {
-      // A edição ainda funciona durante esta sessão.
-    }
-  }, [profile, storageKey])
+    if (!user || user.perfil !== 'COLABORADOR') return
+    const controller = new AbortController()
+    fetchProfile(controller.signal).then((data) => {
+      if (!controller.signal.aborted) setLoaded({ id: user.id, profile: data })
+    }).catch(() => { /* A identidade da sessão continua visível se o perfil não carregar. */ })
+    return () => controller.abort()
+  }, [user])
 
-  return (
-    <ProfileContext.Provider value={{ profile,
-      updateProfile: (changes) => setProfile((current) => ({ ...current, ...changes, email: base.email })),
-      resetProfile: () => { setProfile(base); return base },
-    }}>
-      {children}
-    </ProfileContext.Provider>
-  )
+  async function updateProfile(changes: Partial<EditableProfile>) {
+    if (!user || user.perfil !== 'COLABORADOR') return
+    const current = loaded?.id === user.id ? loaded.profile : await fetchProfile()
+    const saved = await saveProfile({
+      name: changes.name ?? current.name, phone: changes.phone ?? current.phone,
+      location: changes.location ?? current.location, position: changes.position ?? current.position,
+      learningFocus: changes.learningFocus ?? current.learningFocus,
+      experienceLevel: changes.experienceLevel ?? current.experienceLevel,
+      notificationsEnabled: changes.notificationsEnabled ?? current.notificationsEnabled,
+    })
+    setLoaded({ id: user.id, profile: saved })
+  }
+
+  async function resetProfile(): Promise<CurrentUser> {
+    if (!user || user.perfil !== 'COLABORADOR') return base
+    const saved = await saveProfile({ name: profile.name, phone: '', location: '', position: '',
+      learningFocus: '', experienceLevel: '', notificationsEnabled: true })
+    setLoaded({ id: user.id, profile: saved })
+    return saved
+  }
+
+  return <ProfileContext.Provider value={{ profile, updateProfile, resetProfile }}>{children}</ProfileContext.Provider>
 }
 
 export function useProfile() {
