@@ -1,4 +1,4 @@
-/** Mock do usuário autenticado — ainda não há integração com a API real. */
+/** Dados do protótipo mantidos para Relatórios e para reconhecer valores antigos do perfil local. A identidade autenticada vem da API. */
 export type CurrentUser = {
   name: string
   role: string

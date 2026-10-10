@@ -11,6 +11,14 @@ type ProfileContextValue = {
 }
 
 const ProfileContext = createContext<ProfileContextValue | null>(null)
+const optionalFields = ['location', 'birthDate', 'phone', 'position', 'company', 'learningFocus', 'experienceLevel'] as const
+const emptyProfile: CurrentUser = {
+  ...currentUser,
+  notificationCount: 0,
+  memberSince: '',
+  location: '', birthDate: '', phone: '', position: '', company: '',
+  learningFocus: '', experienceLevel: '',
+}
 
 function readProfile(base: CurrentUser, storageKey: string | null): CurrentUser {
   if (!storageKey) return base
@@ -19,22 +27,26 @@ function readProfile(base: CurrentUser, storageKey: string | null): CurrentUser 
     if (saved) {
       const data: unknown = JSON.parse(saved)
       if (data && typeof data === 'object') {
-        const entries = Object.entries(data).filter(([key, value]) =>
-          key in currentUser && typeof value === typeof currentUser[key as keyof CurrentUser],
-        )
-        return { ...base, ...Object.fromEntries(entries), email: base.email, role: base.role }
+        const entries = Object.entries(data).filter(([key, value]) => {
+          if (!['name', ...optionalFields, 'notificationsEnabled', 'language'].includes(key)) return false
+          if (typeof value !== typeof base[key as keyof CurrentUser]) return false
+          // A versão anterior persistia os exemplos do protótipo mesmo sem edição.
+          if (optionalFields.some((field) => field === key) && value === currentUser[key as keyof CurrentUser]) return false
+          return true
+        })
+        return { ...base, ...Object.fromEntries(entries) }
       }
     }
   } catch {
-    // Armazenamento indisponível: usa o perfil demonstrativo.
+    // Armazenamento indisponível: mantém os dados da sessão em memória.
   }
   return base
 }
 
 export function ProfileProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
-  const base: CurrentUser = user ? { ...currentUser, name: user.nome, email: user.email,
-    role: user.perfil === 'EMPRESA' ? 'Empresa / RH' : 'Colaborador' } : currentUser
+  const base: CurrentUser = user ? { ...emptyProfile, name: user.nome, email: user.email,
+    role: user.perfil === 'EMPRESA' ? 'Empresa / RH' : 'Colaborador' } : emptyProfile
   const storageKey = user ? `${STORAGE_KEY}:${user.id}` : null
   const [profile, setProfile] = useState(() => readProfile(base, storageKey))
 
