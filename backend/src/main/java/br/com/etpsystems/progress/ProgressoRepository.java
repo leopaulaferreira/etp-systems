@@ -13,4 +13,7 @@ public interface ProgressoRepository extends JpaRepository<ProgressoCurso, UUID>
     List<ProgressoCurso> findByUsuario_Id(UUID usuarioId);
 
     Optional<ProgressoCurso> findByUsuario_IdAndCurso_Id(UUID usuarioId, UUID cursoId);
+
+    @EntityGraph(attributePaths = "curso")
+    List<ProgressoCurso> findByUsuario_IdIn(List<UUID> usuarioIds);
 }

@@ -71,6 +71,10 @@ public class ProgressoCurso {
         return curso;
     }
 
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
     public BigDecimal getPercentualProgresso() {
         return percentualProgresso;
     }

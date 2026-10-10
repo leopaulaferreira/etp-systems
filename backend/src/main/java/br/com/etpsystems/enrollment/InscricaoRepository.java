@@ -13,4 +13,7 @@ public interface InscricaoRepository extends JpaRepository<Inscricao, UUID> {
 
     @EntityGraph(attributePaths = "curso")
     List<Inscricao> findByUsuario_IdAndCursoIsNotNullOrderByInscritoEmDesc(UUID usuarioId);
+
+    @EntityGraph(attributePaths = {"curso", "curso.categoria"})
+    List<Inscricao> findByUsuario_IdInAndCursoIsNotNull(List<UUID> usuarioIds);
 }

@@ -10,4 +10,7 @@ public interface TentativaRepository extends JpaRepository<Tentativa, UUID> {
 
     @EntityGraph(attributePaths = {"avaliacao", "avaliacao.curso"})
     List<Tentativa> findByUsuario_IdOrderByConcluidoEmDesc(UUID usuarioId);
+
+    @EntityGraph(attributePaths = {"avaliacao", "avaliacao.curso"})
+    List<Tentativa> findByUsuario_IdInOrderByConcluidoEmDesc(List<UUID> usuarioIds);
 }

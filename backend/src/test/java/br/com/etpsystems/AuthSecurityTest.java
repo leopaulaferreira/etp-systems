@@ -18,6 +18,7 @@ import br.com.etpsystems.course.CursoService;
 import br.com.etpsystems.assessment.AvaliacaoService;
 import br.com.etpsystems.certificate.CertificadoService;
 import br.com.etpsystems.dashboard.DashboardService;
+import br.com.etpsystems.company.CompanyOverviewService;
 import br.com.etpsystems.user.Perfil;
 import br.com.etpsystems.user.Usuario;
 import br.com.etpsystems.user.UsuarioRepository;
@@ -85,6 +86,9 @@ class AuthSecurityTest {
 
     @MockitoBean
     private DashboardService dashboard;
+
+    @MockitoBean
+    private CompanyOverviewService companyOverview;
 
     @BeforeEach
     void accounts() {

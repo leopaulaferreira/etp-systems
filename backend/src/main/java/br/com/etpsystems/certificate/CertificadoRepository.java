@@ -14,4 +14,7 @@ public interface CertificadoRepository extends JpaRepository<Certificado, UUID> 
 
     @EntityGraph(attributePaths = {"curso", "usuario"})
     Optional<Certificado> findByIdAndUsuario_Id(UUID id, UUID usuarioId);
+
+    @EntityGraph(attributePaths = "curso")
+    List<Certificado> findByUsuario_IdIn(List<UUID> usuarioIds);
 }

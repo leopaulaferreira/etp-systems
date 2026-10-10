@@ -58,6 +58,10 @@ public class Inscricao {
         return id;
     }
 
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
     public Curso getCurso() {
         return curso;
     }
