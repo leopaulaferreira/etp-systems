@@ -51,7 +51,7 @@ public class AuthService {
     }
 
     private boolean hasValidAccount(Usuario usuario) {
-        return usuario.getPerfil() != null
+        return usuario.isLoginHabilitado() && usuario.getPerfil() != null
                 && (usuario.getPerfil() != Perfil.EMPRESA || usuario.getEmpresa() != null);
     }
 }

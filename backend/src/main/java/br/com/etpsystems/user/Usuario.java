@@ -57,6 +57,13 @@ public class Usuario {
     @JoinColumn(name = "empresa_id")
     private Empresa empresa;
 
+    @Column(name = "login_habilitado", nullable = false)
+    private boolean loginHabilitado = true;
+
+    @Size(max = 100)
+    @Column(name = "departamento", length = 100)
+    private String departamento;
+
     @Column(name = "criado_em", insertable = false, updatable = false)
     private Instant criadoEm;
 
@@ -72,6 +79,13 @@ public class Usuario {
         this.senhaHash = senhaHash;
         this.perfil = perfil;
         this.empresa = empresa;
+    }
+
+    public Usuario(String nome, String email, String senhaHash, Perfil perfil, Empresa empresa,
+            String departamento, boolean loginHabilitado) {
+        this(nome, email, senhaHash, perfil, empresa);
+        this.departamento = departamento;
+        this.loginHabilitado = loginHabilitado;
     }
 
     public UUID getId() {
@@ -96,6 +110,14 @@ public class Usuario {
 
     public Empresa getEmpresa() {
         return empresa;
+    }
+
+    public boolean isLoginHabilitado() {
+        return loginHabilitado;
+    }
+
+    public String getDepartamento() {
+        return departamento;
     }
 
     public Instant getCriadoEm() {

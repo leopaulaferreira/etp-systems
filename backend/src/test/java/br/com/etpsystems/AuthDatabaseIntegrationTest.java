@@ -38,6 +38,7 @@ class AuthDatabaseIntegrationTest {
     private static final String SUFFIX = UUID.randomUUID().toString();
     private static final String USER_EMAIL = "user-" + SUFFIX + "@example.test";
     private static final String RH_EMAIL = "rh-" + SUFFIX + "@example.test";
+    private static final String DISABLED_EMAIL = "disabled-" + SUFFIX + "@example.test";
     private static final String COMPANY_NAME = "Auth integration " + SUFFIX;
     private static final String PASSWORD = "integration-test-only";
     private static final JsonMapper JSON = JsonMapper.builder().build();
@@ -99,8 +100,27 @@ class AuthDatabaseIntegrationTest {
         }
     }
 
+    @Test
+    void collaboratorWithoutLoginCannotAuthenticateEvenWithMatchingPassword() throws Exception {
+        Usuario account = usuarios.save(new Usuario("Colaboradora sem acesso", DISABLED_EMAIL,
+                passwords.encode(PASSWORD), Perfil.COLABORADOR,
+                usuarios.findByEmailIgnoreCase(RH_EMAIL).orElseThrow().getEmpresa(), "Tecnologia", false));
+        assertThat(account.isLoginHabilitado()).isFalse();
+        assertThat(account.getDepartamento()).isEqualTo("Tecnologia");
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            HttpResponse<String> login = client.send(HttpRequest.newBuilder(uri("/api/auth/login"))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(JSON.writeValueAsString(
+                            Map.of("email", DISABLED_EMAIL, "senha", PASSWORD)))).build(),
+                    HttpResponse.BodyHandlers.ofString());
+            assertThat(login.statusCode()).isEqualTo(401);
+            assertThat(login.body()).doesNotContain(account.getSenhaHash());
+        }
+    }
+
     @AfterAll
     void removeTestAccounts() {
+        usuarios.findByEmailIgnoreCase(DISABLED_EMAIL).ifPresent(usuarios::delete);
         usuarios.findByEmailIgnoreCase(USER_EMAIL).ifPresent(usuarios::delete);
         usuarios.findByEmailIgnoreCase(RH_EMAIL).ifPresent(usuarios::delete);
         empresas.findFirstByNome(COMPANY_NAME).ifPresent(empresas::delete);
