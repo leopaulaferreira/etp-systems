@@ -5,7 +5,6 @@ import Avatar from '../ui/Avatar'
 import { useAuth } from '../../auth/AuthContext'
 import { useProfile } from '../../profile/ProfileContext'
 import { useCompanySettings } from '../../pages/Empresa/companySettings'
-import { company } from '../../mocks/company.mock'
 
 type TopbarProps = {
   /** Estado do drawer mobile — usado apenas para o aria-expanded do botão hambúrguer. */
@@ -91,7 +90,7 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
             <Avatar name={displayName} className="h-10 w-10" />
             <span className="flex flex-col items-start leading-tight">
               <span className="text-sm font-semibold text-ink-900">{displayName}</span>
-              <span className="text-xs text-ink-500">{isCompany ? company.role : profile.role}</span>
+              <span className="text-xs text-ink-500">{isCompany ? 'Empresa / RH' : profile.role}</span>
             </span>
             <ChevronDown
               className={`h-4 w-4 text-ink-400 transition-transform duration-200 ${menuOpen ? 'rotate-180' : ''}`}

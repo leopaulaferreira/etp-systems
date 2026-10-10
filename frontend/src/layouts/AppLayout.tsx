@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import Sidebar from '../components/layout/Sidebar'
 import Topbar from '../components/layout/Topbar'
+import CompanyOverviewProvider from '../pages/Empresa/CompanyOverviewProvider'
 import './AppLayout.css'
 
 const DESKTOP_QUERY = '(min-width: 1024px)'
@@ -45,7 +46,7 @@ export default function AppLayout() {
   }, [drawerOpen])
 
   return (
-    <div className="app-shell flex h-[100svh] min-h-[640px] w-full overflow-hidden bg-surface">
+    <CompanyOverviewProvider><div className="app-shell flex h-[100svh] min-h-[640px] w-full overflow-hidden bg-surface">
       {drawerOpen && (
         <button
           type="button"
@@ -78,6 +79,6 @@ export default function AppLayout() {
           </div>
         </main>
       </div>
-    </div>
+    </div></CompanyOverviewProvider>
   )
 }

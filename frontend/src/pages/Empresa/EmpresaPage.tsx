@@ -6,18 +6,19 @@ import IllustratedIcon, { type IconTone } from '../../components/ui/IllustratedI
 import Avatar from '../../components/ui/Avatar'
 import { useCompanySettings } from './companySettings'
 import { useAuth } from '../../auth/AuthContext'
-import { employees, company } from '../../mocks/company.mock'
-import { companyEmployees, companySummary, formatCompanyDate, recentCompletions } from './company'
+import { companySummary, formatCompanyDate, recentCompletions } from './company'
+import { useCompanyOverview } from './companyOverviewContext'
+import CompanyLoadState from './CompanyLoadState'
 import EmployeeDialog from './EmployeeDialog'
 
 const cardClass = 'min-w-0 rounded-[22px] border border-ink-200/70 bg-panel p-5 shadow-card sm:p-6'
 
 export default function EmpresaPage() {
   const { companyId } = useAuth()
-  const { settings } = useCompanySettings(companyId)
+  const { data } = useCompanyOverview()
+  const { settings } = useCompanySettings(companyId, data?.companyName)
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  // O painel ainda usa dados sintéticos até a integração do domínio Empresa/RH.
-  const team = companyEmployees(employees, company.id)
+  const team = data?.employees ?? []
   const summary = companySummary(team)
   const recent = recentCompletions(team)
   const selected = team.find((employee) => employee.id === selectedId)
@@ -28,6 +29,7 @@ export default function EmpresaPage() {
     { label: 'Média nas avaliações', value: summary.average === null ? '—' : `${summary.average}%`, detail: `${summary.assessments} notas · última entrega por curso`, icon: ClipboardCheck, tone: 'orange' },
   ]
 
+  if (!data) return <CompanyLoadState />
 
   return (
     <div className="flex min-w-0 flex-col gap-5 lg:gap-6">

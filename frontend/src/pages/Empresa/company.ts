@@ -1,19 +1,20 @@
 export type EmployeeCourse = {
   id: string
   title: string
-  track: string
+  category: string
   progress: number
   updatedAt: string | null
   completedAt: string | null
   score: number | null
   certificateCode: string | null
+  certificateIssuedAt: string | null
 }
 export type Employee = {
   id: string
   companyId: string
   name: string
   email: string
-  department: string
+  department: string | null
   courses: EmployeeCourse[]
 }
 export type EmployeeStatus = 'not_started' | 'in_progress' | 'completed'
@@ -30,9 +31,6 @@ export function averageScore(courses: EmployeeCourse[]) {
 }
 export function employeeProgress(employee: Employee) {
   return employee.courses.length ? Math.round(employee.courses.reduce((sum, course) => sum + course.progress, 0) / employee.courses.length) : 0
-}
-export function companyEmployees(employees: Employee[], companyId: string | null) {
-  return employees.filter((employee) => employee.companyId === companyId)
 }
 export function filterEmployees(employees: Employee[], query: string, status: EmployeeStatus | 'all', department: string) {
   const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR').trim()

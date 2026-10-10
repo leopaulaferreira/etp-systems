@@ -6,13 +6,17 @@ import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import { useAuth } from '../../auth/AuthContext'
 import { useCompanySettings, type CompanySettings } from './companySettings'
+import { useCompanyOverview } from './companyOverviewContext'
+import CompanyLoadState from './CompanyLoadState'
 
 export default function CompanySettingsPage() {
   const { section } = useParams()
   const { companyId, logout } = useAuth()
-  const { settings, save } = useCompanySettings(companyId)
+  const { data } = useCompanyOverview()
+  const { settings, save } = useCompanySettings(companyId, data?.companyName)
   const navigate = useNavigate()
   if (!section || !['dados', 'conta', 'seguranca'].includes(section)) return <Navigate to="/empresa/configuracoes/dados" replace />
+  if (section === 'dados' && !data) return <CompanyLoadState />
   const title = section === 'dados' ? 'Dados da empresa' : section === 'conta' ? 'Minha conta' : 'Segurança'
   return <div className="flex min-w-0 flex-col gap-5 lg:gap-6">
     <PageHero eyebrow="Configurações" title={title} icon={section === 'dados' ? Building2 : section === 'conta' ? UserRound : ShieldCheck} description="Gerencie as informações da organização e da sua conta." />

@@ -6,25 +6,28 @@ import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import { useCompanySettings } from './companySettings'
 import { useAuth } from '../../auth/AuthContext'
-import { employees, company } from '../../mocks/company.mock'
-import { averageScore, companyEmployees, employeeProgress, employeeStatus, filterEmployees, statusLabels, type EmployeeStatus } from './company'
+import { averageScore, employeeProgress, employeeStatus, filterEmployees, statusLabels, type EmployeeStatus } from './company'
+import { useCompanyOverview } from './companyOverviewContext'
+import CompanyLoadState from './CompanyLoadState'
 import EmployeeDialog from './EmployeeDialog'
 
 const statusClasses = { not_started: 'border-ink-200 bg-ink-100 text-ink-500', in_progress: 'border-brand-blue-400/20 bg-brand-blue-500/10 text-brand-blue-400', completed: 'border-brand-cyan-400/20 bg-brand-cyan-400/10 text-brand-cyan-400' }
 
 export default function ColaboradoresPage() {
   const { companyId } = useAuth()
-  const { settings } = useCompanySettings(companyId)
+  const { data } = useCompanyOverview()
+  const { settings } = useCompanySettings(companyId, data?.companyName)
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState<EmployeeStatus | 'all'>('all')
   const [department, setDepartment] = useState('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const team = companyEmployees(employees, company.id)
+  const team = data?.employees ?? []
   const visible = filterEmployees(team, query, status, department)
   const selected = team.find((employee) => employee.id === selectedId)
   const filtered = Boolean(query || status !== 'all' || department)
-  const departments = [...new Set(team.map((employee) => employee.department))].sort()
+  const departments = [...new Set(team.map((employee) => employee.department).filter((value): value is string => Boolean(value)))].sort()
   function resetFilters() { setQuery(''); setStatus('all'); setDepartment('') }
+  if (!data) return <CompanyLoadState />
   return <div className="flex min-w-0 flex-col gap-5 lg:gap-6">
     <PageHero eyebrow={settings.name} icon={UsersRound} title="Colaboradores" description="Consulte o desenvolvimento de cada pessoa da equipe." />
       <section className="min-w-0 overflow-hidden rounded-[22px] border border-ink-200/70 bg-panel shadow-card" aria-labelledby="company-team-title">
@@ -44,7 +47,7 @@ export default function ColaboradoresPage() {
             const score = averageScore(employee.courses)
             const progress = employeeProgress(employee)
             return <li key={employee.id}><button type="button" onClick={() => setSelectedId(employee.id)} aria-label={`Ver resumo de ${employee.name}`} className="grid w-full grid-cols-2 items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-brand-blue-500/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue-400 sm:px-6 lg:grid-cols-[minmax(180px,1.7fr)_0.65fr_1fr_0.6fr_0.6fr_24px]">
-              <span className="col-span-2 flex min-w-0 items-center gap-3 lg:col-span-1"><Avatar name={employee.name} className="h-10 w-10" /><span className="min-w-0"><span className="block text-sm font-bold text-ink-900">{employee.name}</span><span className="mt-1 block text-[11px] text-ink-500">{employee.department}</span><span className={`mt-1.5 inline-flex rounded-md border px-1.5 py-0.5 text-[9px] font-semibold ${statusClasses[state]}`}>{statusLabels[state]}</span></span></span>
+              <span className="col-span-2 flex min-w-0 items-center gap-3 lg:col-span-1"><Avatar name={employee.name} className="h-10 w-10" /><span className="min-w-0"><span className="block text-sm font-bold text-ink-900">{employee.name}</span><span className="mt-1 block text-[11px] text-ink-500">{employee.department ?? 'Área não informada'}</span><span className={`mt-1.5 inline-flex rounded-md border px-1.5 py-0.5 text-[9px] font-semibold ${statusClasses[state]}`}>{statusLabels[state]}</span></span></span>
               <span className="text-xs text-ink-700"><span className="mb-1 block text-[10px] text-ink-500 lg:hidden">Conclusões</span><strong>{employee.courses.filter((course) => course.progress === 100).length}</strong> de {employee.courses.length} cursos</span>
               <span className="min-w-0 text-xs font-bold text-ink-700"><span className="mb-1 block text-[10px] font-normal text-ink-500 lg:hidden">Progresso médio</span>{progress}%<span aria-hidden="true" className="mt-2 block h-1.5 overflow-hidden rounded-full bg-ink-100"><span className="block h-full rounded-full bg-gradient-to-r from-brand-blue-600 to-brand-cyan-400" style={{ width: `${progress}%` }} /></span></span>
               <span className="text-sm font-semibold text-ink-700"><span className="mb-1 block text-[10px] font-normal text-ink-500 lg:hidden">Nota média</span>{score === null ? <span aria-label="Sem avaliação entregue">—</span> : `${score}%`}</span>
