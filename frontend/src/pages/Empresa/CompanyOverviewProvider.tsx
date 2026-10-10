@@ -13,6 +13,19 @@ export default function CompanyOverviewProvider({ children }: { children: ReactN
 
   useEffect(() => {
     if (role !== 'empresa' || !companyId) return
+    const refresh = () => {
+      if (document.visibilityState === 'visible') setAttempt((value) => value + 1)
+    }
+    window.addEventListener('focus', refresh)
+    document.addEventListener('visibilitychange', refresh)
+    return () => {
+      window.removeEventListener('focus', refresh)
+      document.removeEventListener('visibilitychange', refresh)
+    }
+  }, [role, companyId])
+
+  useEffect(() => {
+    if (role !== 'empresa' || !companyId) return
     const controller = new AbortController()
     fetchCompanyOverview(companyId, controller.signal).then((data) => {
       if (!controller.signal.aborted) setState({ key, data, error: false })
