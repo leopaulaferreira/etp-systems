@@ -1,5 +1,5 @@
 import { CheckCircle2 } from 'lucide-react'
-import { type CourseItem } from '../../../mocks/meus-cursos.mock'
+import { type CourseItem } from '../courseTypes'
 
 export default function CourseProgress({ course }: { course: CourseItem }) {
   if (course.progress === undefined || course.progress === 0) {

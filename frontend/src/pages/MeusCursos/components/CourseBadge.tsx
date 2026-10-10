@@ -1,4 +1,4 @@
-import { type CourseItem } from '../../../mocks/meus-cursos.mock'
+import { type CourseItem } from '../courseTypes'
 
 export default function CourseBadge({ type }: { type: CourseItem['type'] }) {
   return (

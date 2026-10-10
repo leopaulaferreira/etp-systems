@@ -1,5 +1,5 @@
 import { authSession } from '../../auth/session.ts'
-import type { CourseItem, CourseThumbnailKey } from '../../mocks/meus-cursos.mock.ts'
+import type { CourseItem, CourseThumbnailKey } from './courseTypes'
 
 type ApiCourse = {
   id: string

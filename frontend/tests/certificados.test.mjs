@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { certificates, initialDownloads } from '../src/mocks/certificados.mock.ts'
+import { certificates, initialDownloads } from './fixtures/certificados.fixture.ts'
 import {
   certificateSummary,
   formatCertificateDate,

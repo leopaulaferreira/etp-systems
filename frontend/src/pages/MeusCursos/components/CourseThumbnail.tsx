@@ -8,7 +8,7 @@ import {
   Workflow,
   type LucideIcon,
 } from 'lucide-react'
-import type { CourseThumbnailKey } from '../../../mocks/meus-cursos.mock'
+import type { CourseThumbnailKey } from '../courseTypes'
 import IllustratedIcon, { type IconTone } from '../../../components/ui/IllustratedIcon'
 
 const thumbnailConfig: Record<CourseThumbnailKey, { icon: LucideIcon; tone: IconTone }> = {

@@ -1,5 +1,5 @@
 import { BookOpen } from 'lucide-react'
-import { type CourseItem } from '../../../mocks/meus-cursos.mock'
+import { type CourseItem } from '../courseTypes'
 import CourseRow from './CourseRow'
 
 type CourseListCardProps = {

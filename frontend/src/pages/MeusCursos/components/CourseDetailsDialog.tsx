@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Bookmark, BookOpen, CalendarDays, Clock3, History, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { type CourseItem } from '../../../mocks/meus-cursos.mock'
+import { type CourseItem } from '../courseTypes'
 import CourseBadge from './CourseBadge'
 import CourseProgress from './CourseProgress'
 import CourseThumbnail from './CourseThumbnail'

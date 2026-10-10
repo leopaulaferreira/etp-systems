@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { initialAssessments } from '../src/mocks/avaliacoes.mock.ts'
+import { initialAssessments } from './fixtures/avaliacoes.fixture.ts'
 import {
   answerAssessment,
   assessmentSummary,

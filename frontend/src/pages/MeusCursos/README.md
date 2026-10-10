@@ -10,6 +10,6 @@ A página `/meus-cursos` usa `GET /api/colaborador/meus-cursos` com o token da c
 - As sugestões vêm do catálogo real e não incluem cursos já inscritos.
 - Falhas ao carregar inscrições mostram uma opção de tentar novamente. Dados de outro usuário ou do mock não substituem a lista real.
 
-Os dados de `../../mocks/meus-cursos.mock.ts` permanecem no repositório como referência do protótipo, mas não alimentam a página autenticada. A página de estudo suporta vídeo opcional; as duas primeiras aulas de LGPD já usam MP4. Ainda não há medição automática de progresso: o percentual é informado pelo próprio colaborador. Marcar 100% registra a conclusão do progresso, mas não emite certificado. Certificados dependem da aprovação em uma avaliação de curso habilitado; LGPD ainda aguarda a terceira videoaula e a liberação da certificação.
+A página de estudo suporta vídeo opcional; as duas primeiras aulas de LGPD já usam MP4. Ainda não há medição automática de progresso: o percentual é informado pelo próprio colaborador. Marcar 100% registra a conclusão do progresso, mas não emite certificado. Certificados dependem da aprovação em uma avaliação de curso habilitado; LGPD ainda aguarda a terceira videoaula e a liberação da certificação.
 
 Validação: `npm run build`, `npm run lint` e `npm run test:meus-cursos` em `frontend/`.

@@ -1,5 +1,5 @@
 import { ArrowRight, Bookmark, Clock3, History } from 'lucide-react'
-import { type CourseItem } from '../../../mocks/meus-cursos.mock'
+import { type CourseItem } from '../courseTypes'
 import CourseThumbnail from './CourseThumbnail'
 import CourseBadge from './CourseBadge'
 import CourseProgress from './CourseProgress'

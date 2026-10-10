@@ -6,4 +6,4 @@ A aprovação em uma avaliação emite um certificado quando o curso está habil
 
 A busca, os filtros e a ordenação atuam sobre os dados recebidos da API. O PDF é gerado localmente com o nome do titular e o código fornecidos pelo backend. Os downloads são contabilizados apenas durante a visita atual; não existe histórico persistente de downloads ou verificação pública do código. Em caso de falha na API, a página mostra uma opção para tentar novamente.
 
-Validação em `frontend/`: `npm run test:certificados`, `npm run build` e `npm run lint`. O arquivo `mocks/certificados.mock.ts` permanece como fixture dos testes de filtros e PDF; a página não o utiliza.
+Validação em `frontend/`: `npm run test:certificados`, `npm run build` e `npm run lint`. O arquivo `tests/fixtures/certificados.fixture.ts` permanece como fixture dos testes de filtros e PDF; a página não o utiliza.

@@ -1,6 +1,6 @@
 import { ArrowRight, Bookmark } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { type CourseItem } from '../../../mocks/meus-cursos.mock'
+import { type CourseItem } from '../courseTypes'
 import CourseThumbnail from './CourseThumbnail'
 import CourseBadge from './CourseBadge'
 
