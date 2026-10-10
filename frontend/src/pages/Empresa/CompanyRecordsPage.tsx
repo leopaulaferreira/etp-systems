@@ -28,7 +28,7 @@ export default function CompanyRecordsPage({ kind }: { kind: 'assessments' | 'ce
     <section className="overflow-hidden rounded-[22px] border border-ink-200/70 bg-panel shadow-card">
       <div className="space-y-4 p-5 sm:p-6">
         <div><h2 className="text-[17px] font-extrabold text-ink-900">{certificates ? 'Certificados emitidos' : 'Resultados da equipe'}</h2><p className="mt-1 text-xs text-ink-500">{certificates ? 'Busque por colaborador, curso ou código do certificado.' : 'Última nota disponível por colaborador e curso.'}</p></div>
-        <div className="grid items-end gap-3 md:grid-cols-[1fr_240px]">
+        <div className="grid items-end gap-3 md:grid-cols-[minmax(0,480px)_240px]">
           <Input id="record-search" label="Buscar" type="search" tone="dark" value={query} onChange={event => setQuery(event.target.value)} placeholder="Colaborador ou curso..." icon={<Search className="h-4 w-4" />} />
           <div className="flex min-w-0 flex-col gap-1.5"><label htmlFor="record-course" className="text-[13px] font-semibold text-ink-700">Curso</label><select id="record-course" value={courseId} onChange={event => setCourseId(event.target.value)} className="min-h-[51px] w-full rounded-xl border border-ink-200 bg-panel-alt px-3 text-xs text-ink-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"><option value="">Todos os cursos</option>{courses.map(([id, title]) => <option key={id} value={id}>{title}</option>)}</select></div>
         </div>
