@@ -30,66 +30,13 @@ deve ser copiado para o frontend. No Compose, o destino é `http://backend:8080`
 
 ## Estrutura
 
-```
-frontend/
-├── src/
-│   ├── app/
-│   │   ├── App.tsx                 # BrowserRouter + AuthProvider + AppRoutes
-│   │   └── routes/
-│   │       └── AppRoutes.tsx       # tabela de rotas (pública + protegidas)
-│   ├── api/client.ts               # JSON, timeout e erros HTTP
-│   ├── auth/                       # autenticação pela API
-│   │   ├── AuthContext.tsx
-│   │   ├── RequireAuth.tsx
-│   │   ├── SessionGate.tsx
-│   │   ├── auth.ts
-│   │   └── session.ts
-│   ├── layouts/
-│   │   ├── AppLayout.tsx           # Sidebar + Topbar + <Outlet/>
-│   │   └── AppLayout.css
-│   ├── components/
-│   │   ├── layout/
-│   │   │   ├── Sidebar.tsx
-│   │   │   ├── Topbar.tsx
-│   │   │   └── navItems.ts
-│   │   └── ui/
-│   │       ├── Button.tsx
-│   │       ├── Input.tsx
-│   │       ├── Checkbox.tsx
-│   │       └── Avatar.tsx
-│   ├── pages/
-│   │   ├── Login/
-│   │   │   ├── LoginPage.tsx
-│   │   │   ├── login.css
-│   │   │   ├── loginTranslations.ts
-│   │   │   └── components/
-│   │   │       ├── BrandIcons.tsx
-│   │   │       └── LoginBackdrop.tsx
-│   │   ├── Dashboard/
-│   │   │   ├── DashboardPage.tsx
-│   │   │   └── components/
-│   │   │       ├── WelcomeSection.tsx
-│   │   │       ├── WelcomeIllustration.tsx   # placeholder decorativo, ver comentário no arquivo
-│   │   │       ├── StatsGrid.tsx
-│   │   │       └── MetricCard.tsx
-│   │   └── ComingSoonPage.tsx      # placeholder para Trilhas/Cursos/Meus Cursos/Avaliações/
-│   │                               # Certificados/Relatórios/Perfil/Configurações
-│   ├── mocks/                      # dados fictícios, separados por domínio
-│   │   ├── user.mock.ts
-│   │   └── dashboard.mock.ts
-│   ├── styles/
-│   │   ├── theme.css                # fonte única dos tokens visuais (cores, sombra, fonte)
-│   │   └── global.css               # import do Tailwind + theme + reset/body
-│   ├── assets/
-│   │   └── etp-symbol.svg
-│   └── main.tsx
-├── public/
-│   └── favicon.svg
-├── index.html
-├── package.json
-├── vite.config.ts
-└── tsconfig.json
-```
+- `src/app/routes/AppRoutes.tsx`: rotas públicas e protegidas por perfil.
+- `src/auth/` e `src/api/client.ts`: sessão JWT e requisições à API.
+- `src/layouts/` e `src/components/`: layout compartilhado e controles reutilizáveis.
+- `src/pages/`: telas de colaborador, empresa, login e ajuda, organizadas por domínio.
+- `src/mocks/`: dados ilustrativos ainda usados em telas sem integração real; o Dashboard e o resumo de estudos do Perfil não dependem desses dados.
+- `src/styles/theme.css`: tokens de cores, tipografia e sombras.
+- `public/videos/`: videoaulas servidas pelo Vite.
 
 ## Rotas
 
@@ -102,9 +49,12 @@ frontend/
 | `/empresa/avaliacoes` | empresa | `CompanyRecordsPage` — consulta das notas |
 | `/empresa/certificados` | empresa | `CompanyRecordsPage` — consulta dos certificados |
 | `/empresa/configuracoes/:section` | empresa | `CompanySettingsPage` — dados, conta e segurança |
-| `/cursos` | autenticada | `CursosPage` — catálogo com busca, filtros, ordenação e detalhes |
-| `/avaliacoes` | autenticada | `AvaliacoesPage` — filtros, atividades, notas, resultados e gráficos |
-| `/configuracoes` | autenticada | `ConfiguracoesPage` — dados pessoais, preferências de estudo e notificações |
+| `/cursos` | colaborador | `CursosPage` — catálogo com busca, filtros, ordenação e detalhes |
+| `/meus-cursos` | colaborador | `MeusCursosPage` — inscrições e progresso |
+| `/avaliacoes` | colaborador | `AvaliacoesPage` — filtros, atividades, notas, resultados e gráficos |
+| `/certificados` | colaborador | `CertificadosPage` — certificados emitidos e pendentes |
+| `/perfil` | colaborador | `PerfilPage` — dados pessoais locais e resumo real de estudos |
+| `/configuracoes` | colaborador | `ConfiguracoesPage` — dados pessoais, preferências de estudo e notificações |
 | `/ajuda` | autenticada | `AjudaPage` — busca e categorias de FAQ, solicitação simulada de suporte |
 
 ## Autenticação — Fase 5
@@ -135,9 +85,11 @@ Quando a API está disponível, o catálogo permite a inscrição real em cursos
 Cadastro, recuperação por e-mail e login Google/Microsoft continuam indisponíveis;
 os textos da tela explicam isso sem aceitar credenciais fictícias.
 
-Nome e e-mail iniciais vêm da conta real. Personalizações de perfil, preferências
-de estudo e configurações locais da empresa usam chaves por usuário. Avaliações
-em memória são reiniciadas quando a conta muda. O e-mail de acesso é somente
+Nome e e-mail iniciais vêm da conta real. Campos pessoais que ainda não vêm da API
+começam vazios e podem ser preenchidos localmente; exemplos antigos salvos sem edição
+são descartados. Personalizações de perfil, preferências de estudo e configurações
+locais da empresa usam chaves por usuário. Respostas
+de avaliações ainda não enviadas ficam em memória e são reiniciadas quando a conta muda. O e-mail de acesso é somente
 leitura até existir uma API para alterá-lo.
 
 O [Painel da empresa](src/pages/Empresa/README.md) ainda usa dados sintéticos para
@@ -154,8 +106,9 @@ ambos os perfis, senha incorreta, recarga, logout, expiração, falha de rede e 
 - [x] **Dashboard** (`/dashboard`) — indicadores reais, curso em andamento, sugestões do catálogo, avaliações e certificados recentes
 - [x] **Cursos** (`/cursos`) — catálogo de 24 cursos, busca, filtros, ordenação, carregamento progressivo e detalhes ([documentação](src/pages/Cursos/README.md))
 - [x] **Avaliações** (`/avaliacoes`) — resumo, filtros, questões interativas, resultados e gráficos ([documentação](src/pages/Avaliacoes/README.md))
-- [x] **Meus Cursos, Avaliações e Certificados** — integrados à API do colaborador
-- [ ] **Empresa, Perfil, Relatórios e partes de Trilhas** — ainda possuem dados ilustrativos
+- [x] **Meus Cursos e Certificados** — integrados à API do colaborador
+- [x] **Perfil** — resumo de cursos, avaliações e certificados reais; dados pessoais e preferências locais
+- [ ] **Empresa, Relatórios e partes de Trilhas** — ainda possuem dados ilustrativos
 
 Login, catálogo, inscrições, progresso, avaliações, certificados e Dashboard usam a API real.
 Algumas telas fora desses fluxos ainda utilizam dados de `src/mocks/`.

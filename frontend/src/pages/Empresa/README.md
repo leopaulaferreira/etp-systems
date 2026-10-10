@@ -1,8 +1,8 @@
 # Painel da empresa
 
-Rota `/empresa/dashboard`, acessível ao selecionar Empresa no login mock. Reutiliza
+Rota `/empresa/dashboard`, acessível com uma conta de perfil `EMPRESA`. Reutiliza
 AppLayout, PageHero, IllustratedIcon, Avatar, Input, Button e CertificateDialog.
-Não há backend nem alteração no schema do banco.
+O acesso já usa autenticação real; os indicadores e colaboradores ainda são ilustrativos.
 
 ## Dados e regras
 
@@ -38,6 +38,12 @@ A autenticação já é real, mas indicadores, colaboradores e resultados contin
 usando exclusivamente o conjunto sintético do mock, separado do UUID da sessão.
 A futura API de Empresa/RH deverá filtrar os registros pelo vínculo do usuário
 autenticado e validar as permissões em todas as consultas.
+
+## Preparação para dados reais
+
+As páginas existentes podem receber respostas de consultas somente leitura do backend. O filtro da empresa deve usar o vínculo do usuário autenticado, nunca o identificador fixo `etp` deste mock. Colaboradores sem cursos, notas ou certificados precisam aparecer com valores vazios coerentes. A área/departamento, hoje usada na busca e no resumo individual, ainda não existe no banco; será opcional na modelagem da Fase 11. Os nomes de trilhas presentes em `company.mock.ts` são apenas rótulos ilustrativos.
+
+Para validar o painel com dados reais, o ambiente de desenvolvimento precisará de mais de um colaborador vinculado à empresa da conta RH e de outra empresa para testar isolamento. Progresso de 100% informado manualmente, aprovação na avaliação e emissão do certificado são eventos distintos. A integração deve mostrar cada medida com seu nome correto e preservar a interface atual sem exibir números fictícios quando a API falhar.
 
 ## Validação
 

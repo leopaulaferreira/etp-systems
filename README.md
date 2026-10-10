@@ -124,7 +124,7 @@ conectando o usuário às principais áreas da aplicação.
 ## 🔐 Autenticação
 
 - login de usuário;
-- estrutura preparada para autenticação real;
+- autenticação real por JWT;
 - rotas públicas e protegidas;
 - separação entre perfis de acesso;
 - logout.
@@ -201,11 +201,15 @@ com código único e consulta na API. A página de Certificados mostra os docume
 emitidos e permite baixar PDF. LGPD na Prática aguarda a terceira videoaula e a
 revisão das questões antes de habilitar a emissão.
 
+O Perfil consulta cursos em andamento, avaliações e certificados da conta autenticada.
+Dados pessoais adicionais ainda são preenchidos localmente pelo usuário; campos sem
+informação não recebem valores fictícios.
+
 ---
 
 ## 📈 Gestão Empresarial
 
-Planejado para permitir que empresas, gestores ou setores de RH acompanhem:
+A interface de Empresa/RH já permite visualizar um painel e consultar:
 
 - colaboradores;
 - progresso individual;
@@ -214,6 +218,10 @@ Planejado para permitir que empresas, gestores ou setores de RH acompanhem:
 - cursos concluídos;
 - certificações;
 - indicadores de aprendizagem.
+
+Essas telas ainda usam dados ilustrativos. A próxima etapa ligará as consultas ao
+vínculo real entre a conta RH, a empresa e seus colaboradores, com isolamento
+entre organizações. A preparação está descrita no [guia do backend](backend/README.md#preparação-para-empresa--rh--fase-11).
 
 ---
 

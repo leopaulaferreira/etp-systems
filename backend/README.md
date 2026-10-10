@@ -108,7 +108,7 @@ A resposta contém `accessToken`, `tokenType: "Bearer"`, `expiresIn` em segundos
 
 Entradas inválidas retornam 400; credenciais ou tokens inválidos retornam 401; falta de permissão retorna 403. As falhas de credenciais usam a mesma mensagem para usuário inexistente e senha errada. A validação JWT verifica assinatura HS256, emissor, expiração, UUID do usuário e perfil.
 
-A API usa Bearer sem cookies de sessão. O token expira após o prazo configurado; não há refresh token nem revogação individual nesta fase. Na futura integração, sair removerá o token do cliente, mas uma cópia continuará válida até expirar. `/api/auth/me` já rejeita usuário removido ou com perfil diferente do token.
+A API usa Bearer sem cookies de sessão. O token expira após o prazo configurado; não há refresh token nem revogação individual nesta fase. O logout remove o token do cliente, mas uma cópia continuará válida até expirar. `/api/auth/me` rejeita usuário removido ou com perfil diferente do token.
 
 A Fase 4 não inclui cadastro público, confirmação/recuperação por e-mail nem login Google/Microsoft. A Fase 5 conecta a tela de login à API: o React valida a sessão por `/api/auth/me` ao recarregar e trata expiração e falhas de conexão. Consulte o [guia do frontend](../frontend/README.md).
 
@@ -149,6 +149,16 @@ As respostas incluem UUID, nome do titular, curso, título, descrição, duraç�
 ## Dashboard — Fase 10
 
 `GET /api/colaborador/dashboard` reúne somente dados do colaborador autenticado: cursos inscritos, em andamento e concluídos, avaliações disponíveis e aprovadas, certificados, horas certificadas, curso para continuar, cursos do catálogo ainda não inscritos e os três resultados/certificados mais recentes. Os valores são calculados a partir dos registros existentes; nenhuma tabela ou meta artificial foi criada. **Horas certificadas** somam a duração dos cursos certificados; o sistema ainda não mede tempo efetivo de estudo. Trilhas, relatórios históricos e indicadores de empresa permanecem para fases posteriores.
+
+## Preparação para Empresa / RH — Fase 11
+
+A interface de empresa ainda usa colaboradores fictícios. O banco local cria apenas as duas contas de acesso configuradas no perfil `dev`; por isso, a integração com indicadores reais requer uma pequena base de colaboradores de teste vinculados à mesma empresa. Essa base deve existir apenas no ambiente de desenvolvimento, sem migração que cadastre pessoas fictícias em todos os ambientes. Também é necessário testar outra empresa para comprovar o isolamento dos dados.
+
+As consultas de RH devem identificar a empresa pelo **usuário autenticado consultado no banco**. Não aceitar `empresaId` fornecido pelo navegador como autoridade, nem devolver usuários de outra empresa ou contas com perfil `EMPRESA` na lista de colaboradores. Começar com consultas somente leitura para painel, colaboradores, avaliações e certificados; configurações da empresa continuam locais até existir uma API própria.
+
+O campo **departamento/área** existe apenas no mock da interface. Para manter o filtro atual, acrescentá-lo como campo opcional de `Usuario` por uma nova migração na Fase 11; registros antigos permanecem sem área até serem preenchidos. O rótulo de trilha exibido no protótipo também não representa uma inscrição real em trilha e não deve ser inferido dos cursos.
+
+Nos indicadores, **curso com progresso concluído** significa 100% registrado pelo colaborador, inclusive quando não há certificado. **Avaliação aprovada** e **certificado emitido** são medidas separadas; só a aprovação em curso habilitado gera certificado. Progresso é manual e horas certificadas representam carga horária do curso, não tempo de estudo medido. A API de RH deve preservar essas distinções, inclusive para colaboradores sem cursos ou sem notas.
 
 ## Verificação
 
