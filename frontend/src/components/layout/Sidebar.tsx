@@ -69,7 +69,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
         <NavLink
           to="/ajuda"
           onClick={onNavigate}
-          className="mt-2 flex min-h-11 w-full items-center justify-between gap-2 rounded-lg text-xs font-medium text-blue-200 transition-colors duration-150 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"
+          className="mt-3 flex min-h-11 w-full items-center justify-between gap-2 rounded-lg border border-blue-200/30 bg-blue-300/5 px-3 text-xs font-medium text-blue-200 transition-colors duration-150 hover:border-blue-200/60 hover:bg-blue-300/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-navy-950"
         >
           Central de Ajuda
           <ArrowUpRight className="h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
