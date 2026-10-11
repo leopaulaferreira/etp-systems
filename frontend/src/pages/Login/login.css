@@ -95,7 +95,7 @@
 .login-brand-copy > p { max-width: 425px; margin-top: 22px; color: var(--color-ink-500); font-size: 14px; line-height: 1.85; }
 .login-illustration { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 490px; height: 240px; margin: 20px 0 24px; pointer-events: none; }
 .login-mark-frame { position: relative; display: grid; place-items: center; width: 186px; height: 186px; border: 1px solid color-mix(in srgb, white 19%, transparent); border-radius: 30px; background: linear-gradient(145deg, color-mix(in srgb, white 9%, transparent), color-mix(in srgb, var(--color-brand-blue-500) 8%, var(--color-panel)) 65%); box-shadow: inset 1px 1px 0 color-mix(in srgb, white 9%, transparent), 14px 22px 45px -18px rgb(0 0 0 / .65), -12px -8px 35px -24px var(--color-brand-cyan-400); transform: perspective(700px) rotateY(-14deg) rotateZ(-9deg); }
-.login-illustration img { position: relative; width: 140px; height: 140px; opacity: .65; filter: drop-shadow(0 2px 8px rgb(255 255 255 / .08)); }
+.login-illustration img { position: relative; width: 140px; height: 140px; }
 .login-mark-edge { position: absolute; left: 30px; right: 30px; top: 0; height: 1px; background: linear-gradient(90deg, transparent, color-mix(in srgb, white 65%, transparent), transparent); }
 .login-mark-halo { position: absolute; width: 300px; height: 220px; border-radius: 50%; background: radial-gradient(ellipse, color-mix(in srgb, var(--color-brand-blue-500) 17%, transparent), transparent 70%); }
 .login-mark-base { position: absolute; bottom: 5px; width: 270px; height: 30px; border-radius: 50%; background: radial-gradient(ellipse, color-mix(in srgb, var(--color-brand-cyan-400) 14%, transparent), transparent 70%); }

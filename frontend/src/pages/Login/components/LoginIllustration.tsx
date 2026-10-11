@@ -1,4 +1,4 @@
-import etpSymbol from '../../../assets/etp-symbol-white.svg'
+import etpSymbol from '../../../assets/etp-symbol-sculpted.svg'
 
 export default function LoginIllustration() {
   return (
