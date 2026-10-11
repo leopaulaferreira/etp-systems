@@ -55,6 +55,34 @@ class AvaliacaoApiIntegrationTest {
     }
 
     @Test
+    void aiCourseHasThreeVideoLessonsInOrder() throws Exception {
+        usuarios.save(new Usuario("Aluno IA", firstEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
+        UUID courseId = cursos.findAllByOrderByOrdemExibicaoAscTituloAsc().stream()
+                .filter(course -> course.getTitulo().equals("Introdução à Inteligência Artificial"))
+                .findFirst().orElseThrow().getId();
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            String token = login(client, firstEmail);
+            String path = "/api/colaborador/cursos/" + courseId + "/aulas";
+            assertThat(get(client, path, token).statusCode()).isEqualTo(404);
+            assertThat(post(client, "/api/colaborador/inscricoes/cursos/" + courseId, token, null).statusCode())
+                    .isEqualTo(200);
+
+            JsonNode lessons = JSON.readTree(get(client, path, token).body());
+            assertThat(lessons.size()).isEqualTo(3);
+            assertThat(lessons.get(0).path("order").asInt()).isEqualTo(1);
+            assertThat(lessons.get(0).path("title").asText()).isEqualTo("Introdução à Inteligência Artificial");
+            assertThat(lessons.get(0).path("videoUrl").asText()).isEqualTo("/videos/ia-aula-1.mp4");
+            assertThat(lessons.get(1).path("order").asInt()).isEqualTo(2);
+            assertThat(lessons.get(1).path("title").asText()).isEqualTo("Introdução à IA: Aula 2");
+            assertThat(lessons.get(1).path("videoUrl").asText()).isEqualTo("/videos/ia-aula-2.mp4");
+            assertThat(lessons.get(2).path("order").asInt()).isEqualTo(3);
+            assertThat(lessons.get(2).path("title").asText())
+                    .isEqualTo("Uso Responsável da Inteligência Artificial");
+            assertThat(lessons.get(2).path("videoUrl").asText()).isEqualTo("/videos/ia-aula-3.mp4");
+        }
+    }
+
+    @Test
     void gradesOnlyEnrolledUserAndPersistsAttemptsWithoutLeakingAnswersEarly() throws Exception {
         usuarios.save(new Usuario("Primeiro", firstEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
         usuarios.save(new Usuario("Segundo", otherEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
