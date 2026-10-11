@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Headset, ArrowUpRight, LayoutDashboard, UsersRound, ClipboardCheck, Award, Building2, UserRound, ShieldCheck } from 'lucide-react'
+import { Headset, X, ArrowUpRight, LayoutDashboard, UsersRound, ClipboardCheck, Award, Building2, UserRound, ShieldCheck } from 'lucide-react'
 import etpSymbol from '../../assets/etp-symbol.svg'
 import { navItems } from './navItems'
 import { useAuth } from '../../auth/AuthContext'
@@ -29,9 +29,10 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
       tabIndex={-1}
       className="app-sidebar app-scrollarea flex h-full w-full shrink-0 flex-col overflow-y-auto px-4 py-6 focus:outline-none"
     >
-      <div className="flex items-center gap-2.5 px-2 pb-7">
-        <img src={etpSymbol} alt="" className="h-9 w-9 shrink-0 object-contain" />
-        <span className="text-[19px] font-bold tracking-[-0.02em] text-white">ETP Systems</span>
+      <div className="flex items-center gap-2 px-2 pb-7">
+        <img src={etpSymbol} alt="" className="h-8 w-8 shrink-0 object-contain lg:h-9 lg:w-9" />
+        <span className="flex-1 whitespace-nowrap text-[17px] font-bold tracking-[-0.02em] text-white lg:text-[19px]">ETP Systems</span>
+        <button type="button" aria-label="Fechar menu" onClick={onNavigate} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-500 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 lg:hidden"><X className="h-5 w-5" aria-hidden="true" /></button>
       </div>
 
       <nav className="flex flex-1 flex-col gap-1" aria-label="Navegação principal">
@@ -45,33 +46,35 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
               to={item.to}
               onClick={onNavigate}
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-left text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan-400/40 ${
-                  isActive ? 'bg-brand-blue-600 text-white' : 'text-white/65 hover:bg-white/[0.06] hover:text-white'
+                `relative flex min-h-11 items-center gap-3 rounded-lg px-3.5 py-2.5 text-left text-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 ${
+                  isActive
+                    ? 'bg-white/[0.045] font-medium text-blue-200 before:absolute before:left-0 before:top-3 before:bottom-3 before:w-0.5 before:rounded-full before:bg-blue-300'
+                    : 'font-normal text-white/60 hover:bg-white/[0.03] hover:text-white/90'
                 }`
               }
             >
-              <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={2} aria-hidden="true" />
+              <Icon className="h-[22px] w-[22px] shrink-0" strokeWidth={1.5} aria-hidden="true" />
               {item.label}
             </NavLink>
           )
         })}</div>)}
       </nav>
 
-      <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.05] p-4">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-cyan-500/15 text-brand-cyan-400">
-          <Headset className="h-[18px] w-[18px]" strokeWidth={2} aria-hidden="true" />
+      <div className="mx-2 mt-6 border-t border-white/[0.08] pt-5">
+        <div className="flex items-center gap-3 text-white/75">
+          <Headset className="h-[22px] w-[22px] shrink-0" strokeWidth={1.5} aria-hidden="true" />
+          <p className="text-sm font-medium">Precisa de ajuda?</p>
         </div>
-        <p className="mt-3 text-sm font-semibold text-white">Precisa de ajuda?</p>
-        <p className="mt-1 text-xs leading-relaxed text-white/55">
+        <p className="mt-2 text-xs leading-relaxed text-white/55">
           Nossa equipe está pronta para apoiar sua jornada.
         </p>
         <NavLink
           to="/ajuda"
           onClick={onNavigate}
-          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg bg-brand-cyan-500 px-3 py-2 text-xs font-semibold text-navy-950 transition-colors duration-150 hover:bg-brand-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan-400/50"
+          className="mt-2 flex min-h-11 w-full items-center justify-between gap-2 rounded-lg text-xs font-medium text-blue-200 transition-colors duration-150 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"
         >
           Central de Ajuda
-          <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />
+          <ArrowUpRight className="h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
         </NavLink>
       </div>
     </aside>

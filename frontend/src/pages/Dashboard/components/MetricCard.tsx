@@ -1,4 +1,5 @@
-import { BookOpen, BookCheck, BadgeCheck, TimerReset, ArrowUpRight, type LucideIcon } from 'lucide-react'
+import IllustratedIcon, { type IconTone } from '../../../components/ui/IllustratedIcon'
+import { BookOpen, BookCheck, Award, Clock3, ArrowUpRight, type LucideIcon } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export type MetricAccent = 'blue' | 'green' | 'purple' | 'orange'
@@ -15,16 +16,11 @@ export type MetricCardData = {
 const icons: Record<MetricCardData['icon'], LucideIcon> = {
   andamento: BookOpen,
   concluidos: BookCheck,
-  certificados: BadgeCheck,
-  horas: TimerReset,
+  certificados: Award,
+  horas: Clock3,
 }
 
-const accentClasses: Record<MetricAccent, { tile: string; icon: string; glow: string }> = {
-  blue: { tile: 'border-blue-400/20 bg-blue-400/10', icon: 'bg-blue-600 text-white', glow: 'bg-blue-500/10' },
-  green: { tile: 'border-emerald-400/20 bg-emerald-400/10', icon: 'bg-emerald-500 text-white', glow: 'bg-emerald-500/10' },
-  purple: { tile: 'border-violet-400/20 bg-violet-400/10', icon: 'bg-violet-600 text-white', glow: 'bg-violet-500/10' },
-  orange: { tile: 'border-orange-400/20 bg-orange-400/10', icon: 'bg-orange-500 text-white', glow: 'bg-orange-500/10' },
-}
+const tones: Record<MetricAccent, IconTone> = { blue: 'blue', green: 'emerald', purple: 'violet', orange: 'orange' }
 
 type MetricCardProps = {
   data: MetricCardData
@@ -32,18 +28,13 @@ type MetricCardProps = {
 
 export default function MetricCard({ data }: MetricCardProps) {
   const Icon = icons[data.icon]
-  const accent = accentClasses[data.accent]
+  const tone = tones[data.accent]
   return (
     <div className="group relative flex min-h-[152px] overflow-hidden rounded-[20px] border border-ink-200/70 bg-panel p-5 shadow-card transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-1 hover:border-brand-blue-500/50 hover:shadow-[0_20px_38px_-22px_rgba(37,99,235,0.45)] motion-reduce:transform-none">
-      <span className={`pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full ${accent.glow}`} aria-hidden="true" />
+      <span className={`pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-brand-blue-500/5`} aria-hidden="true" />
       <div className="relative flex w-full flex-col">
         <div className="flex items-center gap-4">
-          <span className={`relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border ${accent.tile}`}>
-            <span className="absolute -right-3 -top-3 h-9 w-9 rounded-full bg-black/25" aria-hidden="true" />
-            <span className={`relative flex h-10 w-10 items-center justify-center rounded-xl shadow-[0_8px_20px_-10px_rgba(0,0,0,0.9)] ${accent.icon}`}>
-              <Icon className="h-[22px] w-[22px]" strokeWidth={1.9} aria-hidden="true" />
-            </span>
-          </span>
+          <IllustratedIcon icon={Icon} tone={tone} size="tile" />
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <span className="text-[13px] font-semibold text-ink-500">{data.label}</span>
             <span className="text-[30px] font-extrabold leading-none tracking-[-0.025em] text-ink-900">{data.value}</span>

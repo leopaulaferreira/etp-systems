@@ -1,3 +1,4 @@
+import IllustratedIcon from '../../../components/ui/IllustratedIcon'
 import { ArrowRight, CheckCircle2, SearchX } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { Assessment } from '../../../types/assessment'
@@ -160,7 +161,7 @@ export default function AssessmentList({ items, total, onOpen, onReset }: Assess
         </>
       ) : (
         <div className="flex flex-col items-center gap-3 px-6 py-12 text-center">
-          <SearchX className="h-8 w-8 text-brand-blue-400" aria-hidden="true" />
+          <IllustratedIcon icon={SearchX} tone="blue" size="tile" />
           <h3 className="text-base font-bold text-ink-900">{total ? 'Nenhuma avaliação encontrada' : 'Nenhuma avaliação disponível'}</h3>
           <p className="text-sm leading-6 text-ink-500">{total ? 'Tente outro termo ou ajuste os filtros.' : 'Inscreva-se em um curso piloto para estudar a aula e fazer sua avaliação.'}</p>
           {total ? <button

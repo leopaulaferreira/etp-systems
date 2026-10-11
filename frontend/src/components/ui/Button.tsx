@@ -1,6 +1,6 @@
 import { type ButtonHTMLAttributes, type ReactNode } from 'react'
 
-/** Botão-base utilizado pela login. */
+/** Botão compartilhado pelas telas de acesso, formulários e diálogos. */
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'secondary' | 'ghost'
   loading?: boolean
@@ -15,8 +15,8 @@ const variants: Record<NonNullable<ButtonProps['variant']>, string> = {
   primary:
     'bg-brand-blue-700 text-white hover:bg-[#17399c] focus-visible:ring-brand-blue-500',
   secondary:
-    'bg-white text-ink-700 border border-ink-200 hover:bg-ink-100 focus-visible:ring-brand-blue-500',
-  ghost: 'bg-transparent text-brand-blue-600 hover:bg-brand-blue-600/10 focus-visible:ring-brand-blue-500',
+    'bg-panel-alt text-ink-700 border border-ink-200 hover:bg-ink-100 focus-visible:ring-brand-blue-500',
+  ghost: 'bg-transparent text-brand-blue-400 hover:bg-brand-blue-400/10 focus-visible:ring-brand-blue-500',
 }
 
 export default function Button({

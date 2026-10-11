@@ -1,3 +1,4 @@
+import IllustratedIcon from '../../../components/ui/IllustratedIcon'
 import { Award, Download, Search, SlidersHorizontal } from 'lucide-react'
 import type { Certificate } from '../../../types/certificate'
 import { formatCertificateDate, type CertificateFilters } from '../certificates'
@@ -36,7 +37,7 @@ export function CertificateToolbar({
           className="min-h-10 min-w-0 w-full bg-transparent text-xs text-ink-900 outline-none placeholder:text-ink-500"
         />
       </label>
-      <label className="flex min-w-0 flex-1 flex-col gap-1.5 text-[11px] font-semibold text-ink-500 sm:flex-none">
+      <label className="flex min-w-0 basis-full flex-col gap-1.5 text-[11px] font-semibold text-ink-500 sm:basis-auto sm:flex-none">
         Status
         <select
           value={filters.status}
@@ -50,7 +51,7 @@ export function CertificateToolbar({
           <option value="in_progress">Em andamento</option>
         </select>
       </label>
-      <label className="flex min-w-0 flex-1 flex-col gap-1.5 text-[11px] font-semibold text-ink-500 sm:flex-none">
+      <label className="flex min-w-0 basis-full flex-col gap-1.5 text-[11px] font-semibold text-ink-500 sm:basis-auto sm:flex-none">
         Data de emissão
         <select
           value={filters.year}
@@ -166,7 +167,7 @@ export default function CertificateList({
         </ul>
       ) : (
         <div className="flex flex-col items-center gap-3 py-12 text-center">
-          <Award className="h-10 w-10 text-ink-400" aria-hidden="true" />
+          <IllustratedIcon icon={Award} tone="violet" size="tile" />
           <h3 className="text-sm font-bold text-ink-900">Nenhum certificado encontrado</h3>
           <p className="max-w-sm text-xs leading-5 text-ink-500">
             Certificados emitidos aparecem aqui. Ajuste a busca ou os filtros, ou conclua uma avaliação disponível.

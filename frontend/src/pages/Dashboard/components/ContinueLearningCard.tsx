@@ -1,5 +1,5 @@
+import LearningIcon from '../../../components/ui/LearningIcon'
 import {
-  BookOpen,
   History,
   ArrowRight,
   Sparkles,
@@ -17,6 +17,7 @@ export default function ContinueLearningCard({ course }: { course: DashboardData
         </h2>
         <Link
           to="/cursos"
+          aria-label="Explorar cursos"
           className="group flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 text-[13px] font-bold text-brand-blue-400 transition-colors duration-150 hover:bg-brand-blue-500/10 hover:text-brand-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
         >
           <span className="hidden sm:inline">Explorar cursos</span>
@@ -29,20 +30,11 @@ export default function ContinueLearningCard({ course }: { course: DashboardData
       </div>
 
       <div className="grid gap-5 md:grid-cols-[190px_minmax(0,1fr)] md:gap-6">
-        <div className="group/thumb relative flex min-h-[218px] items-center justify-center overflow-hidden rounded-[20px] border border-white/[0.06] bg-gradient-to-br from-[#071225] via-navy-900 to-[#15356e]">
-          <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,0.4)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.4)_1px,transparent_1px)] [background-size:22px_22px]" />
-          <div className="absolute -bottom-12 -right-10 h-40 w-40 rounded-full bg-brand-cyan-400/10 blur-3xl" />
-          <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-brand-cyan-400/20 bg-brand-cyan-400/10 px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-[0.13em] text-brand-cyan-400">
-            <Sparkles className="h-3 w-3" strokeWidth={2.2} aria-hidden="true" />
+        <div className="relative">
+          <LearningIcon kind={course?.icon ?? 'book'} size="large" />
+          <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-brand-blue-400/20 bg-panel/80 px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-[0.13em] text-brand-blue-400">
+            <Sparkles className="h-3 w-3" aria-hidden="true" />
             {course ? 'Em andamento' : 'Comece por aqui'}
-          </span>
-          <div className="absolute h-[126px] w-[126px] rotate-6 rounded-[26px] border border-brand-cyan-400/10 bg-brand-blue-500/[0.08]" />
-          <div className="absolute h-[126px] w-[126px] -rotate-3 rounded-[26px] border border-white/10 bg-white/[0.055]" />
-          <div className="relative flex h-[98px] w-[98px] items-center justify-center rounded-[22px] border border-brand-cyan-400/20 bg-gradient-to-br from-brand-blue-600/35 to-brand-cyan-400/10 shadow-[0_18px_38px_-20px_rgba(34,195,238,0.7)] transition-transform duration-300 group-hover/thumb:scale-[1.03] motion-reduce:transform-none">
-            <BookOpen className="h-16 w-16 text-brand-cyan-400" strokeWidth={1.45} aria-hidden="true" />
-          </div>
-          <span className="absolute bottom-4 right-4 flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-navy-800 text-brand-cyan-400 shadow-lg">
-            <BookOpen className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           </span>
         </div>
 

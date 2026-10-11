@@ -158,8 +158,10 @@ recarregar, respeita os perfis Colaborador e Empresa e é encerrada no logout ou
 
 ## 🛤️ Trilhas de Aprendizagem
 
-As trilhas permitem organizar cursos relacionados em sequências de desenvolvimento,
-facilitando a criação de jornadas de aprendizagem estruturadas.
+Quatro trilhas reúnem cursos do catálogo em jornadas de desenvolvimento. O
+colaborador pode se inscrever em uma trilha e acompanhar seu progresso, calculado
+pela média do progresso dos cursos que a compõem. A inscrição na trilha também
+inscreve o colaborador nos cursos relacionados.
 
 ---
 
@@ -202,8 +204,9 @@ emitidos e permite baixar PDF. LGPD na Prática aguarda a terceira videoaula e a
 revisão das questões antes de habilitar a emissão.
 
 O Perfil consulta cursos em andamento, avaliações e certificados da conta autenticada.
-Dados pessoais adicionais ainda são preenchidos localmente pelo usuário; campos sem
-informação não recebem valores fictícios.
+Os dados editáveis do colaborador são carregados e salvos na API; e-mail e empresa
+continuam vinculados à conta. Preferências de formato, lembretes e acessibilidade
+ficam apenas no navegador.
 
 ---
 
@@ -219,9 +222,23 @@ A interface de Empresa/RH já permite visualizar um painel e consultar:
 - certificações;
 - indicadores de aprendizagem.
 
-Essas telas ainda usam dados ilustrativos. A próxima etapa ligará as consultas ao
-vínculo real entre a conta RH, a empresa e seus colaboradores, com isolamento
-entre organizações. A preparação está descrita no [guia do backend](backend/README.md#preparação-para-empresa--rh--fase-11).
+Essas telas consultam a API com os dados da empresa vinculada à conta RH
+autenticada. Colaboradores, progresso, avaliações e certificados vêm dos registros
+persistidos, com isolamento entre organizações. Configurações de contato da
+empresa ainda são locais ao navegador. Consulte o
+[guia do backend](backend/README.md#empresa--rh--fase-11) para os detalhes da API e
+dos dados de demonstração opcionais.
+
+---
+
+## 📈 Relatórios
+
+O colaborador pode consultar seus indicadores de aprendizagem, evolução mensal,
+distribuição do progresso e histórico de avaliações. Os números são calculados a
+partir das inscrições, tentativas, certificados e trilhas da própria conta. A página
+permite filtrar o histórico e exportar um CSV da atividade do ano corrente. Horas
+certificadas representam a carga horária dos cursos certificados, não o tempo de
+estudo medido.
 
 ---
 
@@ -259,4 +276,7 @@ TutorService
 
 ## Backend
 
-As Fases 1–9 do backend estão disponíveis em [`backend/`](backend/README.md): Spring Boot, MySQL, Docker, migrações, catálogo, login com BCrypt/JWT, inscrições, progresso, avaliações e certificados. Consulte o guia para configurar as contas locais, usar o Swagger e executar os testes.
+O backend em [`backend/`](backend/README.md) oferece Spring Boot, MySQL, Docker,
+migrações, catálogo, login com BCrypt/JWT, inscrições, progresso, avaliações,
+certificados, painéis do colaborador e da empresa, trilhas e perfil. Consulte o guia
+para configurar as contas locais, usar o Swagger e executar os testes.

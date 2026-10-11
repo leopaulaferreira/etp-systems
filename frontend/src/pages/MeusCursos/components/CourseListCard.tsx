@@ -1,3 +1,4 @@
+import IllustratedIcon from '../../../components/ui/IllustratedIcon'
 import { BookOpen } from 'lucide-react'
 import { type CourseItem } from '../courseTypes'
 import CourseRow from './CourseRow'
@@ -47,7 +48,7 @@ export default function CourseListCard({
         </ul>
       ) : (
         <div className="flex flex-col items-center gap-3 py-10 text-center">
-          <BookOpen className="h-8 w-8 text-brand-blue-400" aria-hidden="true" />
+          <IllustratedIcon icon={BookOpen} tone="blue" size="tile" />
           <p className="text-sm font-bold text-ink-700">Nenhum curso por aqui ainda</p>
           <p className="max-w-xs text-sm leading-6 text-ink-500">
             {emptyMessage}

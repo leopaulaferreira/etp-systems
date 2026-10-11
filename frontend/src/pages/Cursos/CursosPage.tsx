@@ -10,18 +10,24 @@ import CatalogCourseCard from './components/CatalogCourseCard'
 import CatalogToolbar from './components/CatalogToolbar'
 import CourseCatalogDialog from './components/CourseCatalogDialog'
 import CursosHero from './components/CursosHero'
+import IllustratedIcon from '../../components/ui/IllustratedIcon'
 import FeaturedCourseCard from './components/FeaturedCourseCard'
 
 const PAGE_SIZE = 8
 
 export default function CursosPage() {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { reload: reloadAssessments } = useAssessments()
-  const [filters, setFilters] = useState<CatalogFilters>(() => ({
+  const [localFilters, setFilters] = useState<CatalogFilters>(() => ({
     ...initialFilters,
     query: searchParams.get('busca') ?? '',
     category: searchParams.get('categoria') ?? 'Todas',
   }))
+  const filters = useMemo(() => ({
+    ...localFilters,
+    query: searchParams.get('busca') ?? '',
+    category: searchParams.get('categoria') ?? 'Todas',
+  }), [localFilters, searchParams])
   const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [courses, setCourses] = useState<CatalogCourse[]>([])
@@ -77,6 +83,20 @@ export default function CursosPage() {
   }, [source])
 
   function updateFilters(update: Partial<CatalogFilters>) {
+    if (update.query !== undefined || update.category !== undefined) {
+      setSearchParams((current) => {
+        const next = new URLSearchParams(current)
+        if (update.query !== undefined) {
+          if (update.query) next.set('busca', update.query)
+          else next.delete('busca')
+        }
+        if (update.category !== undefined) {
+          if (update.category !== 'Todas') next.set('categoria', update.category)
+          else next.delete('categoria')
+        }
+        return next
+      }, { replace: true })
+    }
     setFilters((current) => ({ ...current, ...update }))
     setVisibleCount(PAGE_SIZE)
   }
@@ -103,6 +123,7 @@ export default function CursosPage() {
   }
 
   function resetFilters() {
+    setSearchParams({}, { replace: true })
     setFilters(initialFilters)
     setVisibleCount(PAGE_SIZE)
   }
@@ -149,9 +170,7 @@ export default function CursosPage() {
           </ul>
         ) : (
           <div className="flex flex-col items-center gap-3 rounded-[22px] border border-ink-200/70 bg-panel px-6 py-14 text-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-blue-500/10">
-              <SearchX className="h-7 w-7 text-brand-blue-400" aria-hidden="true" />
-            </span>
+            <IllustratedIcon icon={SearchX} tone="blue" size="tile" />
             <h3 className="text-lg font-extrabold text-ink-900">Nenhum curso encontrado</h3>
             <p className="max-w-sm text-sm leading-6 text-ink-500">
               Tente outro termo ou ajuste os filtros para encontrar seu próximo aprendizado.

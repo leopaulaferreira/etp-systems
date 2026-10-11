@@ -1,3 +1,4 @@
+import IllustratedIcon from '../../components/ui/IllustratedIcon'
 import { useState } from 'react'
 import { ChevronRight, Search, SearchX, UsersRound } from 'lucide-react'
 import PageHero from '../../components/ui/PageHero'
@@ -56,7 +57,7 @@ export default function ColaboradoresPage() {
             </button></li>
           })}
         </ul>
-        {!visible.length && <div className="flex flex-col items-center gap-3 px-5 py-10 text-center"><SearchX className="h-8 w-8 text-brand-blue-400" aria-hidden="true" /><h3 className="text-sm font-bold text-ink-900">{team.length ? 'Nenhum colaborador encontrado' : 'Nenhum colaborador vinculado'}</h3><p className="text-xs text-ink-500">{team.length ? 'Tente outro nome ou ajuste os filtros.' : 'Os colaboradores da empresa aparecerão aqui quando forem vinculados.'}</p></div>}
+        {!visible.length && <div className="flex flex-col items-center gap-3 px-5 py-10 text-center"><IllustratedIcon icon={SearchX} tone="blue" size="tile" /><h3 className="text-sm font-bold text-ink-900">{team.length ? 'Nenhum colaborador encontrado' : 'Nenhum colaborador vinculado'}</h3><p className="text-xs text-ink-500">{team.length ? 'Tente outro nome ou ajuste os filtros.' : 'Os colaboradores da empresa aparecerão aqui quando forem vinculados.'}</p></div>}
       </section>
     {selected && <EmployeeDialog employee={selected} onClose={() => setSelectedId(null)} />}
   </div>

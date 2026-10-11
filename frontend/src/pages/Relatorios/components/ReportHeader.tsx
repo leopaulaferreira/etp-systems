@@ -1,3 +1,4 @@
+import IllustratedIcon from '../../../components/ui/IllustratedIcon'
 import { BarChart3, CalendarDays, Download } from 'lucide-react'
 import PageHero from '../../../components/ui/PageHero'
 import type { ReportPeriod } from '../reportData'
@@ -13,7 +14,7 @@ export default function ReportHeader({ period, onPeriodChange, onExport, year, c
     <PageHero eyebrow="Seu desenvolvimento" icon={BarChart3} title="Relatórios" description="Acompanhe sua evolução." />
     <div className="flex flex-wrap items-center justify-between gap-4">
       <div className="flex items-center gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-ink-200 bg-panel text-ink-500"><CalendarDays className="h-4 w-4" aria-hidden="true" /></span>
+        <IllustratedIcon icon={CalendarDays} tone="blue" size="compact" />
         <div><p className="text-xs font-bold text-ink-900">Seu desempenho no período</p><p className="mt-1 text-[11px] text-ink-500">{period === 'year' ? `01/01/${year} – 31/12/${year}` : 'Todo o histórico da sua conta'}</p></div>
       </div>
       <div className="grid w-full grid-cols-2 items-center gap-2 sm:flex sm:w-auto sm:flex-wrap">

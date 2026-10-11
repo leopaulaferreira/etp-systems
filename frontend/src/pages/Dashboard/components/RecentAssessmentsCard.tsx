@@ -1,3 +1,4 @@
+import IllustratedIcon from '../../../components/ui/IllustratedIcon'
 import { ArrowRight, ClipboardCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { DashboardData } from '../dashboardApi'
@@ -15,11 +16,9 @@ export default function RecentAssessmentsCard({ items }: { items: DashboardData[
         {items.length === 0 && <li className="py-4 text-sm text-ink-500">Suas avaliações concluídas aparecerão aqui.</li>}
         {items.map((item, index) => (
           <li key={`${item.courseId}-${item.completedAt}-${index}`} className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-3.5 transition-colors hover:bg-ink-100/60">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-400/10 text-blue-400">
-              <ClipboardCheck className="h-6 w-6" strokeWidth={1.9} aria-hidden="true" />
-            </span>
+            <IllustratedIcon icon={ClipboardCheck} tone="blue" size="compact" />
             <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <span className="truncate text-[14px] font-bold text-ink-900">{item.course}</span>
+              <span className="line-clamp-2 text-[14px] font-bold text-ink-900">{item.course}</span>
               <span className="text-[11px] font-medium text-ink-500">{new Date(item.completedAt).toLocaleDateString('pt-BR')} · Nota {item.score}%</span>
             </span>
             <span className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-bold ${item.passed ? 'bg-emerald-400/10 text-emerald-400' : 'bg-amber-400/10 text-amber-400'}`}>

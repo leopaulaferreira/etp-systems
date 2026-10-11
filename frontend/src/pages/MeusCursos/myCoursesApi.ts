@@ -1,3 +1,4 @@
+import { courseIcons } from '../Cursos/courseTypes.ts'
 import { authSession } from '../../auth/session.ts'
 import type { CourseItem, CourseThumbnailKey } from './courseTypes'
 
@@ -14,14 +15,10 @@ type ApiCourse = {
 }
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-const thumbnails: Record<string, CourseThumbnailKey> = {
-  security: 'security', cloud: 'cloud', ai: 'ai', projects: 'projects',
-  analytics: 'data', python: 'data', code: 'data', governance: 'projects',
-  workspace: 'projects', communication: 'projects', leadership: 'projects',
-}
+const thumbnails = new Set<string>(courseIcons)
 
 export function courseThumbnail(icon: string): CourseThumbnailKey {
-  return thumbnails[icon] ?? 'data'
+  return thumbnails.has(icon) ? icon as CourseThumbnailKey : 'data'
 }
 
 export function formatCourseDuration(hours: number): string {

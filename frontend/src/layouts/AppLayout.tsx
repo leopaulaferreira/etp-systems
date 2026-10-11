@@ -9,6 +9,7 @@ const DESKTOP_QUERY = '(min-width: 1024px)'
 
 export default function AppLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia(DESKTOP_QUERY).matches)
   const drawerRef = useRef<HTMLDivElement>(null)
 
   function closeDrawer() {
@@ -19,6 +20,7 @@ export default function AppLayout() {
   useEffect(() => {
     const desktopQuery = window.matchMedia(DESKTOP_QUERY)
     function handleChange(event: MediaQueryListEvent) {
+      setIsDesktop(event.matches)
       if (event.matches) setDrawerOpen(false)
     }
     desktopQuery.addEventListener('change', handleChange)
@@ -31,10 +33,18 @@ export default function AppLayout() {
 
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
-    drawerRef.current?.focus()
+    drawerRef.current?.querySelector<HTMLElement>('button, a[href]')?.focus()
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') closeDrawer()
+      if (event.key === 'Tab') {
+        const items = drawerRef.current?.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex="0"]')
+        const visible = Array.from(items ?? []).filter(item => item.getClientRects().length > 0)
+        const first = visible[0]
+        const last = visible.at(-1)
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus() }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus() }
+      }
     }
     window.addEventListener('keydown', handleKeyDown)
 
@@ -46,7 +56,7 @@ export default function AppLayout() {
   }, [drawerOpen])
 
   return (
-    <CompanyOverviewProvider><div className="app-shell flex h-[100svh] min-h-[640px] w-full overflow-hidden bg-surface">
+    <CompanyOverviewProvider><div className="app-shell flex h-[100svh] min-h-0 w-full overflow-hidden bg-surface">
       {drawerOpen && (
         <button
           type="button"
@@ -59,6 +69,7 @@ export default function AppLayout() {
 
       <div
         id="app-sidebar-drawer"
+        inert={!isDesktop && !drawerOpen}
         ref={drawerRef}
         role={drawerOpen ? 'dialog' : undefined}
         aria-modal={drawerOpen ? true : undefined}
@@ -71,10 +82,10 @@ export default function AppLayout() {
         <Sidebar onNavigate={closeDrawer} />
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div inert={drawerOpen && !isDesktop} className="flex min-w-0 flex-1 flex-col">
         <Topbar isMenuOpen={drawerOpen} onOpenMenu={() => setDrawerOpen(true)} />
         <main className="app-scrollarea min-w-0 flex-1 overflow-y-auto">
-          <div className="mx-auto flex max-w-[1440px] flex-col gap-5 px-7 py-7 lg:px-9">
+          <div className="mx-auto flex max-w-[1440px] flex-col gap-5 px-4 py-5 sm:px-7 sm:py-7 lg:px-9">
             <Outlet />
           </div>
         </main>

@@ -1,17 +1,10 @@
 export const courseLevels = ['Iniciante', 'Intermediário', 'Avançado'] as const
 export type CourseLevel = (typeof courseLevels)[number]
-export type CourseIcon =
-  | 'cloud'
-  | 'python'
-  | 'communication'
-  | 'ai'
-  | 'security'
-  | 'governance'
-  | 'workspace'
-  | 'analytics'
-  | 'code'
-  | 'leadership'
-  | 'projects'
+export const courseIcons = [
+  'cloud', 'python', 'communication', 'ai', 'security', 'governance',
+  'workspace', 'analytics', 'code', 'leadership', 'projects',
+] as const
+export type CourseIcon = (typeof courseIcons)[number]
 
 export type CatalogCourse = {
   id: string

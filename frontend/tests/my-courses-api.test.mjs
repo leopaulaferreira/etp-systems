@@ -22,6 +22,14 @@ test('converte a inscrição real e valida o progresso', () => {
   }).completedAt, '09/10/2026')
 })
 
+test('inscrições preservam o tema do catálogo em vez de trocar programação e liderança por outros ícones', () => {
+  for (const icon of ['python', 'code', 'leadership', 'communication', 'governance', 'workspace', 'analytics']) {
+    assert.equal(parseMyCourse({ ...course, icon }).thumbnail, icon)
+  }
+  assert.equal(parseMyCourse({ ...course, icon: 'desconhecido' }).thumbnail, 'data')
+  assert.equal(parseMyCourse({ ...course, icon: '__proto__' }).thumbnail, 'data')
+})
+
 test('lista e inscreve pela API usando POST idempotente', async () => {
   const previous = globalThis.fetch
   const requests = []

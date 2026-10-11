@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, Bell, Building2, ChevronDown, LogOut, Menu, UserRound } from 'lucide-react'
 import Avatar from '../ui/Avatar'
@@ -15,6 +15,18 @@ type TopbarProps = {
 
 export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const menuRef = useRef<HTMLDivElement>(null)
+  const accountButtonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    function closeOutside(event: PointerEvent) {
+      if (!menuRef.current?.contains(event.target as Node)) setMenuOpen(false)
+    }
+    document.addEventListener('pointerdown', closeOutside)
+    return () => document.removeEventListener('pointerdown', closeOutside)
+  }, [menuOpen])
   const { logout, role, companyId } = useAuth()
   const navigate = useNavigate()
   const { profile } = useProfile()
@@ -30,7 +42,7 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
   }
 
   return (
-    <header className="flex h-[92px] shrink-0 items-center justify-between gap-4 border-b border-ink-200 bg-panel/95 px-5 backdrop-blur-xl sm:px-8">
+    <header className="relative z-30 flex h-20 shrink-0 items-center justify-between gap-2 border-b border-ink-200 bg-panel/95 px-4 backdrop-blur-xl sm:h-[92px] sm:gap-4 sm:px-8">
       <button
         type="button"
         id="mobile-menu-button"
@@ -44,17 +56,23 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
         <Menu className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
       </button>
 
-      {isCompany ? <div className="flex min-w-0 flex-1 items-center gap-2 text-xs font-semibold text-ink-500"><Building2 className="h-5 w-5 shrink-0 text-brand-blue-400" aria-hidden="true" /><span className="hidden sm:inline">Gestão de aprendizagem</span></div> : <div className="flex max-w-md flex-1 items-center gap-2.5 rounded-xl border border-ink-200 bg-panel-alt px-3.5 py-3 transition-[border-color,box-shadow] duration-150 focus-within:border-brand-blue-500 focus-within:ring-2 focus-within:ring-brand-blue-500/15">
+      {isCompany ? <div className="flex min-w-0 flex-1 items-center gap-2 text-xs font-semibold text-ink-500"><Building2 className="h-5 w-5 shrink-0 text-brand-blue-400" aria-hidden="true" /><span className="hidden sm:inline">Gestão de aprendizagem</span></div> : <form role="search" onSubmit={(event) => {
+        event.preventDefault()
+        navigate(query.trim() ? `/cursos?busca=${encodeURIComponent(query.trim())}` : '/cursos')
+      }} className="flex min-w-0 max-w-md flex-1 items-center gap-2.5 rounded-xl border border-ink-200 bg-panel-alt px-3.5 py-3 transition-[border-color,box-shadow] duration-150 focus-within:border-brand-blue-500 focus-within:ring-2 focus-within:ring-brand-blue-500/15">
         <Search className="h-[18px] w-[18px] shrink-0 text-ink-400" strokeWidth={2} aria-hidden="true" />
         <input
           type="search"
-          placeholder="Buscar cursos, trilhas, temas..."
-          aria-label="Buscar cursos, trilhas, temas"
+          enterKeyHint="search"
+          placeholder="Buscar cursos..."
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          aria-label="Buscar cursos"
           className="w-full min-w-0 bg-transparent text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none"
         />
-      </div>}
+      </form>}
 
-      <div className="flex items-center gap-4">
+      <div className="flex shrink-0 items-center gap-1 sm:gap-4">
         {!isCompany && <button
           type="button"
           aria-label={`Notificações (${notificationCount} não lidas)`}
@@ -69,31 +87,34 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
           )}
         </button>}
 
-        <div className="h-8 w-px bg-ink-200" aria-hidden="true" />
+        <div className="hidden h-8 w-px bg-ink-200 sm:block" aria-hidden="true" />
 
         <div
+          ref={menuRef}
           className="relative"
           onBlur={(event) => {
             if (!event.currentTarget.contains(event.relatedTarget)) setMenuOpen(false)
           }}
           onKeyDown={(event) => {
-            if (event.key === 'Escape') setMenuOpen(false)
+            if (event.key === 'Escape') { setMenuOpen(false); accountButtonRef.current?.focus() }
           }}
         >
           <button
             type="button"
-            aria-haspopup="menu"
+            ref={accountButtonRef}
+            aria-label="Opções da conta"
+            aria-controls="account-options"
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((open) => !open)}
             className="flex items-center gap-3 rounded-xl px-1.5 py-1 transition-colors duration-150 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
           >
             <Avatar name={displayName} className="h-10 w-10" />
-            <span className="flex flex-col items-start leading-tight">
-              <span className="text-sm font-semibold text-ink-900">{displayName}</span>
+            <span className="hidden max-w-40 flex-col items-start text-left leading-tight md:flex">
+              <span className="w-full truncate text-sm font-semibold text-ink-900" title={displayName}>{displayName}</span>
               <span className="text-xs text-ink-500">{isCompany ? 'Empresa / RH' : profile.role}</span>
             </span>
             <ChevronDown
-              className={`h-4 w-4 text-ink-400 transition-transform duration-200 ${menuOpen ? 'rotate-180' : ''}`}
+              className={`hidden h-4 w-4 text-ink-400 transition-transform sm:block duration-200 ${menuOpen ? 'rotate-180' : ''}`}
               strokeWidth={2}
               aria-hidden="true"
             />
@@ -101,12 +122,13 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
 
           {menuOpen && (
             <div
-              role="menu"
+              id="account-options"
+              role="group"
+              aria-label="Opções da conta"
               className="absolute right-0 top-full mt-2 w-44 overflow-hidden rounded-xl border border-ink-200 bg-panel p-1.5 shadow-card"
             >
               <button
                 type="button"
-                role="menuitem"
                 onClick={() => {
                   setMenuOpen(false)
                   navigate(isCompany ? '/empresa/configuracoes/conta' : '/perfil')
@@ -118,7 +140,6 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
               </button>
               <button
                 type="button"
-                role="menuitem"
                 onClick={handleLogout}
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-ink-700 transition-colors duration-150 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
               >

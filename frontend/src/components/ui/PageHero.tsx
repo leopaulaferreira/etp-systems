@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import IllustratedIcon from './IllustratedIcon'
 import type { LucideIcon } from 'lucide-react'
 
 type PageHeroProps = {
@@ -51,7 +52,7 @@ export default function PageHero({
         aria-hidden="true"
         className="pointer-events-none absolute inset-y-0 right-6 hidden w-28 items-center justify-center text-white/20 sm:flex lg:right-8"
       >
-        <ArtworkIcon className="h-24 w-24" strokeWidth={0.9} focusable="false" />
+        <IllustratedIcon icon={ArtworkIcon} tone="blue" size="hero" />
       </div>
     </section>
   )

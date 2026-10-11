@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Award, BookOpen, CheckCircle2, ChevronDown, ClipboardCheck, Headset, Search, SearchX, Send, UserRound, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import PageHero from '../../components/ui/PageHero'
+import IllustratedIcon from '../../components/ui/IllustratedIcon'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
 import { filterHelpQuestions, helpCategories, type HelpCategory } from './help'
@@ -31,13 +32,13 @@ export default function AjudaPage() {
   return (
     <div className="flex min-w-0 flex-col gap-5 lg:gap-6">
       <PageHero eyebrow="Estamos por aqui" icon={Headset} title="Central de Ajuda" description="Encontre respostas rápidas ou fale com o suporte." />
-      <div role="group" aria-label="Categorias de ajuda" className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <div role="group" aria-label="Categorias de ajuda" className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2 xl:grid-cols-4">
         {helpCategories.map(({ id, label }) => {
           const Icon = categoryIcons[id]
           const active = category === id
           return (
             <button key={id} type="button" aria-pressed={active} onClick={() => { setCategory(active ? null : id); setOpenQuestion(null) }} className={`flex min-w-0 items-center gap-3 rounded-2xl border p-3 text-left transition-colors sm:p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 ${active ? 'border-brand-blue-400/50 bg-brand-blue-500/10 text-ink-900' : 'border-ink-200 bg-panel text-ink-700 hover:border-brand-blue-400/40 hover:bg-panel-alt'}`}>
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-brand-blue-400/20 bg-brand-blue-500/10 text-brand-blue-400"><Icon className="h-[18px] w-[18px]" aria-hidden="true" /></span>
+              <IllustratedIcon icon={Icon} tone="blue" size="compact" />
               <span className="text-xs font-bold sm:text-sm">{label}</span>
             </button>
           )
@@ -83,7 +84,7 @@ export default function AjudaPage() {
           )
         }) : (
           <div className="flex flex-col items-center gap-3 px-5 py-8 text-center">
-            <SearchX className="h-8 w-8 text-brand-blue-400" aria-hidden="true" />
+            <IllustratedIcon icon={SearchX} tone="blue" size="tile" />
             <h3 className="text-sm font-bold text-ink-900">Nenhuma dúvida encontrada</h3>
             <p className="text-sm text-ink-500">Tente outra palavra ou limpe os filtros para ver todas as respostas.</p>
           </div>
@@ -91,7 +92,7 @@ export default function AjudaPage() {
       </section>
       <section aria-labelledby="help-support-title" className="flex flex-col gap-4 rounded-[22px] border border-brand-blue-400/20 bg-panel p-5 shadow-card sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div className="flex items-start gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-cyan-500/10 text-brand-cyan-400"><Headset className="h-5 w-5" aria-hidden="true" /></span>
+          <IllustratedIcon icon={Headset} tone="teal" size="compact" />
           <div>
             <h2 id="help-support-title" className="text-base font-extrabold text-ink-900">Ainda precisa de ajuda?</h2>
             <p className="mt-1 max-w-xl text-sm leading-6 text-ink-500">Se não encontrou a resposta que procura, envie uma solicitação para nossa equipe.</p>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { type CourseItem } from '../courseTypes'
 import CourseThumbnail from './CourseThumbnail'
 import CourseBadge from './CourseBadge'
+import IllustratedIcon from '../../../components/ui/IllustratedIcon'
 
 type SideCourseCardProps = {
   title: string
@@ -57,7 +58,7 @@ export default function SideCourseCard({
         </ul>
       ) : (
         <div className="flex flex-col items-center gap-3 py-8 text-center text-sm text-ink-500">
-          <Bookmark className="h-7 w-7 text-brand-blue-400" aria-hidden="true" />
+          <IllustratedIcon icon={Bookmark} tone="blue" size="tile" />
           <p>{emptyMessage}</p>
         </div>
       )}

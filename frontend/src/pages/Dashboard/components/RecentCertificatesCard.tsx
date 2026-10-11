@@ -1,3 +1,4 @@
+import IllustratedIcon from '../../../components/ui/IllustratedIcon'
 import { Award, ArrowUpRight, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { DashboardData } from '../dashboardApi'
@@ -23,16 +24,9 @@ export default function RecentCertificatesCard({ items }: { items: DashboardData
             key={certificate.id}
             className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-3.5 transition-colors duration-150 first:pt-0 last:pb-0 hover:bg-ink-100/60"
           >
-            <span
-              aria-hidden="true"
-              className="relative flex h-12 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-brand-blue-500/20 bg-gradient-to-br from-brand-blue-500/15 via-panel-alt to-brand-cyan-500/10 text-brand-blue-400 shadow-sm"
-            >
-              <span className="absolute inset-x-2 top-2 h-px bg-brand-blue-500/20" />
-              <span className="absolute inset-x-3 top-3.5 h-px bg-brand-blue-500/10" />
-              <Award className="relative mt-2 h-5 w-5" strokeWidth={1.9} />
-            </span>
+            <IllustratedIcon icon={Award} tone="violet" size="compact" />
             <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <span className="truncate text-[14px] font-bold text-ink-900">{certificate.title}</span>
+              <span className="line-clamp-2 text-[14px] font-bold text-ink-900">{certificate.title}</span>
               <span className="text-[11px] font-medium text-ink-500">Emitido em {new Date(certificate.issuedAt).toLocaleDateString('pt-BR')}</span>
             </span>
             <Link

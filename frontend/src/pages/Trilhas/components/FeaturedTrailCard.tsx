@@ -1,4 +1,5 @@
-import { ShieldCheck, Layers3, Clock3, ArrowRight, LockKeyhole, Network, Sparkles } from 'lucide-react'
+import LearningIcon from '../../../components/ui/LearningIcon'
+import { Layers3, Clock3, ArrowRight, Sparkles } from 'lucide-react'
 import { levelIcons } from './trailLevels'
 import type { LearningPath } from '../trailApi'
 
@@ -19,18 +20,7 @@ export default function FeaturedTrailCard({ data, onOpen }: { data: LearningPath
       <div aria-hidden="true" className="absolute right-[-15px] top-[-35px] h-36 w-36 rounded-full border border-brand-cyan-400/[0.08]" />
 
       <div className="relative mx-auto flex h-[168px] w-full max-w-[230px] shrink-0 items-center justify-center md:row-span-2 md:mx-0 md:w-[190px] xl:row-span-1 xl:w-[210px]">
-        <div className="absolute h-[136px] w-[136px] rotate-6 rounded-[28px] border border-brand-cyan-400/10 bg-brand-blue-500/[0.08]" />
-        <div className="absolute h-[136px] w-[136px] -rotate-3 rounded-[28px] border border-white/10 bg-white/[0.055] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm" />
-        <div className="relative flex h-[108px] w-[108px] items-center justify-center rounded-[24px] border border-brand-cyan-400/20 bg-gradient-to-br from-brand-blue-600/35 to-brand-cyan-400/10 shadow-[0_18px_38px_-20px_rgba(34,195,238,0.7)]">
-          <ShieldCheck className="h-[68px] w-[68px] text-brand-cyan-400" strokeWidth={1.45} aria-hidden="true" />
-          <LockKeyhole className="absolute h-6 w-6 text-white" strokeWidth={2.2} aria-hidden="true" />
-        </div>
-        <span className="absolute left-3 top-2 flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-navy-800 text-brand-cyan-400 shadow-lg">
-          <Network className="h-4.5 w-4.5" strokeWidth={1.8} aria-hidden="true" />
-        </span>
-        <span className="absolute bottom-4 right-2 h-2.5 w-2.5 rounded-full bg-brand-cyan-400 shadow-[0_0_0_5px_rgba(34,195,238,0.1)]" />
-        <span className="absolute left-0 top-1/2 h-px w-8 bg-gradient-to-r from-transparent to-brand-cyan-400/50" aria-hidden="true" />
-        <span className="absolute right-0 top-[38%] h-px w-8 bg-gradient-to-l from-transparent to-brand-cyan-400/50" aria-hidden="true" />
+        <LearningIcon kind={data.icon} size="featured" />
       </div>
 
       <div className="relative flex min-w-0 flex-1 flex-col items-start gap-3.5">

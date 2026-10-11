@@ -1,3 +1,4 @@
+import IllustratedIcon from '../../components/ui/IllustratedIcon'
 import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, ClipboardCheck, Play, VideoOff } from 'lucide-react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
@@ -19,7 +20,7 @@ function VideoSlot({ lesson }: { lesson: Lesson }) {
   if (embedVideo) return <iframe title={`Vídeo da aula ${lesson.title}`} src={lesson.videoUrl ?? undefined} allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="aspect-video w-full rounded-2xl border-0 bg-navy-950" />
   return <div className="relative flex aspect-video flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl border border-brand-blue-400/15 bg-[radial-gradient(circle_at_50%_40%,rgba(41,104,181,0.18),transparent_55%),linear-gradient(130deg,#13233e,#0b1629)] px-6 text-center">
     <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,.025)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,.025)_1px,transparent_1px)] bg-[size:34px_34px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-    <span className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-brand-blue-400/30 bg-brand-blue-500/10 text-brand-blue-400"><VideoOff className="h-6 w-6" aria-hidden="true" /></span>
+    <IllustratedIcon icon={VideoOff} tone="blue" size="tile" />
     <span className="relative text-sm font-bold text-ink-900">Vídeo em preparação</span>
     <span className="relative max-w-sm text-xs leading-5 text-ink-500">Enquanto isso, leia o conteúdo da aula e pratique na avaliação.</span>
   </div>

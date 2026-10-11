@@ -1,8 +1,5 @@
+import LearningIcon from '../../../components/ui/LearningIcon'
 import {
-  ShieldCheck,
-  CloudCog,
-  Fingerprint,
-  BookOpen,
   ArrowRight,
   Clock3,
   SignalLow,
@@ -12,14 +9,6 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { DashboardData } from '../dashboardApi'
-
-const thumbnailConfig: Record<string, { icon: LucideIcon; tile: string; iconClass: string }> = {
-  security: { icon: ShieldCheck, tile: 'border-indigo-400/20 bg-indigo-400/10', iconClass: 'bg-indigo-600 text-white' },
-  cloud: { icon: CloudCog, tile: 'border-orange-400/20 bg-orange-400/10', iconClass: 'bg-orange-500 text-white' },
-  analytics: { icon: Fingerprint, tile: 'border-teal-400/20 bg-teal-400/10', iconClass: 'bg-teal-600 text-white' },
-}
-
-const fallbackThumbnail = { icon: BookOpen, tile: 'border-blue-400/20 bg-blue-400/10', iconClass: 'bg-blue-600 text-white' }
 
 const levelIcons: Record<string, LucideIcon> = { Iniciante: SignalLow, Intermediário: SignalMedium, Avançado: SignalHigh }
 
@@ -40,7 +29,6 @@ export default function RecommendationsCard({ items }: { items: DashboardData['r
       <ul className="flex flex-col divide-y divide-ink-100">
         {items.length === 0 && <li className="py-4 text-sm text-ink-500">Você já está inscrito nos cursos disponíveis.</li>}
         {items.map((item) => {
-          const { icon: Icon, tile, iconClass } = thumbnailConfig[item.icon] ?? fallbackThumbnail
           const LevelIcon = levelIcons[item.level] ?? SignalLow
           return (
             <li key={item.id} className="first:[&>a]:pt-0 last:[&>a]:pb-0">
@@ -48,12 +36,7 @@ export default function RecommendationsCard({ items }: { items: DashboardData['r
                 to={`/cursos?busca=${encodeURIComponent(item.title)}`}
                 className="group -mx-2 flex w-full items-center gap-3 rounded-xl px-2 py-3.5 text-left transition-[background-color,transform] duration-150 hover:translate-x-0.5 hover:bg-ink-100/60 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-brand-blue-400 motion-reduce:transform-none"
               >
-                <span className={`relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border ${tile}`}>
-                  <span className="absolute -right-3 -top-3 h-8 w-8 rounded-full bg-black/25" aria-hidden="true" />
-                  <span className={`relative flex h-9 w-9 items-center justify-center rounded-xl shadow-[0_8px_20px_-10px_rgba(0,0,0,0.9)] ${iconClass}`}>
-                    <Icon className="h-5 w-5" strokeWidth={1.9} aria-hidden="true" />
-                  </span>
-                </span>
+                <LearningIcon kind={item.icon} />
                 <span className="flex min-w-0 flex-1 flex-col gap-1.5">
                   <span className="line-clamp-2 text-[14px] font-bold leading-snug text-ink-900">{item.title}</span>
                   <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] font-semibold text-ink-500">
