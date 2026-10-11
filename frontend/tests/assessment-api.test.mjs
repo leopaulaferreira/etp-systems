@@ -31,6 +31,19 @@ test('nota vinda da API funciona sem expor o gabarito antes da última tentativa
   assert.equal(assessmentSummary([assessment]).average, 0)
 })
 
+test('avaliação de IA preserva o tema e as seis questões recebidas da API', () => {
+  const item = response()
+  item.topic = 'ai'
+  item.questions = Array.from({ length: 6 }, (_, index) => ({
+    ...item.questions[0],
+    id: `33333333-3333-4333-8333-${String(index + 1).padStart(12, '0')}`,
+    prompt: `Questão ${index + 1}`,
+  }))
+  const parsed = parseAssessment(item)
+  assert.equal(parsed.topic, 'ai')
+  assert.equal(parsed.questions.length, 6)
+})
+
 test('o parser rejeita alternativas e notas inválidas', () => {
   const invalidOptions = response()
   invalidOptions.questions[0].optionIds = [ids.first]
