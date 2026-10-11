@@ -1,7 +1,8 @@
 import { NavLink } from 'react-router-dom'
-import { Headset, X, ArrowUpRight, LayoutDashboard, UsersRound, ClipboardCheck, Award, Building2, UserRound, ShieldCheck } from 'lucide-react'
+import { X, ArrowUpRight } from 'lucide-react'
 import etpSymbol from '../../assets/etp-symbol.svg'
 import { navItems } from './navItems'
+import SidebarSculptedIcon, { type SidebarSymbol } from './SidebarSculptedIcon'
 import { useAuth } from '../../auth/AuthContext'
 
 type SidebarProps = {
@@ -11,19 +12,19 @@ type SidebarProps = {
 
 export default function Sidebar({ onNavigate }: SidebarProps) {
   const { role } = useAuth()
-  const groups = role === 'empresa' ? [
+  const groups: { label: string; items: { id: string; label: string; to: string; symbol: SidebarSymbol }[] }[] = role === 'empresa' ? [
     { label: 'Painel da empresa', items: [
-      { id: 'overview', label: 'Visão geral', to: '/empresa/dashboard', icon: LayoutDashboard },
-      { id: 'team', label: 'Colaboradores', to: '/empresa/colaboradores', icon: UsersRound },
-      { id: 'assessments', label: 'Avaliações', to: '/empresa/avaliacoes', icon: ClipboardCheck },
-      { id: 'certificates', label: 'Certificados', to: '/empresa/certificados', icon: Award },
+      { id: 'overview', label: 'Visão geral', to: '/empresa/dashboard', symbol: 'dashboard' },
+      { id: 'team', label: 'Colaboradores', to: '/empresa/colaboradores', symbol: 'team' },
+      { id: 'assessments', label: 'Avaliações', to: '/empresa/avaliacoes', symbol: 'avaliacoes' },
+      { id: 'certificates', label: 'Certificados', to: '/empresa/certificados', symbol: 'certificados' },
     ] },
     { label: 'Configurações', items: [
-      { id: 'company', label: 'Dados da empresa', to: '/empresa/configuracoes/dados', icon: Building2 },
-      { id: 'account', label: 'Minha conta', to: '/empresa/configuracoes/conta', icon: UserRound },
-      { id: 'security', label: 'Segurança', to: '/empresa/configuracoes/seguranca', icon: ShieldCheck },
+      { id: 'company', label: 'Dados da empresa', to: '/empresa/configuracoes/dados', symbol: 'company' },
+      { id: 'account', label: 'Minha conta', to: '/empresa/configuracoes/conta', symbol: 'perfil' },
+      { id: 'security', label: 'Segurança', to: '/empresa/configuracoes/seguranca', symbol: 'security' },
     ] },
-  ] : [{ label: '', items: navItems }]
+  ] : [{ label: '', items: navItems.map(item => ({ ...item, symbol: item.id })) }]
   return (
     <aside
       tabIndex={-1}
@@ -38,9 +39,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
       <nav className="flex flex-1 flex-col gap-1" aria-label="Navegação principal">
         {groups.map((group) => <div key={group.label} className="mb-4 flex flex-col gap-1">
           {group.label && <p className="px-3.5 pb-2 pt-2 text-[10px] font-bold uppercase tracking-widest text-white/40">{group.label}</p>}
-          {group.items.map((item) => {
-          const Icon = item.icon
-          return (
+          {group.items.map((item) => (
             <NavLink
               key={item.id}
               to={item.to}
@@ -48,21 +47,20 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
               className={({ isActive }) =>
                 `relative flex min-h-11 items-center gap-3 rounded-lg px-3.5 py-2.5 text-left text-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 ${
                   isActive
-                    ? 'bg-white/[0.045] font-medium text-blue-200 before:absolute before:left-0 before:top-3 before:bottom-3 before:w-0.5 before:rounded-full before:bg-blue-300'
-                    : 'font-normal text-white/60 hover:bg-white/[0.03] hover:text-white/90'
+                    ? 'font-medium text-blue-200'
+                    : 'font-normal text-white/60 hover:text-white/90'
                 }`
               }
             >
-              <Icon className="h-[22px] w-[22px] shrink-0" strokeWidth={1.5} aria-hidden="true" />
+              <SidebarSculptedIcon kind={item.symbol} />
               {item.label}
             </NavLink>
-          )
-        })}</div>)}
+          ))}</div>)}
       </nav>
 
       <div className="mx-2 mt-6 border-t border-white/[0.08] pt-5">
         <div className="flex items-center gap-3 text-white/75">
-          <Headset className="h-[22px] w-[22px] shrink-0" strokeWidth={1.5} aria-hidden="true" />
+          <SidebarSculptedIcon kind="help" />
           <p className="text-sm font-medium">Precisa de ajuda?</p>
         </div>
         <p className="mt-2 text-xs leading-relaxed text-white/55">
