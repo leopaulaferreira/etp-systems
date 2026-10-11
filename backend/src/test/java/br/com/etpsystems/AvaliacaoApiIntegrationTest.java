@@ -51,7 +51,7 @@ class AvaliacaoApiIntegrationTest {
                                    'Computação em Nuvem: Conceitos e Aplicações')
                 GROUP BY q.id
                 """, Integer.class);
-        assertThat(optionCounts).hasSize(15).allMatch(count -> count >= 4);
+        assertThat(optionCounts).hasSize(16).allMatch(count -> count >= 4);
     }
 
     @Test
@@ -169,7 +169,11 @@ class AvaliacaoApiIntegrationTest {
 
             JsonNode assessment = JSON.readTree(get(client, "/api/colaborador/avaliacoes", firstToken).body()).get(0);
             String path = "/api/colaborador/avaliacoes/" + assessment.path("id").asText() + "/tentativas";
-            assertThat(assessment.path("questions").size()).isEqualTo(5);
+            assertThat(assessment.path("questions").size()).isEqualTo(6);
+            assertThat(assessment.path("questions").get(5).path("prompt").asText())
+                    .startsWith("Um colaborador percebe que enviou por engano uma planilha");
+            assertThat(assessment.path("questions").get(5).path("options").get(2).asText())
+                    .isEqualTo("Interromper o compartilhamento, se possível, preservar as informações sobre o ocorrido e comunicar rapidamente a área responsável da empresa.");
             for (JsonNode question : assessment.path("questions")) {
                 assertThat(question.path("options").size()).isGreaterThanOrEqualTo(4);
                 assertThat(question.path("optionIds").size()).isEqualTo(question.path("options").size());
@@ -184,14 +188,15 @@ class AvaliacaoApiIntegrationTest {
                 int correctIndex = question.path("options").toString().contains("Nome associado ao e-mail") ? 0 :
                         question.path("options").toString().contains("Usar apenas os dados necessários") ? 1 :
                         question.path("options").toString().contains("Por canais autorizados") ? 2 :
-                        question.path("options").toString().contains("Bloquear a tela") ? 0 : 1;
+                        question.path("options").toString().contains("Bloquear a tela") ? 0 :
+                        question.path("options").toString().contains("Seguir o procedimento interno") ? 1 : 2;
                 right.add(Map.of("questaoId", questionId,
                         "alternativaId", question.path("optionIds").get(correctIndex).asText()));
                 wrong.add(Map.of("questaoId", questionId,
                         "alternativaId", question.path("optionIds").get((correctIndex + 1) % question.path("optionIds").size()).asText()));
             }
             String duplicate = JSON.writeValueAsString(Map.of("respostas", List.of(wrong.get(0), wrong.get(0),
-                    wrong.get(1), wrong.get(2), wrong.get(3))));
+                    wrong.get(1), wrong.get(2), wrong.get(3), wrong.get(4))));
             assertThat(post(client, path, otherToken, JSON.writeValueAsString(Map.of("respostas", wrong)))
                     .statusCode()).isEqualTo(404);
             assertThat(post(client, path, firstToken, duplicate).statusCode()).isEqualTo(400);
@@ -207,6 +212,9 @@ class AvaliacaoApiIntegrationTest {
             assertThat(passed.path("attempts").get(1).path("score").asInt()).isEqualTo(100);
             assertThat(passed.path("attempts").get(1).path("passed").asBoolean()).isTrue();
             assertThat(passed.path("questions").get(0).path("correctOption").isNull()).isFalse();
+            assertThat(passed.path("questions").get(5).path("correctOption").asInt()).isEqualTo(2);
+            assertThat(passed.path("questions").get(5).path("explanation").asText())
+                    .startsWith("Em um possível incidente envolvendo dados pessoais");
             assertThat(post(client, path, firstToken, JSON.writeValueAsString(Map.of("respostas", right)))
                     .statusCode()).isEqualTo(409);
             assertThat(JSON.readTree(get(client, "/api/colaborador/avaliacoes", firstToken).body())
