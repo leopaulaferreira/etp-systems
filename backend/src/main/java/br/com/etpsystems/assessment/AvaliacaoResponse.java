@@ -40,7 +40,12 @@ public record AvaliacaoResponse(
             return new TentativaResponse(respostas, tentativa.getNota(), tentativa.isAprovado(), tentativa.getConcluidoEm());
         }).toList();
         String icon = avaliacao.getCurso().getIcone();
-        String topic = icon.equals("security") ? "security" : icon.equals("cloud") ? "cloud" : "privacy";
+        String topic = switch (icon) {
+            case "security" -> "security";
+            case "cloud" -> "cloud";
+            case "ai" -> "ai";
+            default -> "privacy";
+        };
         return new AvaliacaoResponse(avaliacao.getId(), avaliacao.getCurso().getId(), avaliacao.getTitulo(),
                 avaliacao.getCurso().getTitulo(), "Curso", "Teste", topic,
                 tentativas.isEmpty() ? "pending" : "completed", 8, avaliacao.getNotaMinima(),

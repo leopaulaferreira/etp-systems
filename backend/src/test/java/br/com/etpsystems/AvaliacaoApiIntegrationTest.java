@@ -55,6 +55,65 @@ class AvaliacaoApiIntegrationTest {
     }
 
     @Test
+    void aiAssessmentHasSixQuestionsAndGradesTheSubmittedAnswers() throws Exception {
+        usuarios.save(new Usuario("Aluno IA", firstEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
+        UUID courseId = cursos.findAllByOrderByOrdemExibicaoAscTituloAsc().stream()
+                .filter(course -> course.getTitulo().equals("Introdução à Inteligência Artificial"))
+                .findFirst().orElseThrow().getId();
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            String token = login(client, firstEmail);
+            post(client, "/api/colaborador/inscricoes/cursos/" + courseId, token, null);
+            JsonNode assessments = JSON.readTree(get(client, "/api/colaborador/avaliacoes", token).body());
+            assertThat(assessments.size()).isEqualTo(1);
+            JsonNode assessment = assessments.get(0);
+            assertThat(assessment.path("courseId").asText()).isEqualTo(courseId.toString());
+            assertThat(assessment.path("minimumScore").asInt()).isEqualTo(80);
+            assertThat(assessment.path("maxAttempts").asInt()).isEqualTo(2);
+            assertThat(assessment.path("topic").asText()).isEqualTo("ai");
+            JsonNode questions = assessment.path("questions");
+            assertThat(questions.size()).isEqualTo(6);
+            assertThat(questions.get(0).path("prompt").asText())
+                    .isEqualTo("Qual alternativa melhor define Inteligência Artificial?");
+            assertThat(questions.get(5).path("prompt").asText())
+                    .startsWith("Um colaborador precisa resumir um documento interno");
+            for (JsonNode question : questions) {
+                assertThat(question.path("options").size()).isEqualTo(4);
+                assertThat(question.path("optionIds").size()).isEqualTo(4);
+                assertThat(question.path("correctOption").isNull()).isTrue();
+                assertThat(question.path("explanation").isNull()).isTrue();
+            }
+
+            List<Map<String, String>> wrong = new ArrayList<>();
+            List<Map<String, String>> right = new ArrayList<>();
+            int[] correctOptions = {1, 1, 1, 2, 2, 2};
+            for (int index = 0; index < questions.size(); index++) {
+                JsonNode question = questions.get(index);
+                String questionId = question.path("id").asText();
+                wrong.add(Map.of("questaoId", questionId,
+                        "alternativaId", question.path("optionIds").get(0).asText()));
+                right.add(Map.of("questaoId", questionId,
+                        "alternativaId", question.path("optionIds").get(correctOptions[index]).asText()));
+            }
+            String path = "/api/colaborador/avaliacoes/" + assessment.path("id").asText() + "/tentativas";
+            JsonNode failed = JSON.readTree(post(client, path, token,
+                    JSON.writeValueAsString(Map.of("respostas", wrong))).body());
+            assertThat(failed.path("attempts").get(0).path("score").asInt()).isZero();
+            assertThat(failed.path("questions").get(0).path("correctOption").isNull()).isTrue();
+
+            JsonNode passed = JSON.readTree(post(client, path, token,
+                    JSON.writeValueAsString(Map.of("respostas", right))).body());
+            assertThat(passed.path("attempts").get(1).path("score").asInt()).isEqualTo(100);
+            assertThat(passed.path("attempts").get(1).path("passed").asBoolean()).isTrue();
+            for (int index = 0; index < questions.size(); index++) {
+                assertThat(passed.path("questions").get(index).path("correctOption").asInt())
+                        .isEqualTo(correctOptions[index]);
+                assertThat(passed.path("questions").get(index).path("explanation").asText())
+                        .isNotBlank();
+            }
+        }
+    }
+
+    @Test
     void aiCourseHasThreeVideoLessonsInOrder() throws Exception {
         usuarios.save(new Usuario("Aluno IA", firstEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
         UUID courseId = cursos.findAllByOrderByOrdemExibicaoAscTituloAsc().stream()
