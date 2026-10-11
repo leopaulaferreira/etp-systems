@@ -52,7 +52,7 @@ export default function PageHero({
         aria-hidden="true"
         className="pointer-events-none absolute inset-y-0 right-6 hidden w-28 items-center justify-center text-white/20 sm:flex lg:right-8"
       >
-        <IllustratedIcon icon={ArtworkIcon} tone="blue" size="hero" />
+        <IllustratedIcon icon={ArtworkIcon} tone="blue" size="hero" finish="relief" />
       </div>
     </section>
   )
