@@ -6,6 +6,6 @@ A página `/avaliacoes` usa a API autenticada do colaborador. Exibe apenas avali
 
 O diálogo, filtros, indicadores e gráfico foram reaproveitados. O gráfico utiliza as notas registradas pela API. A busca e os filtros continuam locais. Durante a avaliação, **Voltar às aulas** retorna à aula de origem quando a avaliação foi aberta pela página de estudo; o botão de avaliação permite retomar as respostas ainda em memória. Em caso de falha ao carregar, há uma ação para tentar novamente; em falha no envio, as escolhas atuais são preservadas para nova tentativa de envio.
 
-Os três cursos piloto anteriores têm cinco questões; Introdução à Inteligência Artificial tem seis, padrão para os próximos cursos. Cada questão tem quatro alternativas, nota mínima de 80% e duas tentativas. Aprovação e conclusão manual do curso são informações separadas. A avaliação de IA ainda não habilita certificado.
+LGPD na Prática e Introdução à Inteligência Artificial têm seis questões, padrão para os próximos cursos; Segurança da Informação e Computação em Nuvem têm cinco. Cada questão tem quatro alternativas, nota mínima de 80% e duas tentativas. Aprovação e conclusão manual do curso são informações separadas. A avaliação de IA ainda não habilita certificado.
 
 Verificação: `npm run test:avaliacoes`, `npm run build` e `npm run lint` em `frontend/`.
