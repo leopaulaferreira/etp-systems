@@ -1,0 +1,67 @@
+<!-- Marca da sidebar: silhueta original com acabamento em metal claro. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 66 66" fill="none">
+  <defs>
+    <linearGradient id="roof-face" x1="22" y1="6" x2="35" y2="24" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff"/>
+      <stop offset=".52" stop-color="#e8f2ff"/>
+      <stop offset="1" stop-color="#a4bcd7"/>
+    </linearGradient>
+    <linearGradient id="ledge-face" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#fff"/>
+      <stop offset=".35" stop-color="#e5effb"/>
+      <stop offset="1" stop-color="#9bb3ce"/>
+    </linearGradient>
+    <linearGradient id="column-face" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#a7bdd6"/>
+      <stop offset=".22" stop-color="#fff"/>
+      <stop offset=".48" stop-color="#edf5ff"/>
+      <stop offset=".8" stop-color="#b8cce3"/>
+      <stop offset="1" stop-color="#7894b3"/>
+    </linearGradient>
+    <linearGradient id="seal-rim" x1="38" y1="36" x2="58" y2="61" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff"/>
+      <stop offset=".45" stop-color="#dbeafa"/>
+      <stop offset="1" stop-color="#738faf"/>
+    </linearGradient>
+    <linearGradient id="seal-face" x1="41" y1="37" x2="56" y2="59" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f7fbff"/>
+      <stop offset=".5" stop-color="#dceafb"/>
+      <stop offset="1" stop-color="#aac3e0"/>
+    </linearGradient>
+    <filter id="cast-shadow" x="-25%" y="-20%" width="150%" height="150%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#020a18" flood-opacity=".5"/>
+    </filter>
+    <path id="roof" d="M30.4 4.8a3 3 0 0 1 3.2 0l24.6 14.8c1.8 1.1 1 3.8-1.1 3.8H6.9c-2.1 0-2.9-2.7-1.1-3.8L30.4 4.8Z"/>
+    <g id="column">
+      <rect x="3.5" y="35" width="6" height="15.5" rx="1" fill="url(#column-face)"/>
+      <rect y="32.5" width="13" height="4.5" rx="2" fill="#64809f"/>
+      <rect y="31.5" width="13" height="4.5" rx="2" fill="url(#ledge-face)"/>
+      <rect y="50.5" width="13" height="4.5" rx="2" fill="#64809f"/>
+      <rect y="49.5" width="13" height="4.5" rx="2" fill="url(#ledge-face)"/>
+    </g>
+  </defs>
+
+  <g filter="url(#cast-shadow)">
+    <use href="#roof" fill="#718eae" transform="translate(0 1.2)"/>
+    <use href="#roof" fill="url(#roof-face)"/>
+    <path d="M7 20.1 30.9 5.7a2 2 0 0 1 2.2 0L57 20.1" stroke="#fff" stroke-opacity=".8" stroke-width=".8" stroke-linecap="round"/>
+    <path d="M8 22h48" stroke="#f6faff" stroke-opacity=".65" stroke-width=".7" stroke-linecap="round"/>
+
+    <rect x="7" y="26.5" width="50" height="4" rx="1.5" fill="#64809f"/>
+    <rect x="7" y="25.5" width="50" height="4" rx="1.5" fill="url(#ledge-face)"/>
+    <use href="#column" x="10"/>
+    <use href="#column" x="25.5"/>
+    <use href="#column" x="41"/>
+
+    <rect x="5" y="56.5" width="42" height="5" rx="2" fill="#64809f"/>
+    <rect x="5" y="55.5" width="42" height="5" rx="2" fill="url(#ledge-face)"/>
+
+    <!-- O selo mantém a forma original e ganha uma face levemente rebaixada. -->
+    <circle cx="48" cy="49.2" r="14" fill="#526e8f"/>
+    <circle cx="48" cy="48" r="14" fill="url(#seal-rim)"/>
+    <circle cx="48" cy="48" r="12.8" fill="url(#seal-face)"/>
+    <path d="M36.6 43a12.5 12.5 0 0 1 18.8-5" stroke="#fff" stroke-opacity=".75" stroke-width=".8" stroke-linecap="round"/>
+    <path d="m40.5 48.1 5.25 5.25L56 41.1" stroke="#fff" stroke-opacity=".7" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="m40.5 47.5 5.25 5.25L56 40.5" stroke="#243e5c" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
