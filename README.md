@@ -191,8 +191,9 @@ O módulo de avaliações permite:
 
 As tentativas e notas são registradas no backend. LGPD na Prática tem duas
 videoaulas; Introdução à Inteligência Artificial tem três videoaulas e uma
-avaliação de seis questões. Segurança da Informação e Computação em Nuvem têm
-aulas em texto e avaliações. O progresso ainda é informado manualmente pelo
+avaliação de seis questões. Gestão de Projetos Ágeis com Scrum tem três videoaulas
+e 18 questões, divididas em seis por aula. Segurança da Informação e Computação
+em Nuvem têm aulas em texto e avaliações. O progresso ainda é informado manualmente pelo
 colaborador.
 
 ---
