@@ -30,9 +30,12 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
       tabIndex={-1}
       className="app-sidebar app-scrollarea flex h-full w-full shrink-0 flex-col overflow-y-auto px-4 py-6 focus:outline-none"
     >
-      <div className="flex items-center gap-2 px-2 pb-7">
-        <img src={etpSymbol} alt="" className="h-9 w-9 shrink-0 object-contain lg:h-10 lg:w-10" />
-        <span className="flex-1 whitespace-nowrap text-[17px] font-bold tracking-[-0.02em] text-white lg:text-[19px]">ETP Systems</span>
+      <div className="flex items-center gap-3 px-2 pb-7">
+        <img src={etpSymbol} alt="" width="38" height="38" className="h-[38px] w-[38px] shrink-0 object-contain" />
+        <span className="flex flex-1 items-baseline gap-1.5 whitespace-nowrap text-[18px] tracking-[-0.6px] text-white">
+          <strong className="font-extrabold tracking-[-0.8px]">ETP</strong>
+          <span className="font-[450] text-ink-500">Systems</span>
+        </span>
         <button type="button" aria-label="Fechar menu" onClick={onNavigate} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-500 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 lg:hidden"><X className="h-5 w-5" aria-hidden="true" /></button>
       </div>
 
