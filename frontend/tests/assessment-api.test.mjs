@@ -53,6 +53,21 @@ test('o parser rejeita alternativas e notas inválidas', () => {
   assert.throws(() => parseAssessment(invalidScore), /Tentativa inválida/)
 })
 
+test('avaliação de Scrum preserva o tema e a ordem das 18 questões recebidas da API', () => {
+  const item = response()
+  item.topic = 'projects'
+  item.questions = Array.from({ length: 18 }, (_, index) => ({
+    ...item.questions[0],
+    id: `33333333-3333-4333-8333-${String(index + 1).padStart(12, '0')}`,
+    prompt: `Questão ${index + 1}`,
+  }))
+  const parsed = parseAssessment(item)
+  assert.equal(parsed.topic, 'projects')
+  assert.equal(parsed.questions.length, 18)
+  assert.deepEqual(parsed.questions.map(question => question.prompt), item.questions.map(question => question.prompt))
+  assert.ok(parsed.questions.every(question => question.correctOption === undefined))
+})
+
 test('aula aceita vídeo ainda ausente e preserva o texto', () => {
   assert.deepEqual(parseLesson({ id: ids.question, title: 'Aula', content: 'Texto da aula',
     videoUrl: null, order: 1 }), {
