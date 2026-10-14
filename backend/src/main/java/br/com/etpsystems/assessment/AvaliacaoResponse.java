@@ -44,11 +44,12 @@ public record AvaliacaoResponse(
             case "security" -> "security";
             case "cloud" -> "cloud";
             case "ai" -> "ai";
+            case "projects" -> "projects";
             default -> "privacy";
         };
         return new AvaliacaoResponse(avaliacao.getId(), avaliacao.getCurso().getId(), avaliacao.getTitulo(),
                 avaliacao.getCurso().getTitulo(), "Curso", "Teste", topic,
-                tentativas.isEmpty() ? "pending" : "completed", 8, avaliacao.getNotaMinima(),
+                tentativas.isEmpty() ? "pending" : "completed", Math.max(8, questoes.size()), avaliacao.getNotaMinima(),
                 avaliacao.getLimiteTentativas(), questoes, Map.of(), historico);
     }
 }
