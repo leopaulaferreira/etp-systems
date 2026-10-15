@@ -48,8 +48,14 @@ class TrilhaPerfilApiIntegrationTest {
             assertThat(JSON.readTree(get(client, "/api/colaborador/meus-cursos", token).body()).size())
                     .isEqualTo(first.path("courseCount").asInt());
             String courseId = first.path("courses").get(0).path("id").asText();
-            assertThat(put(client, "/api/colaborador/meus-cursos/" + courseId + "/progresso", token,
-                    "{\"percentual\":100}").statusCode()).isEqualTo(200);
+            JsonNode lessons = JSON.readTree(get(client, "/api/colaborador/cursos/" + courseId + "/aulas", token).body());
+            if (lessons.isEmpty()) {
+                assertThat(put(client, "/api/colaborador/meus-cursos/" + courseId + "/progresso", token,
+                        "{\"percentual\":100}").statusCode()).isEqualTo(200);
+            } else for (JsonNode lesson : lessons) {
+                assertThat(put(client, "/api/colaborador/meus-cursos/" + courseId + "/aulas/"
+                        + lesson.path("id").asText() + "/conclusao", token, "{}").statusCode()).isEqualTo(200);
+            }
             JsonNode refreshed = JSON.readTree(get(client, "/api/colaborador/trilhas", token).body());
             JsonNode current = findTrail(refreshed, id);
             assertThat(current).isNotNull();

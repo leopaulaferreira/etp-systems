@@ -1,12 +1,13 @@
 import IllustratedIcon from '../../components/ui/IllustratedIcon'
 import { useEffect, useRef, useState } from 'react'
-import { ArrowLeft, ArrowRight, BookOpen, ClipboardCheck, Play, VideoOff } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BookOpen, ClipboardCheck, CheckCircle2, Play, VideoOff } from 'lucide-react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useAssessments } from '../../assessments/AssessmentContext'
 import PageHero from '../../components/ui/PageHero'
 import type { CatalogCourse } from './courseTypes'
 import { fetchCourseDetails } from './courseApi'
 import { fetchLessons, type Lesson } from '../Avaliacoes/assessmentApi'
+import { completeLesson, fetchLessonProgress, type LessonProgress } from './lessonProgressApi'
 import { latestScore, remainingAttempts } from '../Avaliacoes/assessment'
 
 const panel = 'rounded-[22px] border border-ink-200/70 bg-panel shadow-card'
@@ -28,11 +29,20 @@ function VideoSlot({ lesson }: { lesson: Lesson }) {
 
 export default function CourseStudyPage() {
   const { id } = useParams()
+  return <CourseStudy key={id} />
+}
+
+function CourseStudy() {
+  const { id } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const [course, setCourse] = useState<CatalogCourse | null>(null)
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [revision, setRevision] = useState(0)
+  const [progress, setProgress] = useState<LessonProgress | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState(false)
+  const saveController = useRef<AbortController | null>(null)
   const lessonHeadingRef = useRef<HTMLHeadingElement>(null)
   const focusNextLesson = useRef(false)
   const { assessments, status: assessmentStatus } = useAssessments()
@@ -47,13 +57,15 @@ export default function CourseStudyPage() {
   useEffect(() => {
     if (!id) return
     const controller = new AbortController()
-    Promise.all([fetchCourseDetails(id, controller.signal), fetchLessons(id, controller.signal)])
-      .then(([details, courseLessons]) => {
+    Promise.all([fetchCourseDetails(id, controller.signal), fetchLessons(id, controller.signal), fetchLessonProgress(id, controller.signal)])
+      .then(([details, courseLessons, lessonProgress]) => {
+        if (controller.signal.aborted) return
+        setProgress(lessonProgress)
         setCourse(details)
         setLessons(courseLessons)
         setStatus('ready')
       }).catch(() => { if (!controller.signal.aborted) setStatus('error') })
-    return () => controller.abort()
+    return () => { controller.abort(); saveController.current?.abort() }
   }, [id, revision])
 
   useEffect(() => {
@@ -62,6 +74,22 @@ export default function CourseStudyPage() {
     lessonHeadingRef.current?.scrollIntoView({ block: 'start' })
     focusNextLesson.current = false
   }, [activeIndex, status])
+
+  async function finishLesson() {
+    if (!id || !activeLesson || saving) return
+    const controller = new AbortController()
+    saveController.current = controller
+    setSaving(true)
+    setSaveError(false)
+    try {
+      const updated = await completeLesson(id, activeLesson.id, controller.signal)
+      if (!controller.signal.aborted) setProgress(updated)
+    } catch {
+      if (!controller.signal.aborted) setSaveError(true)
+    } finally {
+      if (!controller.signal.aborted) setSaving(false)
+    }
+  }
 
   function showLesson(index: number) {
     if (index < 0 || index >= lessons.length || index === activeIndex) return
@@ -82,14 +110,23 @@ export default function CourseStudyPage() {
           <div className="flex flex-col gap-1.5"><span className="text-[10px] font-extrabold uppercase tracking-wider text-brand-blue-400">Aula {activeIndex + 1} de {lessons.length}</span><h2 ref={lessonHeadingRef} tabIndex={-1} className="rounded text-xl font-extrabold tracking-tight text-ink-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">{activeLesson.title}</h2></div>
           <VideoSlot lesson={activeLesson} />
           {activeLesson.content.trim() && <div className="flex flex-col gap-4 border-t border-ink-100 pt-5"><h3 className="text-sm font-extrabold text-ink-900">Resumo da aula</h3>{activeLesson.content.split(/\n\n/).map((paragraph, position) => <p key={position} className="text-sm leading-7 text-ink-700">{paragraph}</p>)}</div>}
+          <div className="flex flex-col gap-3 border-t border-ink-100 pt-5">
+            <button type="button" onClick={() => void finishLesson()} disabled={saving || progress?.completedLessonIds.includes(activeLesson.id)} className={`${lessonNavPrimary} disabled:cursor-default disabled:opacity-60`}>
+              <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+              {progress?.completedLessonIds.includes(activeLesson.id) ? 'Aula concluída' : saving ? 'Salvando…' : 'Concluir aula'}
+            </button>
+            {saveError && <p role="alert" className="text-sm text-rose-400">Não foi possível salvar. Tente concluir a aula novamente.</p>}
+            <p role="status" className="text-sm text-ink-500">{progress?.completedLessonIds.length ?? 0} de {progress?.totalLessons ?? lessons.length} aulas concluídas · {progress?.progress.toLocaleString('pt-BR') ?? 0}% das aulas</p>
+            <p className="text-xs leading-5 text-ink-500">Concluir as aulas registra seu estudo. Para obter o certificado, você precisa passar na avaliação.</p>
+          </div>
           {lessons.length > 1 && <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink-100 pt-5">
             <button type="button" onClick={() => showLesson(activeIndex - 1)} disabled={activeIndex === 0} className={lessonNavSecondary}><ArrowLeft className="h-4 w-4" aria-hidden="true" /> Aula anterior</button>
             {activeIndex < lessons.length - 1 ? <button type="button" onClick={() => showLesson(activeIndex + 1)} className={lessonNavPrimary}>Próxima aula <ArrowRight className="h-4 w-4" aria-hidden="true" /></button> : assessment && <Link to={assessmentHref} className={lessonNavPrimary}>Ir para avaliação <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>}
           </div>}
-        </article> : <section className={`${panel} p-6 sm:p-8`}><h2 className="text-lg font-extrabold text-ink-900">Conteúdo em preparação</h2><p className="mt-2 text-sm leading-6 text-ink-500">Este curso ainda não tem aula ou avaliação publicada. Você pode acompanhar seu avanço manualmente em Meus Cursos.</p></section>}
+        </article> : <section className={`${panel} p-6 sm:p-8`}><h2 className="text-lg font-extrabold text-ink-900">Conteúdo em preparação</h2><p className="mt-2 text-sm leading-6 text-ink-500">Este curso ainda não tem aula ou avaliação publicada. As aulas aparecerão aqui quando forem publicadas.</p></section>}
       </section>
       {lessons.length > 0 && <aside className="flex min-w-0 flex-col gap-5" aria-label="Roteiro do curso">
-        <section className={`${panel} p-5`}><h2 className="text-sm font-extrabold text-ink-900">Aulas do curso</h2><ol className="mt-4 flex flex-col gap-2">{lessons.map((lesson, index) => <li key={lesson.id}><button type="button" onClick={() => showLesson(index)} aria-current={index === activeIndex ? 'step' : undefined} className={`flex min-h-11 w-full items-center gap-3 rounded-xl border px-3 py-2 text-left text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 ${index === activeIndex ? 'border-brand-blue-500/25 bg-brand-blue-500/10 text-brand-blue-400' : 'border-transparent text-ink-700 hover:border-ink-200 hover:bg-ink-100'}`}><span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-blue-500/10 font-extrabold">{index + 1}</span><span className="min-w-0">{lesson.title}</span></button></li>)}</ol></section>
+        <section className={`${panel} p-5`}><h2 className="text-sm font-extrabold text-ink-900">Aulas do curso</h2><ol className="mt-4 flex flex-col gap-2">{lessons.map((lesson, index) => <li key={lesson.id}><button type="button" onClick={() => showLesson(index)} aria-current={index === activeIndex ? 'step' : undefined} className={`flex min-h-11 w-full items-center gap-3 rounded-xl border px-3 py-2 text-left text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 ${index === activeIndex ? 'border-brand-blue-500/25 bg-brand-blue-500/10 text-brand-blue-400' : 'border-transparent text-ink-700 hover:border-ink-200 hover:bg-ink-100'}`}><span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-blue-500/10 font-extrabold">{index + 1}</span><span className="min-w-0">{lesson.title}{progress?.completedLessonIds.includes(lesson.id) && <span className="mt-1 block text-emerald-400">Concluída</span>}</span></button></li>)}</ol></section>
         <section className={`${panel} p-5`}><div className="flex items-center gap-2"><ClipboardCheck className="h-5 w-5 text-brand-blue-400" aria-hidden="true" /><h2 className="text-sm font-extrabold text-ink-900">Avaliação do curso</h2></div>{assessment ? <><p className="mt-3 text-xs leading-5 text-ink-500">{assessment.questions.length} questões · Nota mínima {assessment.minimumScore}% · {remainingAttempts(assessment)} tentativas restantes</p>{latestScore(assessment) !== null && <p className="mt-3 text-xs font-bold text-ink-700">Última nota: {latestScore(assessment)}%</p>}<Link to={assessmentHref} className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Ir para avaliação <ArrowRight className="h-4 w-4" aria-hidden="true" /></Link></> : <p className="mt-3 text-xs leading-5 text-ink-500">{assessmentStatus === 'loading' ? 'Carregando avaliação...' : 'A avaliação deste curso ainda não está disponível.'}</p>}</section>
       </aside>}
     </div>}

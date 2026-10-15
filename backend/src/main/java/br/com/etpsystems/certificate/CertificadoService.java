@@ -9,6 +9,7 @@ import br.com.etpsystems.course.Curso;
 import br.com.etpsystems.progress.ProgressoCurso;
 import br.com.etpsystems.progress.ProgressoRepository;
 import br.com.etpsystems.user.Usuario;
+import br.com.etpsystems.user.UsuarioRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,15 +19,18 @@ import org.springframework.web.server.ResponseStatusException;
 public class CertificadoService {
     private final CertificadoRepository certificados;
     private final ProgressoRepository progressos;
+    private final UsuarioRepository usuarios;
 
-    public CertificadoService(CertificadoRepository certificados, ProgressoRepository progressos) {
+    public CertificadoService(CertificadoRepository certificados, ProgressoRepository progressos, UsuarioRepository usuarios) {
         this.certificados = certificados;
         this.progressos = progressos;
+        this.usuarios = usuarios;
     }
 
     @Transactional
     public void emitirSeHabilitado(Usuario usuario, Curso curso, Instant aprovadoEm) {
         if (!curso.isCertificacaoHabilitada()) return;
+        usuarios.findByIdForUpdate(usuario.getId()).orElseThrow();
         ProgressoCurso progresso = progressos.findByUsuario_IdAndCurso_Id(usuario.getId(), curso.getId())
                 .orElseGet(() -> new ProgressoCurso(usuario, curso));
         progresso.atualizar(BigDecimal.valueOf(100));

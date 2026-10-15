@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Bookmark, BookOpen, CalendarDays, Clock3, History, X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { type CourseItem } from '../courseTypes'
@@ -12,7 +12,6 @@ type CourseDetailsDialogProps = {
   editable: boolean
   onClose: () => void
   onToggleSave: (course: CourseItem) => void
-  onUpdateProgress: (course: CourseItem, percentual: number) => Promise<void>
 }
 
 export default function CourseDetailsDialog({
@@ -21,27 +20,8 @@ export default function CourseDetailsDialog({
   editable,
   onClose,
   onToggleSave,
-  onUpdateProgress,
 }: CourseDetailsDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
-  const [draft, setDraft] = useState(course.progress ?? 0)
-  const [saving, setSaving] = useState(false)
-  const [saveError, setSaveError] = useState(false)
-  const [saved, setSaved] = useState(false)
-
-  async function saveProgress() {
-    setSaving(true)
-    setSaveError(false)
-    setSaved(false)
-    try {
-      await onUpdateProgress(course, draft)
-      setSaved(true)
-    } catch {
-      setSaveError(true)
-    } finally {
-      setSaving(false)
-    }
-  }
   useEffect(() => {
     const dialog = dialogRef.current
     const trigger = document.activeElement as HTMLElement | null
@@ -65,7 +45,7 @@ export default function CourseDetailsDialog({
       onKeyDown={(event) => {
         if (event.key !== 'Tab') return
         const buttons =
-          event.currentTarget.querySelectorAll<HTMLButtonElement>('button:not([disabled])')
+          event.currentTarget.querySelectorAll<HTMLElement>('button:not([disabled]), a[href]')
         const first = buttons[0]
         const last = buttons[buttons.length - 1]
         if (event.shiftKey && document.activeElement === first) {
@@ -127,26 +107,7 @@ export default function CourseDetailsDialog({
         </div>
         {editable && <Link to={`/cursos/${course.id}/estudar`} onClick={onClose}
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"><BookOpen className="h-4 w-4" aria-hidden="true" /> Abrir aula</Link>}
-        {editable && (
-          <form onSubmit={(event) => { event.preventDefault(); void saveProgress() }}
-            className="flex flex-col gap-3 rounded-xl border border-ink-200 bg-panel-alt p-4">
-            <div className="flex items-center justify-between gap-3 text-sm font-bold text-ink-900">
-              <label htmlFor="manual-course-progress">Seu progresso</label>
-              <output htmlFor="manual-course-progress" className="text-brand-blue-400">{draft}%</output>
-            </div>
-            <input id="manual-course-progress" type="range" min="0" max="100" step="5"
-              value={draft} disabled={saving}
-              onChange={(event) => { setDraft(Number(event.target.value)); setSaved(false) }}
-              className="w-full cursor-pointer accent-brand-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 disabled:cursor-wait" />
-            <p className="text-xs leading-5 text-ink-500">Atualize seu avanço manualmente. Em 100%, o curso aparece em Concluídos.</p>
-            {saveError && <p role="alert" className="text-xs text-rose-400">Não foi possível salvar o progresso. Tente novamente.</p>}
-            {saved && <p role="status" className="text-xs text-emerald-400">Progresso salvo.</p>}
-            <button type="submit" disabled={saving || draft === (course.progress ?? 0)}
-              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-blue-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 disabled:cursor-not-allowed disabled:opacity-50">
-              {saving ? 'Salvando...' : 'Salvar progresso'}
-            </button>
-          </form>
-        )}
+        {editable && <p className="text-xs leading-5 text-ink-500">Conclua cada aula na página de estudo para registrar seu progresso. O certificado depende da aprovação na avaliação.</p>}
         <button
           type="button"
           onClick={() => onToggleSave(course)}

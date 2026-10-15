@@ -119,11 +119,15 @@ A Fase 4 não inclui cadastro público, confirmação/recuperação por e-mail n
 - `GET /api/colaborador/trilhas` lista as trilhas cadastradas e calcula o progresso com base nos cursos. `POST /api/colaborador/trilhas/{trilhaId}/inscricao` inscreve na trilha e em seus cursos sem duplicar inscrições.
 - Progresso, aulas concluídas e certificados continuam nas fases seguintes; a Fase 6 não inventa percentuais.
 
-## Progresso — Fase 7
+## Progresso por aula
 
-`PUT /api/colaborador/meus-cursos/{cursoId}/progresso` recebe `{ "percentual": 45 }` e exige JWT de `COLABORADOR` inscrito no curso. Aceita valores entre 0 e 100, com até duas casas decimais; valor inválido retorna 400 e curso não inscrito retorna 404. A chamada grava o percentual na tabela `progresso_cursos`. Ao chegar a 100%, registra a data de conclusão; ao voltar para menos de 100%, remove essa data. Repetir 100% preserva a data original.
+`GET /api/colaborador/meus-cursos/{cursoId}/aulas/progresso` retorna `completedLessonIds`, `totalLessons` e `progress`. `PUT /api/colaborador/meus-cursos/{cursoId}/aulas/{aulaId}/conclusao` registra a conclusão, sem receber percentual. Ambas exigem inscrição; a aula deve pertencer ao curso. O usuário vem do JWT.
 
-`GET /api/colaborador/meus-cursos` e a resposta do `PUT` incluem `progress`, `updatedAt` e `completedAt`. Cursos sem registro de progresso aparecem com 0% e datas nulas. O avanço é **informado manualmente pelo colaborador**, pois a leitura e os vídeos das aulas ainda não são rastreados. Marcar 100% manualmente não emite certificado.
+O percentual é calculado no servidor: aulas concluídas / total de aulas × 100, truncado em duas casas decimais. A chave única por usuário e aula e o bloqueio transacional impedem duplicatas e perda de progresso em chamadas simultâneas. Repetir a conclusão preserva a data. O avanço alimenta Meus Cursos, dashboard, trilhas e RH.
+
+A migração V25 preserva os percentuais antigos, sem inventar quais aulas foram assistidas. O primeiro registro de aula recalcula o progresso dos cursos ainda sem certificado. Cursos certificados permanecem concluídos; a página de estudo mostra separadamente a contagem real das aulas registradas. Concluir aulas não emite certificado: a aprovação na avaliação continua obrigatória.
+
+A tela não oferece mais edição manual. A rota legada `PUT /api/colaborador/meus-cursos/{cursoId}/progresso` continua disponível apenas para cursos sem aulas; para cursos com aulas retorna 409.
 
 ## Aulas e avaliações — Fase 8
 

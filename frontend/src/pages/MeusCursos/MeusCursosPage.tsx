@@ -9,7 +9,7 @@ import SideCourseCard from './components/SideCourseCard'
 import MeusCursosHero from './components/MeusCursosHero'
 import CourseDetailsDialog from './components/CourseDetailsDialog'
 import ContinueCourseCard from './components/ContinueCourseCard'
-import { courseThumbnail, fetchMyCourses, formatCourseDuration, updateCourseProgress } from './myCoursesApi'
+import { courseThumbnail, fetchMyCourses, formatCourseDuration } from './myCoursesApi'
 import './meus-cursos.css'
 
 export default function MeusCursosPage() {
@@ -65,14 +65,6 @@ export default function MeusCursosPage() {
     document.getElementById('course-tab-saved')?.focus()
   }
 
-  async function handleUpdateProgress(course: CourseItem, percentual: number) {
-    const updated = await updateCourseProgress(course.id, percentual)
-    setCourses((current) => current.map((item) => item.id === course.id ? updated : item))
-    setSaved((current) => current.map((item) => item.id === course.id ? updated : item))
-    setSelectedCourse(updated)
-    setAnnouncement(`${updated.title}: progresso atualizado para ${percentual}%.`)
-  }
-
   const listProps = { savedIds, onOpen: setSelectedCourse, onToggleSave: toggleSave }
   return (
     <div className="flex min-w-0 flex-col gap-5 lg:gap-6">
@@ -121,8 +113,7 @@ export default function MeusCursosPage() {
       {selectedCourse && (
         <CourseDetailsDialog key={selectedCourse.id} course={selectedCourse}
           editable={courseIds.has(selectedCourse.id)} isSaved={savedIds.has(selectedCourse.id)}
-          onClose={() => setSelectedCourse(null)} onToggleSave={toggleSave}
-          onUpdateProgress={handleUpdateProgress} />
+          onClose={() => setSelectedCourse(null)} onToggleSave={toggleSave} />
       )}
     </div>
   )

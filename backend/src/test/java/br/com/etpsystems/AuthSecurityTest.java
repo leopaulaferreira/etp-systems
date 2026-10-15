@@ -77,6 +77,9 @@ class AuthSecurityTest {
     private InscricaoService inscricoes;
 
     @MockitoBean
+    private br.com.etpsystems.progress.ProgressoAulaService progressoAulas;
+
+    @MockitoBean
     private ProgressoService progressos;
 
     @MockitoBean

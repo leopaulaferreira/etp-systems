@@ -2,7 +2,6 @@ package br.com.etpsystems;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -18,8 +17,7 @@ import br.com.etpsystems.company.Empresa;
 import br.com.etpsystems.company.EmpresaRepository;
 import br.com.etpsystems.course.CursoRepository;
 import br.com.etpsystems.enrollment.InscricaoService;
-import br.com.etpsystems.progress.AtualizarProgressoRequest;
-import br.com.etpsystems.progress.ProgressoService;
+import br.com.etpsystems.progress.ProgressoAulaService;
 import br.com.etpsystems.user.Perfil;
 import br.com.etpsystems.user.Usuario;
 import br.com.etpsystems.user.UsuarioRepository;
@@ -53,7 +51,8 @@ class CompanyOverviewApiIntegrationTest {
     @Autowired private CursoRepository cursos;
     @Autowired private AvaliacaoRepository avaliacoes;
     @Autowired private InscricaoService inscricoes;
-    @Autowired private ProgressoService progressos;
+    @Autowired private ProgressoAulaService progressos;
+    @Autowired private br.com.etpsystems.assessment.AulaRepository aulas;
     @Autowired private AvaliacaoService avaliacaoService;
     @Autowired private PasswordEncoder passwords;
     @Autowired private JdbcTemplate jdbc;
@@ -77,8 +76,7 @@ class CompanyOverviewApiIntegrationTest {
                 .findFirst().orElseThrow();
         inscricoes.inscrever(employee.getId(), security.getId());
         inscricoes.inscrever(otherEmployee.getId(), lgpd.getId());
-        progressos.atualizar(otherEmployee.getId(), lgpd.getId(),
-                new AtualizarProgressoRequest(BigDecimal.valueOf(40)));
+        progressos.concluir(otherEmployee.getId(), lgpd.getId(), aulas.findByCurso_IdOrderByOrdem(lgpd.getId()).getFirst().getId());
         var assessment = avaliacoes.findByCurso_IdIn(List.of(security.getId())).getFirst();
         var answers = jdbc.query("""
                 SELECT q.id AS question_id, o.id AS option_id FROM questoes q
@@ -118,7 +116,7 @@ class CompanyOverviewApiIntegrationTest {
             assertThat(other.path("employees").size()).isEqualTo(1);
             assertThat(other.path("employees").get(0).path("email").asText()).isEqualTo(otherEmployeeEmail);
             assertThat(other.path("employees").get(0).path("courses").get(0).path("progress").asInt())
-                    .isEqualTo(40);
+                    .isEqualTo(33);
             assertThat(other.toString()).doesNotContain(employeeEmail);
         }
     }

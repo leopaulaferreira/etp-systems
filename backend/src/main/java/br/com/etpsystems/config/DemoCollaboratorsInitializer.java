@@ -19,8 +19,8 @@ import br.com.etpsystems.company.EmpresaRepository;
 import br.com.etpsystems.course.Curso;
 import br.com.etpsystems.course.CursoRepository;
 import br.com.etpsystems.enrollment.InscricaoService;
-import br.com.etpsystems.progress.AtualizarProgressoRequest;
-import br.com.etpsystems.progress.ProgressoService;
+import br.com.etpsystems.progress.ProgressoCurso;
+import br.com.etpsystems.progress.ProgressoRepository;
 import br.com.etpsystems.user.Perfil;
 import br.com.etpsystems.user.Usuario;
 import br.com.etpsystems.user.UsuarioRepository;
@@ -69,7 +69,7 @@ public class DemoCollaboratorsInitializer implements ApplicationRunner {
     private final CursoRepository cursos;
     private final AvaliacaoRepository avaliacoes;
     private final InscricaoService inscricoes;
-    private final ProgressoService progressos;
+    private final ProgressoRepository progressos;
     private final AvaliacaoService avaliacaoService;
     private final PasswordEncoder encoder;
     private final String companyName;
@@ -77,7 +77,7 @@ public class DemoCollaboratorsInitializer implements ApplicationRunner {
 
     public DemoCollaboratorsInitializer(EmpresaRepository empresas, UsuarioRepository usuarios,
             CursoRepository cursos, AvaliacaoRepository avaliacoes, InscricaoService inscricoes,
-            ProgressoService progressos, AvaliacaoService avaliacaoService, PasswordEncoder encoder,
+            ProgressoRepository progressos, AvaliacaoService avaliacaoService, PasswordEncoder encoder,
             @Value("${etp.demo.company-name}") String companyName,
             @Value("${etp.demo.company-data-email-domain:etp.example}") String emailDomain) {
         this.empresas = empresas;
@@ -127,8 +127,10 @@ public class DemoCollaboratorsInitializer implements ApplicationRunner {
                 Curso curso = cursosPorTitulo.get(cursoDemo.titulo());
                 inscricoes.inscrever(usuario.getId(), curso.getId());
                 if (cursoDemo.percentual() > 0) {
-                    progressos.atualizar(usuario.getId(), curso.getId(),
-                            new AtualizarProgressoRequest(BigDecimal.valueOf(cursoDemo.percentual())));
+                    // Cenários históricos de demonstração; não simulam aulas assistidas.
+                    var progresso = new ProgressoCurso(usuario, curso);
+                    progresso.atualizar(BigDecimal.valueOf(cursoDemo.percentual()));
+                    progressos.saveAndFlush(progresso);
                 }
                 if (cursoDemo.nota() != null) {
                     Avaliacao avaliacao = avaliacoesPorCurso.get(curso.getId());

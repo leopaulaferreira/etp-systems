@@ -54,6 +54,9 @@ public class AvaliacaoService {
     public AvaliacaoResponse enviar(UUID usuarioId, UUID avaliacaoId, EnviarTentativaRequest request) {
         Avaliacao avaliacao = avaliacoes.findByIdForUpdate(avaliacaoId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada"));
+        // Mesmo bloqueio usado na conclusão de aulas, antes das leituras de progresso.
+        Usuario usuario = usuarios.findByIdForUpdate(usuarioId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário indisponível"));
         verificarInscricao(usuarioId, avaliacao.getCurso().getId());
         List<Tentativa> anteriores = historico(usuarioId, avaliacaoId);
         if (anteriores.size() >= avaliacao.getLimiteTentativas() || anteriores.stream().anyMatch(Tentativa::isAprovado)) {
@@ -78,8 +81,6 @@ public class AvaliacaoService {
         }
         long acertos = escolhas.values().stream().filter(Alternativa::isCorreta).count();
         int nota = (int) Math.round(acertos * 100.0 / escolhas.size());
-        Usuario usuario = usuarios.findById(usuarioId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário indisponível"));
         Tentativa tentativa = new Tentativa(avaliacao, usuario, nota);
         escolhas.forEach(tentativa::responder);
         tentativas.save(tentativa);

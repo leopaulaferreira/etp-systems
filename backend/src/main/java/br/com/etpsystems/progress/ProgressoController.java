@@ -27,7 +27,7 @@ public class ProgressoController {
     }
 
     @PutMapping("/{cursoId}/progresso")
-    @Operation(summary = "Registrar avanço informado pelo colaborador", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Registrar avanço legado de curso sem aulas", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<MeuCursoResponse> atualizar(@AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID cursoId, @Valid @RequestBody AtualizarProgressoRequest request) {
         return ResponseEntity.ok().cacheControl(CacheControl.noStore())

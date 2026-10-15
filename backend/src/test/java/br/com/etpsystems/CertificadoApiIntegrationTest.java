@@ -62,8 +62,9 @@ class CertificadoApiIntegrationTest {
             assertThat(JSON.readTree(get(client, base, owner).body()).size()).isZero();
             assertThat(post(client, "/api/colaborador/inscricoes/cursos/" + courseId, owner, null)
                     .statusCode()).isEqualTo(200);
-            assertThat(put(client, "/api/colaborador/meus-cursos/" + courseId + "/progresso", owner,
-                    "{\"percentual\":40}").statusCode()).isEqualTo(200);
+            // Progresso legado: a migração preserva percentuais anteriores.
+            jdbc.update("INSERT INTO progresso_cursos (id, usuario_id, curso_id, percentual_progresso, concluido) VALUES (?, ?, ?, 40, FALSE)",
+                    UUID.randomUUID().toString(), usuarios.findByEmailIgnoreCase(ownerEmail).orElseThrow().getId().toString(), courseId.toString());
             JsonNode before = JSON.readTree(get(client, "/api/colaborador/dashboard", owner).body());
             assertThat(before.path("ongoingCourses").asInt()).isEqualTo(1);
             assertThat(before.path("completedCourses").asInt()).isZero();
@@ -84,8 +85,16 @@ class CertificadoApiIntegrationTest {
             int minimumRight = (int) Math.ceil(count * 0.8);
             var wrong = answers(assessmentId, false);
             for (int index = minimumRight; index < count; index++) answers.set(index, wrong.get(index));
-            HttpResponse<String> result = post(client, "/api/colaborador/avaliacoes/" + assessmentId + "/tentativas",
-                    owner, JSON.writeValueAsString(Map.of("respostas", answers)));
+            JsonNode concurrentLessons = JSON.readTree(get(client, "/api/colaborador/cursos/" + courseId + "/aulas", owner).body());
+            HttpResponse<String> result;
+            try (var executor = java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor()) {
+                var approval = executor.submit(() -> post(client, "/api/colaborador/avaliacoes/" + assessmentId + "/tentativas",
+                        owner, JSON.writeValueAsString(Map.of("respostas", answers))));
+                var completion = executor.submit(() -> put(client, "/api/colaborador/meus-cursos/" + courseId + "/aulas/"
+                        + concurrentLessons.get(0).path("id").asText() + "/conclusao", owner, "{}"));
+                result = approval.get();
+                assertThat(completion.get().statusCode()).isEqualTo(200);
+            }
             assertThat(result.statusCode()).isEqualTo(200);
             assertThat(JSON.readTree(result.body()).path("attempts").get(0).path("passed").asBoolean()).isTrue();
             assertThat(JSON.readTree(result.body()).path("attempts").get(0).path("score").asInt()).isEqualTo((int) Math.round(minimumRight * 100.0 / count));
@@ -112,6 +121,11 @@ class CertificadoApiIntegrationTest {
             JsonNode myCourses = JSON.readTree(get(client, "/api/colaborador/meus-cursos", owner).body());
             assertThat(myCourses.get(0).path("progress").asInt()).isEqualTo(100);
             assertThat(myCourses.get(0).path("completedAt").isNull()).isFalse();
+            JsonNode lessonsAfterApproval = JSON.readTree(get(client, "/api/colaborador/cursos/" + courseId + "/aulas", owner).body());
+            assertThat(put(client, "/api/colaborador/meus-cursos/" + courseId + "/aulas/"
+                    + lessonsAfterApproval.get(lessonsAfterApproval.size() - 1).path("id").asText() + "/conclusao", owner, "{}").statusCode()).isEqualTo(200);
+            assertThat(JSON.readTree(get(client, "/api/colaborador/meus-cursos", owner).body()).get(0).path("progress").asInt()).isEqualTo(100);
+
             assertThat(put(client, "/api/colaborador/meus-cursos/" + courseId + "/progresso", owner,
                     "{\"percentual\":45}").statusCode()).isEqualTo(409);
             assertThat(JSON.readTree(get(client, base + "/" + id, owner).body()).path("code").asText())
@@ -125,7 +139,7 @@ class CertificadoApiIntegrationTest {
     }
 
     @Test
-    void manualCompletionAndFailedAttemptsDoNotIssueCertificate() throws Exception {
+    void lessonCompletionAndFailedAttemptsDoNotIssueCertificate() throws Exception {
         usuarios.save(new Usuario("Titular", ownerEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
         UUID courseId = cursos.findAllByOrderByOrdemExibicaoAscTituloAsc().stream()
                 .filter(course -> course.getTitulo().equals("Fundamentos de Segurança da Informação"))
@@ -134,8 +148,11 @@ class CertificadoApiIntegrationTest {
             String token = login(client, ownerEmail);
             assertThat(post(client, "/api/colaborador/inscricoes/cursos/" + courseId, token, null)
                     .statusCode()).isEqualTo(200);
-            assertThat(put(client, "/api/colaborador/meus-cursos/" + courseId + "/progresso", token,
-                    "{\"percentual\":100}").statusCode()).isEqualTo(200);
+            JsonNode lessons = JSON.readTree(get(client, "/api/colaborador/cursos/" + courseId + "/aulas", token).body());
+            for (JsonNode lesson : lessons) {
+                assertThat(put(client, "/api/colaborador/meus-cursos/" + courseId + "/aulas/"
+                        + lesson.path("id").asText() + "/conclusao", token, "{}").statusCode()).isEqualTo(200);
+            }
             assertThat(JSON.readTree(get(client, "/api/colaborador/certificados", token).body()).size()).isZero();
             JsonNode assessment = JSON.readTree(get(client, "/api/colaborador/avaliacoes", token).body()).get(0);
             String id = assessment.path("id").asText();

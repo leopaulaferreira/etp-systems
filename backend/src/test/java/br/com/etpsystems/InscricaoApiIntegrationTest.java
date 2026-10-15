@@ -39,12 +39,15 @@ class InscricaoApiIntegrationTest {
     private CursoRepository cursos;
     @Autowired
     private PasswordEncoder passwords;
+    @Autowired
+    private br.com.etpsystems.assessment.AulaRepository aulas;
 
     @Test
     void enrollsOnlyTheAuthenticatedCollaboratorAndKeepsDuplicatesIdempotent() throws Exception {
         usuarios.save(new Usuario("Primeiro", firstEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
         usuarios.save(new Usuario("Segundo", otherEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
-        UUID cursoId = cursos.findAllByOrderByOrdemExibicaoAscTituloAsc().getFirst().getId();
+        UUID cursoId = cursos.findAllByOrderByOrdemExibicaoAscTituloAsc().stream()
+                .filter(curso -> aulas.findByCurso_IdOrderByOrdem(curso.getId()).isEmpty()).findFirst().orElseThrow().getId();
 
         try (HttpClient client = HttpClient.newHttpClient()) {
             assertThat(get(client, "/api/colaborador/meus-cursos", null).statusCode()).isEqualTo(401);
