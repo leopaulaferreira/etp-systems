@@ -21,6 +21,7 @@ import {
 } from '../assessment'
 import AssessmentBadge from './AssessmentBadge'
 import AssessmentIcon from './AssessmentIcon'
+import AssessmentCertificateResult from './AssessmentCertificateResult'
 
 type AssessmentDialogProps = {
   item: Assessment
@@ -311,14 +312,20 @@ export default function AssessmentDialog({
                   tabIndex={-1}
                   className="rounded font-extrabold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"
                 >
-                  {passed ? 'Parabéns, você foi aprovado!' : 'Continue praticando'}
+                  {passed ? 'Parabéns, você foi aprovado!' : 'Você ainda não atingiu a nota mínima'}
                 </h3>
                 <p className="mt-1 text-xs leading-5 text-ink-500">
                   Nota mínima: {item.minimumScore}% · Tentativa {item.attempts.length} de{' '}
                   {item.maxAttempts}
                 </p>
+                {!passed && <p className="mt-2 text-sm font-semibold text-amber-300">
+                  {remainingAttempts(item) > 0
+                    ? `Você tem ${remainingAttempts(item)} ${remainingAttempts(item) === 1 ? 'tentativa restante' : 'tentativas restantes'}. Revise as aulas antes de tentar novamente.`
+                    : 'Você utilizou todas as tentativas desta avaliação.'}
+                </p>}
               </div>
             </div>
+            {passed && item.courseId && <AssessmentCertificateResult key={item.courseId} courseId={item.courseId} />}
             {item.questions.every((question) => question.correctOption !== undefined) ? <div>
               <h3 className="mb-4 text-base font-bold">Confira suas respostas</h3>
               <ol className="flex flex-col gap-4">
@@ -358,11 +365,6 @@ export default function AssessmentDialog({
                 })}
               </ol>
             </div> : <p className="rounded-xl border border-ink-200 bg-panel-alt p-4 text-sm leading-6 text-ink-500">Revise a aula antes de tentar novamente. A correção detalhada aparece após a aprovação ou ao terminar as tentativas.</p>}
-            {!passed && !remainingAttempts(item) && (
-              <p className="text-sm text-amber-300">
-                Você utilizou todas as tentativas desta avaliação.
-              </p>
-            )}
             <div className="flex flex-wrap gap-3">
               {canStart(item) && (
                 <button type="button" onClick={start} className={secondary}>
