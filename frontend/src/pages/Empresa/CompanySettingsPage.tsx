@@ -4,6 +4,7 @@ import { Building2, LogOut, ShieldCheck, UserRound } from 'lucide-react'
 import PageHero from '../../components/ui/PageHero'
 import Input from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
+import Avatar from '../../components/ui/Avatar'
 import { useAuth } from '../../auth/AuthContext'
 import { useCompanySettings, type CompanySettings } from './companySettings'
 import { useCompanyOverview } from './companyOverviewContext'
@@ -24,6 +25,7 @@ export default function CompanySettingsPage() {
   </div>
 }
 function SettingsForm({ section, settings, save }: { section: string; settings: CompanySettings; save: (settings: CompanySettings) => void }) {
+  const { user } = useAuth()
   const [draft, setDraft] = useState(settings)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
@@ -38,6 +40,10 @@ function SettingsForm({ section, settings, save }: { section: string; settings: 
   }
   return <form onSubmit={submit} className="max-w-3xl space-y-5 rounded-[22px] border border-ink-200/70 bg-panel p-5 shadow-card sm:p-6">
     <div><h2 className="text-[17px] font-extrabold text-ink-900">{section === 'dados' ? 'Informações da organização' : 'Responsável pela conta'}</h2><p className="mt-1 text-xs leading-5 text-ink-500">{section === 'dados' ? 'Mantenha os dados de contato atualizados.' : 'Identifique quem acompanha a equipe na plataforma. O e-mail de acesso é exibido apenas para consulta.'}</p></div>
+    {section === 'conta' && <div className="flex items-center gap-4">
+      <Avatar name={draft.contactName} email={user?.email} className="h-20 w-20 text-2xl" />
+      <div className="min-w-0"><p className="truncate text-base font-bold text-ink-900">{draft.contactName}</p><p className="mt-1 text-xs text-ink-500">Empresa / RH</p></div>
+    </div>}
     <div className="grid gap-4 sm:grid-cols-2">{fields.map(({ key, label, type }) => <Input key={key} id={`settings-${key}`} label={label} type={type} tone="dark" required readOnly={key === 'accountEmail'} maxLength={key.includes('Email') ? 254 : 100} value={draft[key]} onChange={event => { setDraft({ ...draft, [key]: event.target.value }); setMessage(''); setError('') }} />)}</div>
     {section === 'conta' && <p className="text-xs text-ink-500">Perfil de acesso: Empresa / RH</p>}
     {error && <p role="alert" className="text-sm text-red-400">{error}</p>}{message && <p role="status" className="text-sm text-brand-cyan-400">{message}</p>}

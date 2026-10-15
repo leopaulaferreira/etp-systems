@@ -253,7 +253,7 @@ export default function ConfiguracoesPage() {
                 <h2 id="settings-title" className="text-lg font-extrabold text-ink-900">Conta</h2>
                 <p className="mt-1 text-xs leading-5 text-ink-500">Atualize os dados exibidos no seu perfil.</p>
                 <div className="mt-5 flex flex-wrap items-center gap-3 rounded-2xl border border-ink-200 bg-panel-alt/60 p-3.5">
-                  <Avatar name={account.name || profile.name} className="h-12 w-12 shrink-0" />
+                  <Avatar name={account.name || profile.name} email={profile.email} className="h-12 w-12 shrink-0" />
                   <div className="min-w-0">
                     <p className="truncate text-sm font-bold text-ink-900">{account.name || profile.name}</p>
                     <p className="truncate text-xs text-ink-500">{account.email || profile.email}</p>

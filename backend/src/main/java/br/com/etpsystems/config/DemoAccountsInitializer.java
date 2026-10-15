@@ -57,7 +57,7 @@ public class DemoAccountsInitializer implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         Empresa empresa = empresas.findFirstByNome(companyName)
                 .orElseGet(() -> empresas.save(new Empresa(companyName, "Empresa do ambiente local do ETP Systems")));
-        createIfMissing("Colaborador ETP", colaboradorEmail, Perfil.COLABORADOR, empresa);
+        createIfMissing("Rafael Martins", colaboradorEmail, Perfil.COLABORADOR, empresa);
         createIfMissing("RH ETP", empresaEmail, Perfil.EMPRESA, empresa);
     }
 

@@ -27,7 +27,7 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
     document.addEventListener('pointerdown', closeOutside)
     return () => document.removeEventListener('pointerdown', closeOutside)
   }, [menuOpen])
-  const { logout, role, companyId } = useAuth()
+  const { logout, role, companyId, user } = useAuth()
   const navigate = useNavigate()
   const { profile } = useProfile()
   const notificationCount = profile.notificationsEnabled ? profile.notificationCount : 0
@@ -108,7 +108,7 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
             onClick={() => setMenuOpen((open) => !open)}
             className="flex items-center gap-3 rounded-xl px-1.5 py-1 transition-colors duration-150 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
           >
-            <Avatar name={displayName} className="h-10 w-10" />
+            <Avatar name={displayName} email={user?.email} className="h-10 w-10" />
             <span className="hidden max-w-40 flex-col items-start text-left leading-tight md:flex">
               <span className="w-full truncate text-sm font-semibold text-ink-900" title={displayName}>{displayName}</span>
               <span className="text-xs text-ink-500">{isCompany ? 'Empresa / RH' : profile.role}</span>

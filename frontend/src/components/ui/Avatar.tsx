@@ -1,6 +1,10 @@
-/** Avatar com iniciais — não há asset de foto de usuário no projeto ainda. */
+import { useState } from 'react'
+import { profilePhoto } from '../../profile/profilePhotos'
+
+/** Foto da conta, com iniciais quando não houver imagem disponível. */
 type AvatarProps = {
   name: string
+  email?: string
   className?: string
 }
 
@@ -11,14 +15,18 @@ function getInitials(name: string) {
   return `${first}${last}`.toUpperCase()
 }
 
-export default function Avatar({ name, className = '' }: AvatarProps) {
+export default function Avatar({ name, email, className = '' }: AvatarProps) {
+  const src = profilePhoto(email)
+  const [failedSrc, setFailedSrc] = useState<string | null>(null)
   return (
     <div
       role="img"
       aria-label={name}
-      className={`flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-blue-600 to-brand-cyan-500 text-sm font-semibold text-white ${className}`}
+      className={`flex shrink-0 overflow-hidden items-center justify-center rounded-full bg-gradient-to-br from-brand-blue-600 to-brand-cyan-500 text-sm font-semibold text-white ${className}`}
     >
-      {getInitials(name)}
+      {src && failedSrc !== src ? (
+        <img src={src} alt="" className="h-full w-full object-cover" onError={() => setFailedSrc(src)} />
+      ) : getInitials(name)}
     </div>
   )
 }

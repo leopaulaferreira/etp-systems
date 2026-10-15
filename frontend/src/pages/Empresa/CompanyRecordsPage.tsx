@@ -37,7 +37,7 @@ export default function CompanyRecordsPage({ kind }: { kind: 'assessments' | 'ce
       </div>
       <ul className="divide-y divide-ink-100 border-t border-ink-100">{visible.map(({ id, employee, course }) => <li key={id}>
         <button onClick={() => setSelectedId(id)} className="flex w-full items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-brand-blue-500/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-blue-400 sm:px-6">
-          <Avatar name={employee.name} className="h-10 w-10 shrink-0" /><span className="min-w-0 flex-1"><span className="block text-sm font-bold text-ink-900">{employee.name}</span><span className="mt-1 block text-xs text-ink-500">{course.title}</span><span className="mt-1 block break-all text-[11px] text-ink-500">{certificates ? course.certificateCode : employee.department ?? 'Área não informada'}</span></span>
+          <Avatar name={employee.name} email={employee.email} className="h-10 w-10 shrink-0" /><span className="min-w-0 flex-1"><span className="block text-sm font-bold text-ink-900">{employee.name}</span><span className="mt-1 block text-xs text-ink-500">{course.title}</span><span className="mt-1 block break-all text-[11px] text-ink-500">{certificates ? course.certificateCode : employee.department ?? 'Área não informada'}</span></span>
           <span className="shrink-0 text-xs font-bold text-brand-cyan-400">{certificates ? <Award className="h-5 w-5" aria-label="Certificado emitido" /> : `${course.score}%`}</span><ChevronRight className="h-4 w-4 shrink-0 text-brand-blue-400" aria-hidden="true" />
         </button>
       </li>)}</ul>

@@ -90,7 +90,7 @@ export default function PerfilPage() {
 
       <section className={`${cardClass} flex flex-col gap-6 xl:flex-row xl:items-stretch`} aria-label="Resumo do perfil">
         <div className="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-start">
-          <Avatar name={profile.name} className="h-20 w-20 text-2xl sm:h-24 sm:w-24" />
+          <Avatar name={profile.name} email={profile.email} className="h-20 w-20 text-2xl sm:h-24 sm:w-24" />
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2"><h2 className="text-xl font-extrabold text-ink-900">{profile.name}</h2><span className="rounded-md bg-brand-blue-500/15 px-2 py-0.5 text-xs font-bold text-brand-blue-400">{profile.role}</span></div>
             <div className="mt-3 flex flex-col gap-2 text-xs text-ink-500">

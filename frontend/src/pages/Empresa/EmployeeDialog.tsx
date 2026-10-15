@@ -8,7 +8,7 @@ export default function EmployeeDialog({ employee, onClose }: { employee: Employ
   return (
     <CertificateDialog title="Resumo do colaborador" onClose={onClose}>
       <div className="flex items-center gap-4">
-        <Avatar name={employee.name} className="h-14 w-14 text-lg" />
+        <Avatar name={employee.name} email={employee.email} className="h-14 w-14 text-lg" />
         <div className="min-w-0"><h3 className="text-lg font-extrabold">{employee.name}</h3><p className="mt-1 text-xs text-brand-blue-400">{employee.department ?? 'Área não informada'}</p><p className="mt-2 flex items-center gap-1.5 break-all text-xs text-ink-500"><Mail className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />{employee.email}</p></div>
       </div>
       <dl className="grid grid-cols-3 gap-2 rounded-2xl border border-ink-200 bg-panel-alt/50 p-4 text-center">
