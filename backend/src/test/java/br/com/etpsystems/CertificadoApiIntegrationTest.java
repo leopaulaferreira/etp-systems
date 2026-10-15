@@ -16,6 +16,8 @@ import br.com.etpsystems.user.Usuario;
 import br.com.etpsystems.user.UsuarioRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,12 +41,15 @@ class CertificadoApiIntegrationTest {
     @Autowired private PasswordEncoder passwords;
     @Autowired private JdbcTemplate jdbc;
 
-    @Test
-    void issuesOnceAfterApprovalAndOnlyOwnerCanRead() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"Fundamentos de Segurança da Informação", "Computação em Nuvem: Conceitos e Aplicações",
+            "LGPD na Prática", "Introdução à Inteligência Artificial", "Gestão de Projetos Ágeis com Scrum",
+            "Cloud Computing Essencial"})
+    void issuesOnceAfterApprovalAndOnlyOwnerCanRead(String courseTitle) throws Exception {
         usuarios.save(new Usuario("Titular", ownerEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
         usuarios.save(new Usuario("Outra pessoa", otherEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
         UUID courseId = cursos.findAllByOrderByOrdemExibicaoAscTituloAsc().stream()
-                .filter(course -> course.getTitulo().equals("Fundamentos de Segurança da Informação"))
+                .filter(course -> course.getTitulo().equals(courseTitle))
                 .findFirst().orElseThrow().getId();
         try (HttpClient client = HttpClient.newHttpClient()) {
             String owner = login(client, ownerEmail);
@@ -74,17 +79,22 @@ class CertificadoApiIntegrationTest {
                     WHERE q.avaliacao_id = ? AND o.correta = TRUE ORDER BY q.ordem
                     """, (rs, row) -> Map.of("questaoId", rs.getString("question_id"),
                     "alternativaId", rs.getString("option_id")), assessmentId);
-            assertThat(answers).hasSize(5);
+            int count = assessment.path("questions").size();
+            assertThat(answers).hasSize(count);
+            int minimumRight = (int) Math.ceil(count * 0.8);
+            var wrong = answers(assessmentId, false);
+            for (int index = minimumRight; index < count; index++) answers.set(index, wrong.get(index));
             HttpResponse<String> result = post(client, "/api/colaborador/avaliacoes/" + assessmentId + "/tentativas",
                     owner, JSON.writeValueAsString(Map.of("respostas", answers)));
             assertThat(result.statusCode()).isEqualTo(200);
             assertThat(JSON.readTree(result.body()).path("attempts").get(0).path("passed").asBoolean()).isTrue();
+            assertThat(JSON.readTree(result.body()).path("attempts").get(0).path("score").asInt()).isEqualTo((int) Math.round(minimumRight * 100.0 / count));
             JsonNode issued = JSON.readTree(get(client, base, owner).body());
             assertThat(issued.size()).isEqualTo(1);
             String id = issued.get(0).path("id").asText();
             String code = issued.get(0).path("code").asText();
             assertThat(code).startsWith("ETP-").hasSize(36);
-            assertThat(issued.get(0).path("title").asText()).isEqualTo("Fundamentos de Segurança da Informação");
+            assertThat(issued.get(0).path("title").asText()).isEqualTo(courseTitle);
             assertThat(issued.get(0).path("holderName").asText()).isEqualTo("Titular");
             assertThat(issued.get(0).path("courseId").asText()).isEqualTo(courseId.toString());
             assertThat(issued.get(0).path("issuedAt").asText()).isNotEmpty();
@@ -115,10 +125,121 @@ class CertificadoApiIntegrationTest {
     }
 
     @Test
-    void lgpdRemainsPendingUntilContentIsFinished() {
+    void manualCompletionAndFailedAttemptsDoNotIssueCertificate() throws Exception {
+        usuarios.save(new Usuario("Titular", ownerEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
+        UUID courseId = cursos.findAllByOrderByOrdemExibicaoAscTituloAsc().stream()
+                .filter(course -> course.getTitulo().equals("Fundamentos de Segurança da Informação"))
+                .findFirst().orElseThrow().getId();
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            String token = login(client, ownerEmail);
+            assertThat(post(client, "/api/colaborador/inscricoes/cursos/" + courseId, token, null)
+                    .statusCode()).isEqualTo(200);
+            assertThat(put(client, "/api/colaborador/meus-cursos/" + courseId + "/progresso", token,
+                    "{\"percentual\":100}").statusCode()).isEqualTo(200);
+            assertThat(JSON.readTree(get(client, "/api/colaborador/certificados", token).body()).size()).isZero();
+            JsonNode assessment = JSON.readTree(get(client, "/api/colaborador/avaliacoes", token).body()).get(0);
+            String id = assessment.path("id").asText();
+            String path = "/api/colaborador/avaliacoes/" + id + "/tentativas";
+            String wrong = JSON.writeValueAsString(Map.of("respostas", answers(id, false)));
+            for (int attempt = 0; attempt < 2; attempt++) {
+                var result = post(client, path, token, wrong);
+                assertThat(result.statusCode()).isEqualTo(200);
+                JsonNode recorded = JSON.readTree(result.body()).path("attempts").get(attempt);
+                assertThat(recorded.path("passed").asBoolean()).isFalse();
+                assertThat(recorded.path("score").asInt()).isZero();
+            }
+            assertThat(post(client, path, token, JSON.writeValueAsString(Map.of("respostas", answers(id, true))))
+                    .statusCode()).isEqualTo(409);
+            assertThat(JSON.readTree(get(client, "/api/colaborador/certificados", token).body()).size()).isZero();
+        }
+    }
+
+    @Test
+    void simultaneousPassingSubmissionsIssueOnlyOneCertificate() throws Exception {
+        usuarios.save(new Usuario("Titular", ownerEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
+        UUID courseId = cursos.findAllByOrderByOrdemExibicaoAscTituloAsc().stream()
+                .filter(course -> course.getTitulo().equals("Fundamentos de Segurança da Informação"))
+                .findFirst().orElseThrow().getId();
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            String token = login(client, ownerEmail);
+            assertThat(post(client, "/api/colaborador/inscricoes/cursos/" + courseId, token, null)
+                    .statusCode()).isEqualTo(200);
+            JsonNode assessment = JSON.readTree(get(client, "/api/colaborador/avaliacoes", token).body()).get(0);
+            String id = assessment.path("id").asText();
+            var request = HttpRequest.newBuilder(uri("/api/colaborador/avaliacoes/" + id + "/tentativas"))
+                    .header("Authorization", "Bearer " + token).header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(JSON.writeValueAsString(Map.of("respostas", answers(id, true)))))
+                    .build();
+            var first = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+            var second = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+            assertThat(List.of(first.get(20, java.util.concurrent.TimeUnit.SECONDS).statusCode(),
+                    second.get(20, java.util.concurrent.TimeUnit.SECONDS).statusCode()))
+                    .containsExactlyInAnyOrder(200, 409);
+            assertThat(JSON.readTree(get(client, "/api/colaborador/certificados", token).body()).size()).isEqualTo(1);
+            assertThat(JSON.readTree(get(client, "/api/colaborador/avaliacoes", token).body())
+                    .get(0).path("attempts").size()).isEqualTo(1);
+        }
+    }
+
+    private List<Map<String, String>> answers(String assessmentId, boolean correct) {
+        return jdbc.query("""
+                SELECT q.id AS question_id, MIN(o.id) AS option_id FROM questoes q
+                JOIN alternativas o ON o.questao_id = q.id
+                WHERE q.avaliacao_id = ? AND o.correta = ? GROUP BY q.id, q.ordem ORDER BY q.ordem
+                """, (rs, row) -> Map.of("questaoId", rs.getString("question_id"),
+                "alternativaId", rs.getString("option_id")), assessmentId, correct);
+    }
+
+    @Test
+    void coursesWithoutPublishedAssessmentRemainDisabled() {
         assertThat(cursos.findAllByOrderByOrdemExibicaoAscTituloAsc().stream()
-                .filter(course -> course.getTitulo().equals("LGPD na Prática"))
+                .filter(course -> course.getTitulo().equals("Python para Análise de Dados"))
                 .findFirst().orElseThrow().isCertificacaoHabilitada()).isFalse();
+    }
+
+    @Test
+    @org.springframework.transaction.annotation.Transactional
+    void migrationRecoversPastApprovalsAndProgressWithoutDuplicatingCertificates() {
+        var owner = usuarios.saveAndFlush(new Usuario("Titular", ownerEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
+        var other = usuarios.saveAndFlush(new Usuario("Outro", otherEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
+        String ownerId = owner.getId().toString();
+        String otherId = other.getId().toString();
+        String lgpdId = jdbc.queryForObject("SELECT id FROM cursos WHERE titulo = 'LGPD na Prática'", String.class);
+        String cloudId = jdbc.queryForObject("SELECT id FROM cursos WHERE titulo = 'Cloud Computing Essencial'", String.class);
+        for (String courseId : List.of(lgpdId, cloudId)) {
+            jdbc.update("""
+                    INSERT INTO tentativas_avaliacao (id, avaliacao_id, usuario_id, nota, aprovado, concluido_em)
+                    SELECT UUID(), id, ?, 100, TRUE, '2026-10-01 12:00:00' FROM avaliacoes WHERE curso_id = ?
+                    """, ownerId, courseId);
+        }
+        jdbc.update("""
+                INSERT INTO tentativas_avaliacao (id, avaliacao_id, usuario_id, nota, aprovado, concluido_em)
+                SELECT UUID(), id, ?, 100, TRUE, '2026-10-02 12:00:00' FROM avaliacoes WHERE curso_id = ?
+                """, ownerId, lgpdId);
+        jdbc.update("""
+                INSERT INTO tentativas_avaliacao (id, avaliacao_id, usuario_id, nota, aprovado, concluido_em)
+                SELECT UUID(), id, ?, 0, FALSE, '2026-10-01 12:00:00' FROM avaliacoes WHERE curso_id = ?
+                """, otherId, lgpdId);
+        jdbc.update("""
+                INSERT INTO progresso_cursos (id, usuario_id, curso_id, percentual_progresso, concluido)
+                VALUES (UUID(), ?, ?, 40, FALSE)
+                """, ownerId, lgpdId);
+        var migration = new org.springframework.jdbc.datasource.init.ResourceDatabasePopulator(
+                new org.springframework.core.io.ClassPathResource("db/migration/V24__enable_completed_course_certificates.sql"));
+        migration.execute(java.util.Objects.requireNonNull(jdbc.getDataSource()));
+        var issued = jdbc.queryForList("SELECT id, codigo, emitido_em FROM certificados WHERE usuario_id = ? ORDER BY curso_id", ownerId);
+        assertThat(issued).hasSize(2);
+        assertThat(jdbc.queryForList("""
+                SELECT DATE_FORMAT(emitido_em, '%Y-%m-%d %H:%i:%s') FROM certificados WHERE usuario_id = ?
+                """, String.class, ownerId)).containsOnly("2026-10-01 12:00:00");
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM certificados WHERE usuario_id = ?", Integer.class, otherId)).isZero();
+        assertThat(jdbc.queryForList("""
+                SELECT percentual_progresso FROM progresso_cursos
+                WHERE usuario_id = ? AND concluido = TRUE AND concluido_em IS NOT NULL
+                """, Integer.class, ownerId)).containsExactlyInAnyOrder(100, 100);
+        migration.execute(jdbc.getDataSource());
+        assertThat(jdbc.queryForList("SELECT id, codigo, emitido_em FROM certificados WHERE usuario_id = ? ORDER BY curso_id", ownerId))
+                .isEqualTo(issued);
     }
 
     @AfterEach

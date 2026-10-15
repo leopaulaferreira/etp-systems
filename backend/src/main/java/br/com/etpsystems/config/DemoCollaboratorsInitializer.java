@@ -56,7 +56,7 @@ public class DemoCollaboratorsInitializer implements ApplicationRunner {
             new ColaboradorDemo("Diego Alves", "diego.alves", "Tecnologia", List.of(
                     new CursoDemo(PYTHON, 0, null), new CursoDemo(SEGURANCA, 0, null))),
             new ColaboradorDemo("Fernanda Oliveira", "fernanda.oliveira", "Financeiro", List.of(
-                    new CursoDemo(LGPD, 100, 80), new CursoDemo(COMUNICACAO, 35, null))),
+                    new CursoDemo(LGPD, 100, 83), new CursoDemo(COMUNICACAO, 35, null))),
             new ColaboradorDemo("Gabriel Santos", "gabriel.santos", "Operações", List.of(
                     new CursoDemo(SEGURANCA, 100, null))),
             new ColaboradorDemo("Helena Ribeiro", "helena.ribeiro", "Financeiro", List.of(
@@ -143,10 +143,13 @@ public class DemoCollaboratorsInitializer implements ApplicationRunner {
 
     private EnviarTentativaRequest respostasParaNota(Avaliacao avaliacao, int nota) {
         List<Questao> questoes = avaliacao.getQuestoes();
-        if (questoes.isEmpty() || nota < 0 || nota > 100 || nota * questoes.size() % 100 != 0) {
+        if (questoes.isEmpty() || nota < 0 || nota > 100) {
             throw new IllegalStateException("Nota de demonstração incompatível com a avaliação");
         }
-        int acertos = nota * questoes.size() / 100;
+        int acertos = (int) Math.round(nota * questoes.size() / 100.0);
+        if (Math.round(acertos * 100.0 / questoes.size()) != nota) {
+            throw new IllegalStateException("Nota de demonstração incompatível com a avaliação");
+        }
         List<EnviarTentativaRequest.RespostaRequest> respostas = new ArrayList<>();
         for (int indice = 0; indice < questoes.size(); indice++) {
             var questao = questoes.get(indice);

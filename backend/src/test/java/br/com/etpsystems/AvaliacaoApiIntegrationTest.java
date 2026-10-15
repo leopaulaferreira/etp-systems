@@ -365,13 +365,16 @@ class AvaliacaoApiIntegrationTest {
 
             post(client, "/api/colaborador/inscricoes/cursos/" + courseId, firstToken, null);
             JsonNode lesson = JSON.readTree(get(client, "/api/colaborador/cursos/" + courseId + "/aulas", firstToken).body());
-            assertThat(lesson.size()).isEqualTo(2);
+            assertThat(lesson.size()).isEqualTo(3);
             assertThat(lesson.get(0).path("title").asText()).isEqualTo("Introdução à LGPD e Proteção de Dados");
             assertThat(lesson.get(0).path("content").asText()).isEmpty();
             assertThat(lesson.get(0).path("videoUrl").asText()).isEqualTo("/videos/lgpd-aula-1.mp4");
             assertThat(lesson.get(1).path("title").asText()).isEqualTo("Boas práticas no ambiente corporativo");
             assertThat(lesson.get(1).path("content").asText()).isEmpty();
             assertThat(lesson.get(1).path("videoUrl").asText()).isEqualTo("/videos/lgpd-aula-2.mp4");
+            assertThat(lesson.get(2).path("order").asInt()).isEqualTo(3);
+            assertThat(lesson.get(2).path("title").asText()).isEqualTo("LGPD na Prática: Prevenção e Resposta a Incidentes");
+            assertThat(lesson.get(2).path("videoUrl").asText()).isEqualTo("/videos/lgpd-aula-3.mp4");
             assertThat(get(client, "/api/colaborador/cursos/" + courseId + "/aulas", otherToken).statusCode())
                     .isEqualTo(404);
 

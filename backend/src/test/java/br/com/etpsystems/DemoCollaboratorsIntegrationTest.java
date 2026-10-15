@@ -64,9 +64,13 @@ class DemoCollaboratorsIntegrationTest {
         assertThat(ana.getSenhaHash()).startsWith("$2");
         assertThat(ana.getEmpresa().getId()).isEqualTo(empresa.getId());
 
-        assertCounts(empresa, 8, 16, 12, 2, 0);
+        assertCounts(empresa, 8, 16, 12, 2, 2);
+        assertThat(jdbc.queryForList("""
+                SELECT t.nota FROM tentativas_avaliacao t JOIN usuarios u ON u.id = t.usuario_id
+                WHERE u.empresa_id = ? AND u.login_habilitado = FALSE ORDER BY t.nota
+                """, Integer.class, empresa.getId().toString())).containsExactly(83, 100);
         initializer.run(new DefaultApplicationArguments(new String[0]));
-        assertCounts(empresa, 8, 16, 12, 2, 0);
+        assertCounts(empresa, 8, 16, 12, 2, 2);
         for (String email : EMAILS) {
             Usuario colaborador = usuarios.findByEmailIgnoreCase(email).orElseThrow();
             assertThat(colaborador.isLoginHabilitado()).isFalse();

@@ -189,7 +189,7 @@ O módulo de avaliações permite:
 - feedback das respostas;
 - indicadores de desempenho.
 
-As tentativas e notas são registradas no backend. LGPD na Prática tem duas
+As tentativas e notas são registradas no backend. LGPD na Prática tem três
 videoaulas; Introdução à Inteligência Artificial tem três videoaulas e uma
 avaliação de seis questões. Gestão de Projetos Ágeis com Scrum tem três videoaulas
 e 18 questões, divididas em seis por aula. Cloud Computing Essencial também tem três videoaulas e 18 questões, com seis por aula. Segurança da Informação e Computação
@@ -202,8 +202,9 @@ colaborador.
 
 Certificados são emitidos após aprovação em avaliações de cursos habilitados,
 com código único e consulta na API. A página de Certificados mostra os documentos
-emitidos e permite baixar PDF. LGPD na Prática aguarda a terceira videoaula e a
-revisão das questões antes de habilitar a emissão.
+emitidos e permite baixar PDF. LGPD, IA, Scrum e Cloud Computing Essencial
+também emitem certificados após aprovação. Aprovações anteriores foram recuperadas,
+preservando a primeira data de aprovação e concluindo o progresso do curso.
 
 O Perfil consulta cursos em andamento, avaliações e certificados da conta autenticada.
 Os dados editáveis do colaborador são carregados e salvos na API; e-mail e empresa
