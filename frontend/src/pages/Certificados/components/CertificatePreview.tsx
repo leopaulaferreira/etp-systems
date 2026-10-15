@@ -36,7 +36,7 @@ export default function CertificatePreview({
         <img src={symbol} alt="" className={compact ? 'h-3 w-3' : 'h-5 w-5'} /> ETP Systems
       </span>
       <span
-        className={`border-b border-current pb-1 font-bold ${compact ? 'text-[5px]' : 'text-sm'}`}
+        className={`max-w-full break-words border-b border-current pb-1 font-bold ${compact ? 'text-[5px]' : 'text-sm'}`}
       >
         {item.holderName ?? profile.name}
       </span>

@@ -17,7 +17,7 @@ const lessonNavPrimary = 'inline-flex min-h-11 w-full items-center justify-cente
 function VideoSlot({ lesson }: { lesson: Lesson }) {
   const localVideo = lesson.videoUrl && /^\/videos\/[a-z0-9/_-]+\.mp4$/i.test(lesson.videoUrl)
   const embedVideo = lesson.videoUrl && /^https:\/\/www\.youtube-nocookie\.com\/embed\/[a-z0-9_-]{11}$/i.test(lesson.videoUrl)
-  if (localVideo) return <video controls preload="metadata" className="aspect-video w-full rounded-2xl bg-navy-950" aria-label={`Vídeo da aula ${lesson.title}`} src={lesson.videoUrl ?? undefined} />
+  if (localVideo) return <video controls playsInline preload="metadata" className="aspect-video w-full rounded-2xl bg-navy-950" aria-label={`Vídeo da aula ${lesson.title}`} src={lesson.videoUrl ?? undefined} />
   if (embedVideo) return <iframe title={`Vídeo da aula ${lesson.title}`} src={lesson.videoUrl ?? undefined} allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="aspect-video w-full rounded-2xl border-0 bg-navy-950" />
   return <div className="relative flex aspect-video flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl border border-brand-blue-400/15 bg-[radial-gradient(circle_at_50%_40%,rgba(41,104,181,0.18),transparent_55%),linear-gradient(130deg,#13233e,#0b1629)] px-6 text-center">
     <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,.025)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,.025)_1px,transparent_1px)] bg-[size:34px_34px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />

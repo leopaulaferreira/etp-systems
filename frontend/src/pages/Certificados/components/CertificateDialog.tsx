@@ -46,10 +46,10 @@ export default function CertificateDialog({
           first?.focus()
         }
       }}
-      className="fixed inset-0 m-auto max-h-[85svh] w-[calc(100%-2rem)] max-w-3xl overflow-y-auto rounded-[22px] border border-ink-200 bg-panel p-0 text-ink-900 shadow-card backdrop:bg-navy-950/80 backdrop:backdrop-blur-sm"
+      className="fixed inset-0 m-auto max-h-[85svh] w-[calc(100%-2rem)] max-w-3xl overflow-y-auto scroll-pt-24 sm:scroll-pt-28 rounded-[22px] border border-ink-200 bg-panel p-0 text-ink-900 shadow-card backdrop:bg-navy-950/80 backdrop:backdrop-blur-sm"
     >
       <div className="flex flex-col gap-5 p-5 sm:p-8">
-        <div className="flex items-center justify-between gap-4">
+        <div className="sticky top-0 z-10 -mx-5 -mt-5 flex items-center justify-between gap-4 bg-panel px-5 pb-3 pt-5 sm:-mx-8 sm:-mt-8 sm:px-8 sm:pt-8">
           <h2 id="certificate-dialog-title" className="text-xl font-extrabold tracking-tight">
             {title}
           </h2>
@@ -57,7 +57,7 @@ export default function CertificateDialog({
             type="button"
             onClick={onClose}
             aria-label="Fechar diálogo"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-ink-500 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-ink-500 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>

@@ -106,3 +106,7 @@ ambos os perfis, senha incorreta, recarga, logout, expiração, falha de rede e 
 - [x] **Relatórios** — indicadores individuais calculados dos registros reais
 
 Login, catálogo, inscrições, progresso, avaliações, certificados, Dashboard, Empresa, Trilhas, Relatórios e Perfil usam a API real. Os arquivos de exemplo usados por testes ficam em `tests/fixtures/`.
+
+## Verificação em telas pequenas
+
+`npm run test:mobile` verifica menus, aulas, avaliações e certificados em cinco tamanhos de tela. Na primeira execução, instale o navegador com `npx playwright install chromium`. Consulte [os cenários e limites da revisão](tests/browser/README.md).

@@ -28,3 +28,14 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+/* Mantém os controles fora da área do indicador de início em celulares. */
+@media (max-width: 1023px) {
+  .app-content {
+    padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+  }
+  .app-sidebar {
+    padding-top: max(1.5rem, env(safe-area-inset-top));
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+}

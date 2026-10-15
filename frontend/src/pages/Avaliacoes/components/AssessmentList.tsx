@@ -31,7 +31,7 @@ function AssessmentAction({
       type="button"
       onClick={() => onOpen(item)}
       aria-label={`${actionLabels[item.status]}: ${item.title}`}
-      className={`inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-[11px] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 ${item.status === 'pending' || item.status === 'in_progress' ? 'bg-brand-blue-700 text-white hover:bg-brand-blue-600' : 'border border-ink-200 bg-panel-alt text-brand-blue-400 hover:bg-brand-blue-500/10'}`}
+      className={`inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-[11px] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 ${item.status === 'pending' || item.status === 'in_progress' ? 'bg-brand-blue-700 text-white hover:bg-brand-blue-600' : 'border border-ink-200 bg-panel-alt text-brand-blue-400 hover:bg-brand-blue-500/10'}`}
     >
       {actionLabels[item.status]}
       <ArrowRight className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
@@ -167,10 +167,10 @@ export default function AssessmentList({ items, total, onOpen, onReset }: Assess
           {total ? <button
             type="button"
             onClick={onReset}
-            className="mt-1 min-h-10 rounded-xl bg-brand-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"
+            className="mt-1 min-h-11 rounded-xl bg-brand-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"
           >
             Ver todas as avaliações
-          </button> : <Link to="/cursos" className="mt-1 inline-flex min-h-10 items-center rounded-xl bg-brand-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Explorar cursos</Link>}
+          </button> : <Link to="/cursos" className="mt-1 inline-flex min-h-11 items-center rounded-xl bg-brand-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Explorar cursos</Link>}
         </div>
       )}
     </section>

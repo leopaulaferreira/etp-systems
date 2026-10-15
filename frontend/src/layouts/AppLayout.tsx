@@ -56,7 +56,7 @@ export default function AppLayout() {
   }, [drawerOpen])
 
   return (
-    <CompanyOverviewProvider><div className="app-shell flex h-[100svh] min-h-0 w-full overflow-hidden bg-surface">
+    <CompanyOverviewProvider><div className="app-shell flex h-[100dvh] min-h-0 w-full overflow-hidden bg-surface">
       {drawerOpen && (
         <button
           type="button"
@@ -75,7 +75,7 @@ export default function AppLayout() {
         aria-modal={drawerOpen ? true : undefined}
         aria-label="Navegação principal"
         tabIndex={-1}
-        className={`fixed inset-y-0 left-0 z-50 w-[268px] shrink-0 transform transition-transform duration-200 ease-out focus:outline-none lg:static lg:z-auto lg:translate-x-0 lg:transition-none ${
+        className={`fixed inset-y-0 left-0 z-50 w-[268px] max-w-[calc(100vw-2rem)] shrink-0 transform transition-transform duration-200 ease-out focus:outline-none lg:static lg:z-auto lg:translate-x-0 lg:transition-none ${
           drawerOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -84,8 +84,8 @@ export default function AppLayout() {
 
       <div inert={drawerOpen && !isDesktop} className="flex min-w-0 flex-1 flex-col">
         <Topbar isMenuOpen={drawerOpen} onOpenMenu={() => setDrawerOpen(true)} />
-        <main className="app-scrollarea min-w-0 flex-1 overflow-y-auto">
-          <div className="mx-auto flex max-w-[1440px] flex-col gap-5 px-4 py-5 sm:px-7 sm:py-7 lg:px-9">
+        <main className="app-scrollarea min-h-0 min-w-0 flex-1 overflow-y-auto">
+          <div className="app-content mx-auto flex max-w-[1440px] flex-col gap-5 px-4 py-5 sm:px-7 sm:py-7 lg:px-9">
             <Outlet />
           </div>
         </main>

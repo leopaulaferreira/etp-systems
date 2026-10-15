@@ -5,7 +5,7 @@ import { formatCertificateDate } from '../certificates'
 import CertificatePreview from './CertificatePreview'
 
 export const certificateButton =
-  'inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-ink-200 px-4 py-2.5 text-xs font-bold text-brand-blue-400 transition-colors hover:bg-brand-blue-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400'
+  'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-ink-200 px-4 py-2.5 text-xs font-bold text-brand-blue-400 transition-colors hover:bg-brand-blue-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400'
 
 export function CertificateBadge({ item }: { item: Certificate }) {
   return (
@@ -52,7 +52,7 @@ export default function CertificateDetails({
           )}
         </div>
         {item.status === 'completed' ? (
-          <div className="flex flex-wrap gap-2 pt-1">
+          <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap">
             <button type="button" onClick={() => onDownload(item)} className={certificateButton}>
               <Download className="h-4 w-4" aria-hidden="true" />
               Baixar PDF

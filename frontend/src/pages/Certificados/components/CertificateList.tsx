@@ -6,7 +6,7 @@ import { CertificateBadge, certificateButton } from './CertificateDetails'
 import CertificatePreview from './CertificatePreview'
 
 const selectClass =
-  'min-h-10 min-w-0 rounded-xl border border-ink-200 bg-panel-alt px-3 py-2 text-xs font-semibold text-ink-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400'
+  'min-h-11 min-w-0 rounded-xl border border-ink-200 bg-panel-alt px-3 py-2 text-base sm:text-xs font-semibold text-ink-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400'
 
 type Props = {
   items: Certificate[]
@@ -34,7 +34,7 @@ export function CertificateToolbar({
           placeholder="Buscar certificado..."
           value={filters.query}
           onChange={(event) => onChange({ query: event.target.value })}
-          className="min-h-10 min-w-0 w-full bg-transparent text-xs text-ink-900 outline-none placeholder:text-ink-500"
+          className="min-h-11 min-w-0 w-full bg-transparent text-base sm:text-xs text-ink-900 outline-none placeholder:text-ink-500"
         />
       </label>
       <label className="flex min-w-0 basis-full flex-col gap-1.5 text-[11px] font-semibold text-ink-500 sm:basis-auto sm:flex-none">
@@ -99,7 +99,7 @@ export default function CertificateList({
             {items.length} {items.length === 1 ? 'resultado' : 'resultados'}
           </span>
         </div>
-        <label className="flex items-center gap-2 text-[11px] text-ink-500">
+        <label className="flex w-full min-w-0 flex-col items-start gap-2 text-[11px] sm:w-auto sm:flex-row sm:items-center text-ink-500">
           Ordenar por
           <select
             value={filters.order}
@@ -158,7 +158,7 @@ export default function CertificateList({
                     ? 'Baixar PDF'
                     : 'Disponível após aprovação e liberação do curso'
                 }
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-ink-200 text-ink-500 hover:bg-brand-blue-500/10 hover:text-brand-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 disabled:cursor-not-allowed disabled:opacity-30"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-ink-200 text-ink-500 hover:bg-brand-blue-500/10 hover:text-brand-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400 disabled:cursor-not-allowed disabled:opacity-30"
               >
                 <Download className="h-4 w-4" aria-hidden="true" />
               </button>

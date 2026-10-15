@@ -8,7 +8,7 @@ type AssessmentFiltersProps = {
   onReset: () => void
 }
 const selectClass =
-  'min-h-10 w-full min-w-0 rounded-xl border border-ink-200 bg-panel-alt px-2.5 py-2 text-xs font-semibold text-ink-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400'
+  'min-h-11 w-full min-w-0 rounded-xl border border-ink-200 bg-panel-alt px-2.5 py-2 text-base sm:text-xs font-semibold text-ink-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400'
 
 export default function AssessmentFilters({ filters, onChange, onReset }: AssessmentFiltersProps) {
   const active =
@@ -27,7 +27,7 @@ export default function AssessmentFilters({ filters, onChange, onReset }: Assess
           onChange={(event) => onChange({ query: event.target.value })}
           aria-label="Buscar avaliações"
           placeholder="Buscar avaliação ou curso..."
-          className="min-w-0 flex-1 bg-transparent py-2.5 text-sm text-ink-900 outline-none placeholder:text-ink-500"
+          className="min-w-0 flex-1 bg-transparent py-2.5 text-base sm:text-sm text-ink-900 outline-none placeholder:text-ink-500"
         />
       </div>
       <div className="sm:w-56">
@@ -52,7 +52,7 @@ export default function AssessmentFilters({ filters, onChange, onReset }: Assess
         <button
           type="button"
           onClick={onReset}
-          className="flex min-h-9 items-center gap-1.5 self-start rounded-lg px-2 text-xs font-bold text-brand-blue-400 hover:bg-brand-blue-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"
+          className="flex min-h-11 items-center gap-1.5 self-start rounded-lg px-2 text-xs font-bold text-brand-blue-400 hover:bg-brand-blue-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"
         >
           <X className="h-3.5 w-3.5" aria-hidden="true" />
           Limpar filtros

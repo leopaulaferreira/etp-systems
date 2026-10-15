@@ -51,7 +51,7 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
         aria-controls="app-sidebar-drawer"
         aria-expanded={isMenuOpen}
         onClick={onOpenMenu}
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-ink-500 transition-colors duration-150 hover:bg-ink-100 hover:text-ink-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30 lg:hidden"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-ink-500 transition-colors duration-150 hover:bg-ink-100 hover:text-ink-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30 lg:hidden"
       >
         <Menu className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
       </button>
@@ -68,7 +68,7 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           aria-label="Buscar cursos"
-          className="w-full min-w-0 bg-transparent text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none"
+          className="w-full min-w-0 bg-transparent text-base sm:text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none"
         />
       </form>}
 
@@ -77,7 +77,7 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
           type="button"
           aria-label={`Notificações (${notificationCount} não lidas)`}
           onClick={() => navigate('/configuracoes?secao=notificacoes')}
-          className="relative flex h-10 w-10 items-center justify-center rounded-full text-ink-500 transition-colors duration-150 hover:bg-ink-100 hover:text-ink-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
+          className="relative flex h-11 w-11 items-center justify-center rounded-full text-ink-500 transition-colors duration-150 hover:bg-ink-100 hover:text-ink-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
         >
           <Bell className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
           {notificationCount > 0 && (
@@ -133,7 +133,7 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
                   setMenuOpen(false)
                   navigate(isCompany ? '/empresa/configuracoes/conta' : '/perfil')
                 }}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-ink-700 transition-colors duration-150 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
+                className="flex min-h-11 w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-ink-700 transition-colors duration-150 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
               >
                 <UserRound className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
                 {isCompany ? 'Minha conta' : 'Meu perfil'}
@@ -141,7 +141,7 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
               <button
                 type="button"
                 onClick={handleLogout}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-ink-700 transition-colors duration-150 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
+                className="flex min-h-11 w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-ink-700 transition-colors duration-150 hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500/30"
               >
                 <LogOut className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
                 Sair
