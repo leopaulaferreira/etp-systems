@@ -93,12 +93,103 @@
 .login-brand-copy h1 { margin-top: 22px; max-width: 560px; font-size: clamp(40px, 3.7vw, 54px); font-weight: 650; line-height: 1.1; letter-spacing: -.045em; text-wrap: balance; }
 .login-brand-copy h1 > span { color: var(--color-brand-blue-400); }
 .login-brand-copy > p { max-width: 425px; margin-top: 22px; color: var(--color-ink-500); font-size: 14px; line-height: 1.85; }
-.login-illustration { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 490px; height: 240px; margin: 20px 0 24px; pointer-events: none; }
-.login-mark-frame { position: relative; display: grid; place-items: center; width: 186px; height: 186px; border: 1px solid color-mix(in srgb, white 19%, transparent); border-radius: 30px; background: linear-gradient(145deg, color-mix(in srgb, white 9%, transparent), color-mix(in srgb, var(--color-brand-blue-500) 8%, var(--color-panel)) 65%); box-shadow: inset 1px 1px 0 color-mix(in srgb, white 9%, transparent), 14px 22px 45px -18px rgb(0 0 0 / .65), -12px -8px 35px -24px var(--color-brand-cyan-400); transform: perspective(700px) rotateY(-14deg) rotateZ(-9deg); }
-.login-illustration img { position: relative; width: 140px; height: 140px; }
-.login-mark-edge { position: absolute; left: 30px; right: 30px; top: 0; height: 1px; background: linear-gradient(90deg, transparent, color-mix(in srgb, white 65%, transparent), transparent); }
-.login-mark-halo { position: absolute; width: 300px; height: 220px; border-radius: 50%; background: radial-gradient(ellipse, color-mix(in srgb, var(--color-brand-blue-500) 17%, transparent), transparent 70%); }
-.login-mark-base { position: absolute; bottom: 5px; width: 270px; height: 30px; border-radius: 50%; background: radial-gradient(ellipse, color-mix(in srgb, var(--color-brand-cyan-400) 14%, transparent), transparent 70%); }
+.login-illustration {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 490px;
+  height: 240px;
+  margin: 20px 0 24px;
+}
+.login-mark-frame {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  width: 186px;
+  height: 186px;
+  border: 1px solid color-mix(in srgb, var(--color-ink-700) 26%, transparent);
+  border-radius: 32px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, white 9%, transparent), transparent 44%),
+    linear-gradient(155deg, var(--color-panel-alt), var(--color-panel));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / .13),
+    inset 0 -2px 0 rgb(0 0 0 / .24),
+    3px 4px 0 -1px var(--color-surface-alt),
+    12px 24px 36px -18px rgb(0 0 0 / .7),
+    -10px -8px 36px -24px var(--color-brand-cyan-400);
+  transform: perspective(700px) rotateX(3deg) rotateY(-14deg) rotateZ(-9deg);
+  transition: transform 600ms cubic-bezier(.22, 1, .36, 1), border-color 400ms, box-shadow 400ms;
+}
+.login-mark-frame::before,
+.login-mark-frame::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.login-mark-frame::before {
+  inset: 7px;
+  border: 1px solid rgb(255 255 255 / .045);
+  border-radius: 25px;
+}
+.login-mark-frame::after {
+  inset: 0;
+  z-index: 2;
+  background: radial-gradient(circle at var(--mark-light-x, 30%) var(--mark-light-y, 15%), rgb(255 255 255 / .13), transparent 65%);
+  opacity: .4;
+  transition: opacity 400ms;
+}
+.login-illustration img {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  pointer-events: none;
+  filter: drop-shadow(2px 7px 5px rgb(0 0 0 / .22));
+  transition: transform 600ms cubic-bezier(.22, 1, .36, 1), filter 400ms;
+}
+.login-mark-edge {
+  position: absolute;
+  left: 30px;
+  right: 30px;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, white 70%, transparent), transparent);
+}
+.login-mark-halo {
+  position: absolute;
+  width: 300px;
+  height: 220px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--color-brand-cyan-400) 12%, transparent), transparent 68%);
+  opacity: .75;
+  transition: opacity 500ms, transform 600ms;
+}
+.login-mark-base {
+  position: absolute;
+  bottom: 5px;
+  width: 240px;
+  height: 26px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--color-brand-cyan-400) 12%, transparent), transparent 70%);
+  transition: opacity 500ms, transform 600ms;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  html:not(.etp-reduced-motion) .login-illustration:hover .login-mark-frame {
+    transform: perspective(700px) translateY(-4px) rotateX(var(--mark-rotate-x, 3deg)) rotateY(var(--mark-rotate-y, -8deg)) rotateZ(-6deg);
+    border-color: color-mix(in srgb, var(--color-ink-700) 40%, transparent);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / .18), inset 0 -2px 0 rgb(0 0 0 / .24), 3px 4px 0 -1px var(--color-surface-alt), 14px 30px 42px -18px rgb(0 0 0 / .65), -10px -8px 40px -20px color-mix(in srgb, var(--color-brand-cyan-400) 65%, transparent);
+  }
+  html:not(.etp-reduced-motion) .login-illustration:hover .login-mark-frame::after { opacity: .9; }
+  html:not(.etp-reduced-motion) .login-illustration:hover img { transform: translateY(-2px); filter: drop-shadow(3px 10px 7px rgb(0 0 0 / .26)); }
+  html:not(.etp-reduced-motion) .login-illustration:hover .login-mark-halo { opacity: 1; transform: scale(1.06); }
+  html:not(.etp-reduced-motion) .login-illustration:hover .login-mark-base { opacity: .65; transform: scaleX(.92); }
+}
 .login-features { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 490px; }
 .login-features li { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 12px; border: 1px solid color-mix(in srgb, var(--color-brand-blue-400) 12%, transparent); border-radius: 16px; background: linear-gradient(130deg, color-mix(in srgb, var(--color-panel-alt) 65%, transparent), color-mix(in srgb, var(--color-panel) 35%, transparent)); box-shadow: inset 0 1px 0 rgb(255 255 255 / .025); transition: border-color 180ms, background-color 180ms; }
 .login-features li:hover { border-color: color-mix(in srgb, var(--color-brand-blue-400) 30%, transparent); background-color: color-mix(in srgb, var(--color-brand-blue-500) 4%, transparent); }

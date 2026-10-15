@@ -1,8 +1,8 @@
 import { NavLink } from 'react-router-dom'
 import { X, ArrowUpRight } from 'lucide-react'
-import etpSymbol from '../../assets/etp-symbol-sculpted.svg'
+import etpSymbol from '../../assets/etp-symbol-flat.svg'
 import { navItems } from './navItems'
-import SidebarSculptedIcon, { type SidebarSymbol } from './SidebarSculptedIcon'
+import SidebarIcon, { type SidebarSymbol } from './SidebarIcon'
 import { useAuth } from '../../auth/AuthContext'
 
 type SidebarProps = {
@@ -55,7 +55,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
                 }`
               }
             >
-              <SidebarSculptedIcon kind={item.symbol} />
+              <SidebarIcon kind={item.symbol} />
               {item.label}
             </NavLink>
           ))}</div>)}
@@ -63,7 +63,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
 
       <div className="mx-2 mt-6 rounded-xl border border-white/[0.12] p-3">
         <div className="flex items-center gap-3 text-white/75">
-          <SidebarSculptedIcon kind="help" />
+          <SidebarIcon kind="help" />
           <p className="text-sm font-medium">Precisa de ajuda?</p>
         </div>
         <p className="mt-2 text-xs leading-relaxed text-white/55">
