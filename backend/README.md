@@ -1,5 +1,7 @@
 # Backend do ETP Systems
 
+Para iniciar o projeto inteiro com um comando, consulte o [guia de execução local](../docs/EXECUCAO_LOCAL.md).
+
 API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. As Fases 1–10 entregam a base, catálogo, autenticação, inscrições, progresso, avaliações, certificados e indicadores do colaborador.
 
 ## Estrutura
@@ -55,7 +57,7 @@ Para iniciar os serviços com Docker, na raiz do repositório:
 docker compose --env-file backend/.env up --build -d database backend
 ```
 
-O backend responde em `http://localhost:8080` por padrão. Se a porta 8080 estiver ocupada, altere `ETP_BACKEND_PORT` no `.env`, por exemplo para `18080`. A conexão interna do container aponta para `database:3306`; a aplicação local usa `localhost:3307`.
+No Compose, o backend responde em `http://localhost:18080` por padrão. Configurações existentes podem usar outra porta; confira `ETP_BACKEND_PORT` no `.env`. A conexão interna do container aponta para `database:3306`; a aplicação local usa `localhost:3307`.
 
 Em um volume já existente, mudar usuário ou senha no `.env` não altera automaticamente as credenciais armazenadas no banco. As novas alterações estruturais são aplicadas pelo Flyway na inicialização do backend.
 
@@ -185,3 +187,13 @@ O Actuator expõe somente o endpoint de health. Login, catálogo, Meus Cursos, a
 ### Cloud Computing Essencial
 
 Três videoaulas locais em `frontend/public/videos/cloud-aula-{1,2,3}.mp4`: Fundamentos de Cloud Computing; Serviços e Modelos de Nuvem; Cloud na Prática: Benefícios, Cuidados e Casos de Uso. A avaliação tem 18 questões (seis por aula), quatro alternativas por questão, nota mínima de 80% e duas tentativas. Com 18 questões, 14 acertos resultam em 78% e 15 em 83%. Gabarito e explicações aparecem após aprovação ou esgotamento das tentativas, seguindo o fluxo existente.
+
+## Tentativas extras — V26
+
+`GET /api/empresa/colaboradores/{usuarioId}/cursos/{cursoId}/tentativas` consulta o limite individual, o uso e as autorizações. `POST` na mesma rota recebe `{ "reason": "Motivo da nova oportunidade" }` e acrescenta uma tentativa.
+
+É necessário ser RH ativo da mesma empresa do colaborador, existir inscrição e avaliação, não haver aprovação e todas as tentativas disponíveis terem sido usadas. O motivo é obrigatório, com até 500 caracteres. A V26 registra responsável (ID e nome preservado), motivo, data e quantidade de tentativas usadas no momento. Bloqueio da avaliação e restrição única impedem liberações duplicadas em chamadas concorrentes. Notas anteriores permanecem no histórico; aprovação na tentativa extra também emite certificado.
+
+A tentativa extra reutiliza as questões do curso; o colaborador pode já ter consultado a correção após esgotar o limite original. A API volta a ocultar o gabarito enquanto existe uma tentativa disponível.
+
+Validação: `TentativaExtraApiIntegrationTest`, com banco temporário, verifica autorização, isolamento entre empresas e colaboradores, motivo, concorrência, histórico e certificado após a terceira tentativa.

@@ -13,3 +13,9 @@ As páginas `/empresa/configuracoes/dados`, `/empresa/configuracoes/conta` e `/e
 Em desenvolvimento, `ETP_DEMO_ENABLED=true` e `ETP_DEMO_COMPANY_DATA_ENABLED=true` cadastram oito colaboradores ilustrativos no MySQL. Eles não podem fazer login. O arquivo `company.mock.ts` foi removido após a integração. A conta de colaborador usada para login também aparece para o RH quando pertence à mesma empresa. Alguns resultados que existiam no antigo mock não existem no banco, pois os respectivos cursos ainda não têm avaliação ou certificação habilitada.
 
 Validação: `npm run test:empresa` cobre o contrato da API, indicadores, dados vazios, filtros e ordenação. `ETP_DB_TEST=true mvn -f backend/pom.xml verify` cobre permissões e isolamento entre empresas com MySQL. Build e lint do frontend devem passar antes de publicar.
+
+## Tentativa extra autorizada pelo RH
+
+Em **Avaliações**, abra o resultado de um colaborador para consultar as tentativas. Quando todas estiverem esgotadas e não houver aprovação, informe o motivo e use **Liberar uma tentativa extra**. O mesmo controle aparece nos detalhes de um colaborador, nos cursos com avaliação entregue.
+
+A autorização vale apenas para aquele colaborador e curso. O servidor valida a empresa da conta RH, preserva todas as notas e registra responsável, motivo, data e a tentativa após a qual ocorreu a liberação. Uma autorização pendente não pode ser duplicada. O histórico aparece no próprio painel. O colaborador usa **Atualizar avaliações** para receber o novo limite.

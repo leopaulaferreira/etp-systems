@@ -1,3 +1,4 @@
+import { hasUnsavedAnswers, leaveAssessmentMessage } from '../../assessments/unsavedAnswers'
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAssessments } from '../../assessments/AssessmentContext'
@@ -66,6 +67,9 @@ export default function AvaliacoesPage() {
   return (
     <div className="flex min-w-0 flex-col gap-5 lg:gap-6">
       <AssessmentHero />
+      <button type="button" className="min-h-11 self-start rounded-xl border border-ink-200 px-4 text-sm font-bold text-brand-blue-400" onClick={() => {
+        if (!hasUnsavedAnswers(items) || window.confirm('Atualizar as avaliações descarta as respostas não enviadas. Deseja continuar?')) reload()
+      }}>Atualizar avaliações</button>
       {status === 'loading' && <p role="status" className="rounded-[22px] border border-ink-200/70 bg-panel p-6 text-sm text-ink-500">Carregando avaliações...</p>}
       {status === 'error' && <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-[22px] border border-ink-200/70 bg-panel p-6 text-sm text-ink-700"><span>Não foi possível carregar suas avaliações.</span><button type="button" onClick={reload} className="rounded-xl bg-brand-blue-700 px-4 py-2 font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Tentar novamente</button></div>}
       {status === 'ready' && <>
@@ -96,7 +100,11 @@ export default function AvaliacoesPage() {
         <AssessmentDialog
           key={selected.id}
           item={selected}
-          onClose={() => { setSelectedId(null); if (courseId) setSearchParams({}, { replace: true }) }}
+          onClose={() => {
+            if (courseId) { setSelectedId(null); setSearchParams({}, { replace: true }); return }
+            if (selected && hasUnsavedAnswers([selected]) && !window.confirm(leaveAssessmentMessage)) return
+            setSelectedId(null)
+          }}
           onReviewLesson={selected.courseId ? () => navigate(`/cursos/${encodeURIComponent(selected.courseId!)}/estudar${lessonQuery}`) : undefined}
           onStart={() => updateSelected(startAssessment)}
           onAnswer={(questionId, option) =>

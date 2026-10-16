@@ -22,16 +22,18 @@ public class AvaliacaoService {
     private final InscricaoRepository inscricoes;
     private final UsuarioRepository usuarios;
     private final CertificadoService certificados;
+    private final TentativaExtraService extras;
 
     public AvaliacaoService(AulaRepository aulas, AvaliacaoRepository avaliacoes,
             TentativaRepository tentativas, InscricaoRepository inscricoes, UsuarioRepository usuarios,
-            CertificadoService certificados) {
+            CertificadoService certificados, TentativaExtraService extras) {
         this.aulas = aulas;
         this.avaliacoes = avaliacoes;
         this.tentativas = tentativas;
         this.inscricoes = inscricoes;
         this.usuarios = usuarios;
         this.certificados = certificados;
+        this.extras = extras;
     }
 
     @Transactional(readOnly = true)
@@ -46,7 +48,7 @@ public class AvaliacaoService {
                 .stream().map(inscricao -> inscricao.getCurso().getId()).toList();
         if (cursoIds.isEmpty()) return List.of();
         return avaliacoes.findByCurso_IdIn(cursoIds).stream()
-                .map(avaliacao -> AvaliacaoResponse.from(avaliacao, historico(usuarioId, avaliacao.getId())))
+                .map(avaliacao -> AvaliacaoResponse.from(avaliacao, historico(usuarioId, avaliacao.getId()), extras.limite(usuarioId, avaliacao)))
                 .toList();
     }
 
@@ -59,7 +61,7 @@ public class AvaliacaoService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário indisponível"));
         verificarInscricao(usuarioId, avaliacao.getCurso().getId());
         List<Tentativa> anteriores = historico(usuarioId, avaliacaoId);
-        if (anteriores.size() >= avaliacao.getLimiteTentativas() || anteriores.stream().anyMatch(Tentativa::isAprovado)) {
+        if (anteriores.size() >= extras.limite(usuarioId, avaliacao) || anteriores.stream().anyMatch(Tentativa::isAprovado)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Não há tentativas disponíveis");
         }
         Map<UUID, UUID> respostas = new HashMap<>();
@@ -88,7 +90,7 @@ public class AvaliacaoService {
             certificados.emitirSeHabilitado(usuario, avaliacao.getCurso(), tentativa.getConcluidoEm());
         }
         anteriores.add(tentativa);
-        return AvaliacaoResponse.from(avaliacao, anteriores);
+        return AvaliacaoResponse.from(avaliacao, anteriores, extras.limite(usuarioId, avaliacao));
     }
 
     private List<Tentativa> historico(UUID usuarioId, UUID avaliacaoId) {

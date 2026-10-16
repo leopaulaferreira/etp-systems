@@ -1,4 +1,5 @@
 import { Award, BookOpen, CalendarDays, Mail } from 'lucide-react'
+import AttemptReleasePanel from './AttemptReleasePanel'
 import Avatar from '../../components/ui/Avatar'
 import CertificateDialog from '../Certificados/components/CertificateDialog'
 import { averageScore, employeeProgress, formatCompanyDate, type Employee } from './company'
@@ -24,6 +25,7 @@ export default function EmployeeDialog({ employee, onClose }: { employee: Employ
             <div role="progressbar" aria-label={`Progresso em ${course.title}`} aria-valuenow={course.progress} aria-valuemin={0} aria-valuemax={100} className="mt-2 h-1.5 overflow-hidden rounded-full bg-ink-100"><div className="h-full rounded-full bg-gradient-to-r from-brand-blue-600 to-brand-cyan-400" style={{ width: `${course.progress}%` }} /></div>
             <div className="mt-3 flex flex-wrap justify-between gap-2 text-xs text-ink-500"><span>Última nota: <strong className="text-ink-700">{course.score === null ? 'Sem avaliação entregue' : `${course.score}%`}</strong></span><span className="inline-flex items-center gap-1"><CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />{formatCompanyDate(course.updatedAt)}</span></div>
             {course.certificateCode && <p className="mt-3 flex items-center gap-2 border-t border-ink-100 pt-3 text-xs text-brand-cyan-400"><Award className="h-4 w-4 shrink-0" aria-hidden="true" /><span>Certificado {course.certificateCode} · emitido em {formatCompanyDate(course.certificateIssuedAt)}</span></p>}
+            {course.score !== null && <AttemptReleasePanel key={`${employee.id}-${course.id}`} employeeId={employee.id} courseId={course.id} />}
           </li>)}
         </ul>
         {!employee.courses.length && <p className="text-sm text-ink-500">Nenhum curso atribuído a este colaborador.</p>}

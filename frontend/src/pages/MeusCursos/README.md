@@ -15,3 +15,7 @@ A página de estudo lista as aulas concluídas e o total registrado. A conclusã
 Validação: `npm run build`, `npm run lint` e `npm run test:meus-cursos` em `frontend/`.
 
 O progresso agora é registrado pelo botão **Concluir aula** na página de estudo. A API calcula o percentual pelas conclusões persistidas; o diálogo de Meus Cursos não oferece mais ajuste manual. Concluir as aulas não substitui a aprovação na avaliação para emissão do certificado.
+
+## Retomar a última aula
+
+Ao abrir um curso sem `?aula=`, a página retoma a última aula visitada pela conta nesse navegador. A preferência fica em `localStorage`, separada por ID de usuário e curso. Um link explícito para uma aula tem prioridade. Se a aula tiver sido removida ou o armazenamento estiver bloqueado, a página abre a primeira aula. A preferência não marca aulas como concluídas e não é sincronizada entre dispositivos.

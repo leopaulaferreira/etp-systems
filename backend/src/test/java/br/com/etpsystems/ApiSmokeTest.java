@@ -44,6 +44,9 @@ class ApiSmokeTest {
     private ProgressoService progressoService;
 
     @MockitoBean
+    private br.com.etpsystems.assessment.TentativaExtraService tentativaExtraService;
+
+    @MockitoBean
     private AvaliacaoService avaliacaoService;
 
     @MockitoBean

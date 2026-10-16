@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Não executa o conteúdo de arquivos .env; a leitura é feita pelo Docker Compose.
+ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+cd "$ROOT_DIR"
+ENV_FILE="${ETP_ENV_FILE:-$ROOT_DIR/backend/.env}"
+
+usage() {
+  cat <<'HELP'
+Uso: ./etp [iniciar|parar|status|logs [frontend|backend|database]|configurar]
+
+  iniciar     Configura, se necessário, e inicia os três serviços; aguarda prontidão.
+  parar       Para os serviços do projeto, preservando banco e arquivos.
+  status      Mostra o estado dos serviços.
+  logs        Acompanha os logs (Ctrl+C encerra apenas a visualização).
+  configurar  Cria backend/.env com credenciais locais; preserva arquivo existente.
+
+Guia: docs/EXECUCAO_LOCAL.md
+HELP
+}
+
+fail() { printf '%s\n' "$*" >&2; exit 1; }
+
+configure() {
+  if [[ -e "$ENV_FILE" ]]; then
+    printf 'Configuração existente preservada: %s\n' "$ENV_FILE"
+    return
+  fi
+  command -v openssl >/dev/null || fail 'Instale OpenSSL ou copie backend/.env.example para backend/.env e preencha as credenciais.'
+  local db_password root_password jwt_secret demo_password
+  db_password="$(openssl rand -hex 24)"
+  root_password="$(openssl rand -hex 24)"
+  jwt_secret="$(openssl rand -hex 32)"
+  demo_password="$(openssl rand -hex 12)"
+  # Noclobber também protege contra duas configurações simultâneas.
+  (umask 077; set -o noclobber; cat > "$ENV_FILE" <<CONFIG
+# Configuração local gerada por ./etp configurar. Não versionar.
+DB_HOST=localhost
+DB_PORT=3307
+DB_NAME=etp_db
+DB_USER=etp_user
+DB_PASSWORD=$db_password
+DB_ROOT_PASSWORD=$root_password
+ETP_BACKEND_PORT=18080
+ETP_FRONTEND_PORT=5174
+JWT_SECRET=$jwt_secret
+JWT_EXPIRATION_MINUTES=60
+CORS_ALLOWED_ORIGINS=http://localhost:5174,http://127.0.0.1:5174,http://localhost:5173,http://127.0.0.1:5173
+SPRING_PROFILES_ACTIVE=dev
+ETP_DEMO_ENABLED=true
+ETP_DEMO_COMPANY_DATA_ENABLED=true
+ETP_DEMO_COLABORADOR_EMAIL=etp@gmail.com
+ETP_DEMO_EMPRESA_EMAIL=rhetp@gmail.com
+ETP_DEMO_PASSWORD=$demo_password
+ETP_DEMO_COMPANY_NAME=ETP Demonstração
+CONFIG
+  ) || fail "Não foi possível criar $ENV_FILE. Verifique se a pasta existe e se você tem permissão."
+  printf 'Configuração criada: %s\nA senha das contas de demonstração está em ETP_DEMO_PASSWORD nesse arquivo.\n' "$ENV_FILE"
+}
+
+compose() { docker compose --env-file "$ENV_FILE" -f "$ROOT_DIR/docker-compose.yml" "$@"; }
+
+ACTION="${1:-iniciar}"
+case "$ACTION" in
+  -h|--help|ajuda) usage; exit 0 ;;
+  configurar) [[ $# -le 1 ]] || fail 'Use: ./etp configurar'; configure; exit 0 ;;
+  iniciar|parar|status) [[ $# -le 1 ]] || fail 'Argumentos extras não são aceitos para este comando.' ;;
+  logs)
+    [[ $# -le 2 ]] || fail 'Use: ./etp logs [frontend|backend|database]'
+    case "${2:-}" in ''|frontend|backend|database) ;; *) fail 'Serviço inválido: escolha frontend, backend ou database.' ;; esac ;;
+  *) usage >&2; exit 1 ;;
+esac
+
+command -v docker >/dev/null || fail 'Docker não encontrado. Instale Docker com Compose v2 (ou mais recente).'
+docker compose version >/dev/null 2>&1 || fail 'Docker Compose não encontrado. Instale o plugin Compose v2 ou Docker Desktop.'
+docker info >/dev/null 2>&1 || fail 'Docker não está disponível. Inicie o Docker e confira a permissão do seu usuário.'
+if [[ "$ACTION" == iniciar ]]; then configure; fi
+[[ -f "$ENV_FILE" ]] || fail 'Configuração ausente. Execute ./etp configurar primeiro.'
+compose config --quiet || fail "Revise os campos obrigatórios em $ENV_FILE. Nenhum serviço foi iniciado."
+
+case "$ACTION" in
+  iniciar)
+    printf 'Iniciando ETP Systems. A primeira execução baixa imagens e dependências e pode levar alguns minutos.\n'
+    if ! compose up --build --detach --wait --wait-timeout 300; then
+      printf '\nNão foi possível deixar todos os serviços prontos.\nUse ./etp status e ./etp logs para diagnosticar; ./etp parar encerra os serviços.\nSe uma porta estiver ocupada, ajuste ETP_FRONTEND_PORT, ETP_BACKEND_PORT ou DB_PORT no .env.\n' >&2
+      exit 1
+    fi
+    frontend_address="$(compose port frontend 5173)"
+    backend_address="$(compose port backend 8080)"
+    printf '\nETP Systems pronto.\nAplicação: http://%s\nAPI: http://%s\nSwagger: http://%s/swagger-ui/index.html\n\nPara parar: ./etp parar\n' "$frontend_address" "$backend_address" "$backend_address"
+    ;;
+  parar) compose stop; printf 'Serviços parados. Banco de dados preservado.\n' ;;
+  status) compose ps --all ;;
+  logs)
+    if [[ -n "${2:-}" ]]; then compose logs --tail 100 --follow "$2"
+    else compose logs --tail 100 --follow; fi
+    ;;
+esac

@@ -11,3 +11,9 @@ LGPD na Prática e Introdução à Inteligência Artificial têm seis questões;
 Após a aprovação, o resultado consulta os certificados emitidos pela API e exibe o certificado do curso, com visualização no próprio diálogo e download em PDF. A mensagem de disponibilidade só aparece quando o certificado é encontrado. Falhas na consulta ou um certificado ainda ausente permitem consultar novamente sem reenviar a avaliação. Na reprovação, as tentativas restantes aparecem junto da nota, antes da correção das questões.
 
 Verificação: `npm run test:avaliacoes`, `npm run build` e `npm run lint` em `frontend/`.
+
+## Respostas ainda não enviadas
+
+Fechar a avaliação ou sair dela por navegação solicita confirmação quando existem respostas em edição. Cancelar mantém a tela e as respostas. Confirmar permite sair e retomar durante a mesma sessão. Recarregar/fechar a página aciona o aviso nativo do navegador; sair da conta e atualizar as avaliações também exigem confirmação antes de descartar respostas. O navegador controla o texto do aviso de recarregamento. Isso não é salvamento automático das respostas no servidor.
+
+O botão **Atualizar avaliações** consulta novamente o limite individual, incluindo oportunidades liberadas pelo RH. A migração V26 mantém as duas tentativas padrão e acrescenta somente as autorizações daquele colaborador e curso.

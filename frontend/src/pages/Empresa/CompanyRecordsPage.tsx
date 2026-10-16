@@ -1,3 +1,4 @@
+import AttemptReleasePanel from './AttemptReleasePanel'
 import { useState } from 'react'
 import { Award, ClipboardCheck, Search, ChevronRight } from 'lucide-react'
 import PageHero from '../../components/ui/PageHero'
@@ -49,6 +50,7 @@ export default function CompanyRecordsPage({ kind }: { kind: 'assessments' | 'ce
     </section>
     {selected && <CertificateDialog title={certificates ? 'Detalhes do certificado' : 'Resultado da avaliação'} onClose={() => setSelectedId(null)}>
       <div className="space-y-5 p-5 sm:p-6"><div><p className="text-sm font-bold text-ink-900">{selected.employee.name}</p><p className="mt-1 break-all text-xs text-ink-500">{selected.employee.email}</p></div><div className="rounded-2xl border border-ink-200 bg-panel-alt p-5"><h3 className="font-bold text-ink-900">{selected.course.title}</h3><p className="mt-1 text-xs text-ink-500">{selected.course.category}</p>{certificates ? <><p className="mt-4 break-all text-sm text-brand-cyan-400">{selected.course.certificateCode}</p><p className="mt-2 text-xs text-ink-500">Emissão: {formatCompanyDate(selected.course.certificateIssuedAt)}</p></> : <><p className="mt-4 text-2xl font-extrabold text-brand-cyan-400">{selected.course.score}%</p><p className="mt-2 text-xs text-ink-500">Última nota disponível neste curso.</p></>}</div></div>
+      {!certificates && <AttemptReleasePanel key={selected.id} employeeId={selected.employee.id} courseId={selected.course.id} />}
     </CertificateDialog>}
   </div>
 }

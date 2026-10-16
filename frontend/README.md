@@ -1,5 +1,7 @@
 # Frontend - ETP Systems
 
+Para iniciar frontend, backend e banco juntos, consulte o [guia de execução local](../docs/EXECUCAO_LOCAL.md). Os comandos abaixo são a alternativa com Node instalado no computador.
+
 Interface web do ETP Systems, construída em **React + TypeScript + Vite + Tailwind CSS**.
 
 Aplicação única (SPA), com Login como rota pública e as demais telas como rotas autenticadas compartilhando o mesmo layout (sidebar + topbar).

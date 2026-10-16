@@ -2,13 +2,13 @@ export const id = (n) => `11111111-1111-4111-8111-${String(n).padStart(12, '0')}
 export const courseId = id(1)
 const title = 'Cloud Computing Essencial: Fundamentos, Serviços e Modelos de Nuvem'
 
-export async function mockLearningApi(page) {
-  const state = { completed: [], attempts: [], certificateError: false, saveError: false }
-  const user = { id: id(2), nome: 'Rafael Martins de Albuquerque', email: 'mobile@example.test', perfil: 'COLABORADOR', empresaId: null }
+export async function mockLearningApi(page, role = 'COLABORADOR') {
+  const state = { completed: [], attempts: [], certificateError: false, saveError: false, extras: 0, grants: [] }
+  const user = { id: role === 'EMPRESA' ? id(99) : id(2), nome: role === 'EMPRESA' ? 'RH ETP' : 'Rafael Martins de Albuquerque', email: 'mobile@example.test', perfil: role, empresaId: role === 'EMPRESA' ? id(90) : null }
   const course = { id: courseId, title, description: 'Fundamentos e aplicações da computação em nuvem.', category: 'Tecnologia', level: 'Iniciante', durationHours: 3, featured: false, icon: 'cloud' }
   const lessons = ['Fundamentos de Cloud Computing', 'Serviços e Modelos de Nuvem', 'Cloud na Prática: Benefícios, Cuidados e Casos de Uso'].map((title, i) => ({ id: id(10 + i), title, content: 'Conheça os recursos de computação em nuvem.\n\nRevise os conceitos antes de concluir a aula.', order: i + 1, videoUrl: i === 0 ? '/videos/cloud-aula-1.mp4' : null }))
   const questions = [0, 1, 2].map((i) => ({ id: id(20 + i), prompt: `Questão ${i + 1}: qual alternativa descreve o uso adequado dos recursos de computação em nuvem?`, options: ['Utilizar recursos pela internet conforme a necessidade.', 'Compartilhar a mesma senha entre todos os usuários.', 'Dispensar planejamento e monitoramento.', 'Ignorar os custos dos recursos utilizados.'], optionIds: [0, 1, 2, 3].map((j) => id(30 + i * 4 + j)), correctOption: null, explanation: null }))
-  const assessment = () => ({ id: id(3), courseId, title: `Avaliação: ${title}`, course: title, status: state.attempts.length ? 'completed' : 'pending', minimumScore: 80, maxAttempts: 2, estimatedMinutes: 8, topic: 'cloud', questions: questions.map(q => ({ ...q, correctOption: state.attempts.some(a => a.passed) || state.attempts.length === 2 ? 0 : null, explanation: 'A nuvem permite ajustar recursos conforme a demanda.' })), attempts: state.attempts })
+  const assessment = () => ({ id: id(3), courseId, title: `Avaliação: ${title}`, course: title, status: state.attempts.length ? 'completed' : 'pending', minimumScore: 80, maxAttempts: 2 + state.extras, estimatedMinutes: 8, topic: 'cloud', questions: questions.map(q => ({ ...q, correctOption: state.attempts.some(a => a.passed) || state.attempts.length === 2 ? 0 : null, explanation: 'A nuvem permite ajustar recursos conforme a demanda.' })), attempts: state.attempts })
   const progress = () => ({ completedLessonIds: state.completed, totalLessons: 3, progress: Math.floor(state.completed.length * 10000 / 3) / 100 })
   await page.addInitScript(() => sessionStorage.setItem('etp-auth-session-v1', JSON.stringify({ accessToken: 'browser-test-only', expiresAt: Date.now() + 3600000 })))
   await page.route(url => url.pathname.startsWith('/api/'), async (route) => {
@@ -16,6 +16,15 @@ export async function mockLearningApi(page) {
     let data
     if (path === '/api/auth/me') data = user
     else if (path === '/api/colaborador/perfil') data = { name: user.nome, email: user.email, phone: '', location: '', position: 'Analista', company: 'ETP', learningFocus: '', experienceLevel: 'Iniciante', notificationsEnabled: true, memberSince: '2026-01-01' }
+    else if (path === '/api/empresa/painel') data = { companyId: id(90), companyName: 'ETP', employees: [{ id: id(2), companyId: id(90), name: 'Rafael Martins', email: 'employee@example.test', department: 'Tecnologia', courses: [{ id: courseId, title, category: 'Tecnologia', progress: 100, score: 0, updatedAt: null, completedAt: null, certificateCode: null, certificateIssuedAt: null }] }] }
+    else if (path.startsWith('/api/empresa/colaboradores/') && path.endsWith('/tentativas')) {
+      if (route.request().method() === 'POST') {
+        if (state.extras > 0) return route.fulfill({ status: 409, json: {} })
+        state.extras++
+        state.grants.push({ id: id(60), authorizedBy: 'RH ETP', reason: route.request().postDataJSON().reason, afterAttempt: 2, createdAt: '2026-10-16T12:00:00Z' })
+      }
+      data = { usedAttempts: 2, maxAttempts: 2 + state.extras, remainingAttempts: state.extras, passed: false, canGrant: state.extras === 0, grants: state.grants }
+    }
     else if (path === '/api/cursos') data = [course]
     else if (path === `/api/cursos/${courseId}`) data = course
     else if (path === `/api/colaborador/cursos/${courseId}/aulas`) data = lessons

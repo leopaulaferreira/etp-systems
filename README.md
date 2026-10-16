@@ -10,6 +10,18 @@
 Projeto acadêmico desenvolvido no curso de **Análise e Desenvolvimento de Sistemas
 da Universidade Municipal de São Caetano do Sul (USCS)**.
 
+## Executar localmente
+
+Com Docker em execução, na pasta do projeto:
+
+```sh
+./etp iniciar
+```
+
+O comando configura o ambiente na primeira execução e inicia banco, backend e frontend. Acesse o endereço exibido no terminal (padrão: **http://127.0.0.1:5174**). Para parar sem apagar os dados: `./etp parar`.
+
+Consulte o [guia curto de execução](docs/EXECUCAO_LOCAL.md) para pré-requisitos, contas de demonstração e solução de problemas.
+
 ---
 
 # 📚 Sobre o Projeto
@@ -193,8 +205,7 @@ As tentativas e notas são registradas no backend. LGPD na Prática tem três
 videoaulas; Introdução à Inteligência Artificial tem três videoaulas e uma
 avaliação de seis questões. Gestão de Projetos Ágeis com Scrum tem três videoaulas
 e 18 questões, divididas em seis por aula. Cloud Computing Essencial também tem três videoaulas e 18 questões, com seis por aula. Segurança da Informação e Computação
-em Nuvem têm aulas em texto e avaliações. O progresso ainda é informado manualmente pelo
-colaborador.
+em Nuvem têm aulas em texto e avaliações. O progresso é calculado pelas aulas que o colaborador marca como concluídas.
 
 ---
 

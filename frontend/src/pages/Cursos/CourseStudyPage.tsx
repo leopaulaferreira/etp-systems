@@ -1,3 +1,5 @@
+import { useAuth } from '../../auth/AuthContext'
+import { savedLesson, rememberLesson, resumeLessonIndex } from './lessonResume'
 import IllustratedIcon from '../../components/ui/IllustratedIcon'
 import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, ClipboardCheck, CheckCircle2, Play, VideoOff } from 'lucide-react'
@@ -34,6 +36,10 @@ export default function CourseStudyPage() {
 
 function CourseStudy() {
   const { id } = useParams()
+  const { user } = useAuth()
+  const [lastLessonId] = useState(() => {
+    try { return user && id ? savedLesson(user.id, id, window.localStorage) : null } catch { return null }
+  })
   const [searchParams, setSearchParams] = useSearchParams()
   const [course, setCourse] = useState<CatalogCourse | null>(null)
   const [lessons, setLessons] = useState<Lesson[]>([])
@@ -47,9 +53,7 @@ function CourseStudy() {
   const focusNextLesson = useRef(false)
   const { assessments, status: assessmentStatus } = useAssessments()
   const assessment = assessments.find((item) => item.courseId === id)
-  const requestedLesson = Number(searchParams.get('aula'))
-  const activeIndex = lessons.length && Number.isSafeInteger(requestedLesson) && requestedLesson > 0
-    ? Math.min(requestedLesson - 1, lessons.length - 1) : 0
+  const activeIndex = resumeLessonIndex(searchParams.get('aula'), lessons.map(lesson => lesson.id), lastLessonId)
   const activeLesson = lessons[activeIndex]
   const hasVideo = lessons.some((lesson) => Boolean(lesson.videoUrl))
   const assessmentHref = `/avaliacoes?curso=${encodeURIComponent(assessment?.courseId ?? id ?? '')}&aula=${activeIndex + 1}`
@@ -74,6 +78,11 @@ function CourseStudy() {
     lessonHeadingRef.current?.scrollIntoView({ block: 'start' })
     focusNextLesson.current = false
   }, [activeIndex, status])
+
+  useEffect(() => {
+    if (status !== 'ready' || !user || !id || !activeLesson) return
+    try { rememberLesson(user.id, id, activeLesson.id, window.localStorage) } catch { /* Armazenamento indisponível. */ }
+  }, [activeLesson, id, status, user])
 
   async function finishLesson() {
     if (!id || !activeLesson || saving) return

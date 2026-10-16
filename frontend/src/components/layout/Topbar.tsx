@@ -1,3 +1,5 @@
+import { useAssessments } from '../../assessments/AssessmentContext'
+import { hasUnsavedAnswers } from '../../assessments/unsavedAnswers'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, Bell, Building2, ChevronDown, LogOut, Menu, UserRound } from 'lucide-react'
@@ -14,6 +16,7 @@ type TopbarProps = {
 }
 
 export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) {
+  const { assessments } = useAssessments()
   const [menuOpen, setMenuOpen] = useState(false)
   const [query, setQuery] = useState('')
   const menuRef = useRef<HTMLDivElement>(null)
@@ -36,6 +39,7 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
   const displayName = isCompany ? settings.contactName : profile.name
 
   function handleLogout() {
+    if (hasUnsavedAnswers(assessments) && !window.confirm('Sair da conta descartará as respostas não enviadas da avaliação. Deseja continuar?')) return
     setMenuOpen(false)
     logout()
     navigate('/login', { replace: true })

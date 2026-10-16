@@ -16,9 +16,9 @@ public record AvaliacaoResponse(
 
     public record TentativaResponse(Map<String, Integer> answers, int score, boolean passed, Instant completedAt) {}
 
-    static AvaliacaoResponse from(Avaliacao avaliacao, List<Tentativa> tentativas) {
+    static AvaliacaoResponse from(Avaliacao avaliacao, List<Tentativa> tentativas, int limiteTentativas) {
         boolean passou = tentativas.stream().anyMatch(Tentativa::isAprovado);
-        boolean podeRevisar = passou || tentativas.size() >= avaliacao.getLimiteTentativas();
+        boolean podeRevisar = passou || tentativas.size() >= limiteTentativas;
         List<QuestaoResponse> questoes = avaliacao.getQuestoes().stream().map(questao -> {
             List<Alternativa> alternativas = questao.getAlternativas();
             int correta = -1;
@@ -50,6 +50,6 @@ public record AvaliacaoResponse(
         return new AvaliacaoResponse(avaliacao.getId(), avaliacao.getCurso().getId(), avaliacao.getTitulo(),
                 avaliacao.getCurso().getTitulo(), "Curso", "Teste", topic,
                 tentativas.isEmpty() ? "pending" : "completed", Math.max(8, questoes.size()), avaliacao.getNotaMinima(),
-                avaliacao.getLimiteTentativas(), questoes, Map.of(), historico);
+                limiteTentativas, questoes, Map.of(), historico);
     }
 }

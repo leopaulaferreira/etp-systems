@@ -83,6 +83,9 @@ class AuthSecurityTest {
     private ProgressoService progressos;
 
     @MockitoBean
+    private br.com.etpsystems.assessment.TentativaExtraService tentativaExtraService;
+
+    @MockitoBean
     private AvaliacaoService avaliacoes;
 
     @MockitoBean

@@ -10,13 +10,15 @@ npm run test:mobile
 
 A suíte inicia o Vite em `127.0.0.1:5178` e o encerra ao terminar. A porta deve estar livre. Não inicia o backend nem modifica o banco. Para usar um Chromium já instalado, defina `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` com o caminho do executável.
 
-São 15 cenários: três fluxos em cinco tamanhos de viewport — 320×568, 390×844, 844×390 (horizontal), 768×1024 e 1440×900 (controle desktop).
+São 30 cenários: seis fluxos em cinco tamanhos de viewport — 320×568, 390×844, 844×390 (horizontal), 768×1024 e 1440×900 (controle desktop).
 
 - Menu lateral: abertura, fechamento, Escape, retorno do foco, rolagem até a ajuda e navegação.
 - Menu da conta e controles principais: áreas de toque de pelo menos 44 pixels.
 - Aula: reprodução do MP4 real de Cloud, navegação entre aulas, erro ao salvar, nova tentativa e estado preservado após recarregar.
 - Avaliação: respostas, reprovação, tentativa restante, aprovação, erro na consulta de certificado e recuperação, além do esgotamento de tentativas.
 - Certificado: visualização dentro do resultado e na página de certificados, download do PDF, fechamento do diálogo e busca sem resultados.
+- Retomada da última aula, prioridade de links explícitos e proteção de respostas ao fechar, navegar, voltar, recarregar e sair da conta.
+- RH: motivo obrigatório, liberação individual, histórico persistido na API simulada e bloqueio de autorização duplicada.
 - Verificação de largura: página, área principal, menu e diálogos sem rolagem horizontal.
 
 As respostas da API e a sessão são simuladas em `mobile.fixture.mjs`, com nomes e títulos longos. Isso permite reproduzir erros de conexão e resultados sem consumir tentativas de contas reais. O vídeo e o gerador de PDF são os do projeto. Estes testes de interface complementam os testes de integração do backend.
