@@ -45,6 +45,7 @@ public record AvaliacaoResponse(
             case "cloud" -> "cloud";
             case "ai" -> "ai";
             case "projects" -> "projects";
+            case "communication" -> "communication";
             default -> "privacy";
         };
         return new AvaliacaoResponse(avaliacao.getId(), avaliacao.getCurso().getId(), avaliacao.getTitulo(),

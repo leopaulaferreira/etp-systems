@@ -197,3 +197,13 @@ Três videoaulas locais em `frontend/public/videos/cloud-aula-{1,2,3}.mp4`: Fund
 A tentativa extra reutiliza as questões do curso; o colaborador pode já ter consultado a correção após esgotar o limite original. A API volta a ocultar o gabarito enquanto existe uma tentativa disponível.
 
 Validação: `TentativaExtraApiIntegrationTest`, com banco temporário, verifica autorização, isolamento entre empresas e colaboradores, motivo, concorrência, histórico e certificado após a terceira tentativa.
+
+### Comunicação Assertiva no Ambiente de Trabalho
+
+As migrações V27–V28 atualizam o título do curso existente, preservando seu ID, inscrições e vínculo com a trilha, e adicionam três aulas e 18 questões (seis por aula). A certificação fica habilitada, com nota mínima de 80% e duas tentativas iniciais; 14 acertos reprovam (78%) e 15 aprovam (83%). As regras de revisão do gabarito e de liberação de tentativa extra pelo RH são as mesmas dos demais cursos.
+
+Vídeos em `frontend/public/videos/comunicacao-aula-{1,2,3}.mp4`:
+
+1. Fundamentos da Comunicação Assertiva — origem: `Assertividade__O_Meio-Termo_aula1.mp4`.
+2. Feedback e Conversas Difíceis — origem: `Assertividade_aula2.mp4`.
+3. Comunicação no Trabalho em Equipe — origem: `Comunicação_Assertiva.mp4`.

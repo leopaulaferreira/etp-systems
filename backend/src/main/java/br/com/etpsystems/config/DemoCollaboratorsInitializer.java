@@ -43,7 +43,7 @@ public class DemoCollaboratorsInitializer implements ApplicationRunner {
     private static final String SEGURANCA = "Fundamentos de Cibersegurança";
     private static final String LGPD = "LGPD na Prática";
     private static final String PYTHON = "Python para Análise de Dados";
-    private static final String COMUNICACAO = "Comunicação Assertiva";
+    private static final String COMUNICACAO = "Comunicação Assertiva no Ambiente de Trabalho";
 
     private static final List<ColaboradorDemo> COLABORADORES = List.of(
             new ColaboradorDemo("Ana Souza", "ana.souza", "Tecnologia", List.of(
