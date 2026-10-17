@@ -2,7 +2,7 @@ import { useAssessments } from '../../assessments/AssessmentContext'
 import { hasUnsavedAnswers } from '../../assessments/unsavedAnswers'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Bell, Building2, ChevronDown, LogOut, Menu, UserRound } from 'lucide-react'
+import { Bell, ChevronDown, LogOut, Menu, UserRound } from 'lucide-react'
 import Avatar from '../ui/Avatar'
 import { useAuth } from '../../auth/AuthContext'
 import { useProfile } from '../../profile/ProfileContext'
@@ -18,7 +18,6 @@ type TopbarProps = {
 export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) {
   const { assessments } = useAssessments()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [query, setQuery] = useState('')
   const menuRef = useRef<HTMLDivElement>(null)
   const accountButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -46,7 +45,7 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
   }
 
   return (
-    <header className="relative z-30 flex h-20 shrink-0 items-center justify-between gap-2 border-b border-ink-200 bg-panel/95 px-4 backdrop-blur-xl sm:h-[92px] sm:gap-4 sm:px-8">
+    <header className="relative z-30 flex h-16 shrink-0 items-center justify-between gap-2 border-b border-ink-200 bg-panel/95 px-4 backdrop-blur-xl sm:gap-4 sm:px-8">
       <button
         type="button"
         id="mobile-menu-button"
@@ -60,21 +59,7 @@ export default function Topbar({ isMenuOpen = false, onOpenMenu }: TopbarProps) 
         <Menu className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
       </button>
 
-      {isCompany ? <div className="flex min-w-0 flex-1 items-center gap-2 text-xs font-semibold text-ink-500"><Building2 className="h-5 w-5 shrink-0 text-brand-blue-400" aria-hidden="true" /><span className="hidden sm:inline">Gestão de aprendizagem</span></div> : <form role="search" onSubmit={(event) => {
-        event.preventDefault()
-        navigate(query.trim() ? `/cursos?busca=${encodeURIComponent(query.trim())}` : '/cursos')
-      }} className="flex min-w-0 max-w-md flex-1 items-center gap-2.5 rounded-xl border border-ink-200 bg-panel-alt px-3.5 py-3 transition-[border-color,box-shadow] duration-150 focus-within:border-brand-blue-500 focus-within:ring-2 focus-within:ring-brand-blue-500/15">
-        <Search className="h-[18px] w-[18px] shrink-0 text-ink-400" strokeWidth={2} aria-hidden="true" />
-        <input
-          type="search"
-          enterKeyHint="search"
-          placeholder="Buscar cursos..."
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          aria-label="Buscar cursos"
-          className="w-full min-w-0 bg-transparent text-base sm:text-sm text-ink-900 placeholder:text-ink-400 focus:outline-none"
-        />
-      </form>}
+      <div className="min-w-0 flex-1" aria-hidden="true" />
 
       <div className="flex shrink-0 items-center gap-1 sm:gap-4">
         {!isCompany && <button
