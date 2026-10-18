@@ -110,7 +110,7 @@ A resposta contém `accessToken`, `tokenType: "Bearer"`, `expiresIn` em segundos
 
 Entradas inválidas retornam 400; credenciais ou tokens inválidos retornam 401; falta de permissão retorna 403. As falhas de credenciais usam a mesma mensagem para usuário inexistente e senha errada. A validação JWT verifica assinatura HS256, emissor, expiração, UUID do usuário e perfil.
 
-A API usa Bearer sem cookies de sessão. O token expira após o prazo configurado; não há refresh token nem revogação individual nesta fase. O logout remove o token do cliente, mas uma cópia continuará válida até expirar. `/api/auth/me` rejeita usuário removido ou com perfil diferente do token.
+A API usa Bearer sem cookies de sessão. Cada requisição autenticada consulta a situação atual da conta: usuário desabilitado ou removido, perfil diferente do token e RH sem empresa recebem 401, mesmo antes da expiração. Não há refresh token nem revogação individual por token nesta fase. O logout remove o token do cliente; uma cópia só continua válida até expirar enquanto a conta permanecer habilitada e compatível com o token.
 
 A Fase 4 não inclui cadastro público, confirmação/recuperação por e-mail nem login Google/Microsoft. A Fase 5 conecta a tela de login à API: o React valida a sessão por `/api/auth/me` ao recarregar e trata expiração e falhas de conexão. Consulte o [guia do frontend](../frontend/README.md).
 

@@ -3,7 +3,9 @@ package br.com.etpsystems.security;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
+import br.com.etpsystems.auth.AuthService;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,8 +16,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -25,7 +29,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, UrlBasedCorsConfigurationSource cors) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, UrlBasedCorsConfigurationSource cors,
+            AuthService accounts) throws Exception {
         JwtGrantedAuthoritiesConverter authorities = new JwtGrantedAuthoritiesConverter();
         authorities.setAuthoritiesClaimName("perfil");
         authorities.setAuthorityPrefix("ROLE_");
@@ -56,7 +61,15 @@ public class SecurityConfig {
                         .authenticationEntryPoint((request, response, exception) -> unauthorized(response))
                         .accessDeniedHandler((request, response, exception) -> forbidden(response)))
                 .oauth2ResourceServer(config -> config
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(converter))
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(token -> {
+                            // Um token assinado não mantém acesso após bloquear ou alterar a conta.
+                            try {
+                                accounts.me(UUID.fromString(token.getSubject()), token.getClaimAsString("perfil"));
+                            } catch (AuthenticationException exception) {
+                                throw new InvalidBearerTokenException("Conta ou sessão inválida", exception);
+                            }
+                            return converter.convert(token);
+                        }))
                         .authenticationEntryPoint((request, response, exception) -> unauthorized(response))
                         .accessDeniedHandler((request, response, exception) -> forbidden(response)))
                 .build();

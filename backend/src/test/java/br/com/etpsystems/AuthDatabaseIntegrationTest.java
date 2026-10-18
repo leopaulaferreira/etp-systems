@@ -62,6 +62,8 @@ class AuthDatabaseIntegrationTest {
     private PasswordEncoder passwords;
     @Autowired
     private DemoAccountsInitializer initializer;
+    @Autowired
+    private org.springframework.jdbc.core.JdbcTemplate jdbc;
 
     @Test
     void provisionsAndAuthenticatesAccountsWithoutResettingThemOnRestart() throws Exception {
@@ -115,6 +117,31 @@ class AuthDatabaseIntegrationTest {
                     HttpResponse.BodyHandlers.ofString());
             assertThat(login.statusCode()).isEqualTo(401);
             assertThat(login.body()).doesNotContain(account.getSenhaHash());
+        }
+    }
+
+    @Test
+    void disablingEitherAccountImmediatelyRejectsItsExistingToken() throws Exception {
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            for (String email : new String[] {USER_EMAIL, RH_EMAIL}) {
+                Usuario account = usuarios.findByEmailIgnoreCase(email).orElseThrow();
+                HttpResponse<String> login = client.send(HttpRequest.newBuilder(uri("/api/auth/login"))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(JSON.writeValueAsString(
+                                Map.of("email", email, "senha", PASSWORD)))).build(), HttpResponse.BodyHandlers.ofString());
+                assertThat(login.statusCode()).isEqualTo(200);
+                String token = JSON.readTree(login.body()).path("accessToken").asText();
+                String path = account.getPerfil() == Perfil.EMPRESA ? "/api/empresa/painel" : "/api/colaborador/dashboard";
+                HttpRequest request = HttpRequest.newBuilder(uri(path)).header("Authorization", "Bearer " + token).GET().build();
+                assertThat(client.send(request, HttpResponse.BodyHandlers.ofString()).statusCode()).isEqualTo(200);
+                try {
+                    jdbc.update("UPDATE usuarios SET login_habilitado = FALSE WHERE id = ?", account.getId().toString());
+                    assertThat(client.send(request, HttpResponse.BodyHandlers.ofString()).statusCode()).isEqualTo(401);
+                } finally {
+                    jdbc.update("UPDATE usuarios SET login_habilitado = TRUE WHERE id = ?", account.getId().toString());
+                }
+                assertThat(client.send(request, HttpResponse.BodyHandlers.ofString()).statusCode()).isEqualTo(200);
+            }
         }
     }
 

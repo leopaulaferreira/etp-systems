@@ -208,6 +208,40 @@ class AuthSecurityTest {
         String token = token("user@example.test");
         when(usuarios.findById(USER_ID)).thenReturn(Optional.empty());
         assertThat(get("/api/auth/me", token).statusCode()).isEqualTo(401);
+        assertThat(get("/api/colaborador/dashboard", token).statusCode()).isEqualTo(401);
+    }
+
+    @Test
+    void existingTokenStopsWorkingOnEveryProtectedRouteWhenAccountIsDisabled() throws Exception {
+        String token = token("user@example.test");
+        ReflectionTestUtils.setField(usuarios.findById(USER_ID).orElseThrow(), "loginHabilitado", false);
+        for (String path : new String[] {"/api/auth/me", "/api/colaborador/dashboard",
+                "/api/colaborador/meus-cursos", "/api/colaborador/avaliacoes",
+                "/api/colaborador/certificados", "/api/colaborador/trilhas", "/api/colaborador/perfil"}) {
+            HttpResponse<String> response = get(path, token);
+            assertThat(response.statusCode()).as(path).isEqualTo(401);
+            assertThat(response.headers().firstValue("WWW-Authenticate")).contains("Bearer");
+        }
+        assertThat(post("/api/colaborador/inscricoes/cursos/" + UUID.randomUUID(), "{}", token).statusCode())
+                .isEqualTo(401);
+    }
+
+    @Test
+    void existingTokenCannotKeepThePreviousRoleAfterAccountChanges() throws Exception {
+        String token = token("user@example.test");
+        ReflectionTestUtils.setField(usuarios.findById(USER_ID).orElseThrow(), "perfil", Perfil.EMPRESA);
+        assertThat(get("/api/colaborador/security-test", token).statusCode()).isEqualTo(401);
+    }
+
+    @Test
+    void existingCompanyTokenRequiresAnEnabledAccountWithCompany() throws Exception {
+        String token = token("rh@example.test");
+        Usuario rh = usuarios.findById(RH_ID).orElseThrow();
+        ReflectionTestUtils.setField(rh, "loginHabilitado", false);
+        assertThat(get("/api/empresa/security-test", token).statusCode()).isEqualTo(401);
+        ReflectionTestUtils.setField(rh, "loginHabilitado", true);
+        ReflectionTestUtils.setField(rh, "empresa", null);
+        assertThat(get("/api/empresa/security-test", token).statusCode()).isEqualTo(401);
     }
 
     @Test
@@ -254,8 +288,14 @@ class AuthSecurityTest {
     }
 
     private HttpResponse<String> post(String path, String body) throws Exception {
-        return CLIENT.send(HttpRequest.newBuilder(uri(path)).header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(body)).build(), HttpResponse.BodyHandlers.ofString());
+        return post(path, body, null);
+    }
+
+    private HttpResponse<String> post(String path, String body, String token) throws Exception {
+        HttpRequest.Builder request = HttpRequest.newBuilder(uri(path)).header("Content-Type", "application/json");
+        if (token != null) request.header("Authorization", "Bearer " + token);
+        return CLIENT.send(request.POST(HttpRequest.BodyPublishers.ofString(body)).build(),
+                HttpResponse.BodyHandlers.ofString());
     }
 
     private HttpResponse<String> get(String path, String token) throws Exception {
