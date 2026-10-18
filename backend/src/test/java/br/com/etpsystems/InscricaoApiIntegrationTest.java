@@ -88,6 +88,31 @@ class InscricaoApiIntegrationTest {
         }
     }
 
+    @Test
+    void simultaneousRequestsForTheSameCourseReturnTheSameEnrollment() throws Exception {
+        usuarios.save(new Usuario("Aluno concorrente", firstEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
+        UUID cursoId = cursos.findAllByOrderByOrdemExibicaoAscTituloAsc().get(0).getId();
+        try (HttpClient client = HttpClient.newHttpClient();
+                var executor = java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor()) {
+            String token = login(client, firstEmail);
+            var start = new java.util.concurrent.CountDownLatch(1);
+            var requests = new java.util.ArrayList<java.util.concurrent.Future<HttpResponse<String>>>();
+            for (int i = 0; i < 8; i++) {
+                requests.add(executor.submit(() -> {
+                    start.await();
+                    return post(client, "/api/colaborador/inscricoes/cursos/" + cursoId, token);
+                }));
+            }
+            start.countDown();
+            for (var request : requests) {
+                var response = request.get(20, java.util.concurrent.TimeUnit.SECONDS);
+                assertThat(response.statusCode()).isEqualTo(200);
+                assertThat(JSON.readTree(response.body()).path("id").asText()).isEqualTo(cursoId.toString());
+            }
+            assertThat(JSON.readTree(get(client, "/api/colaborador/meus-cursos", token).body()).size()).isEqualTo(1);
+        }
+    }
+
     @AfterEach
     void removeUsers() {
         usuarios.findByEmailIgnoreCase(firstEmail).ifPresent(usuarios::delete);

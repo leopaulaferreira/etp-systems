@@ -29,6 +29,7 @@ class TrilhaPerfilApiIntegrationTest {
     @LocalServerPort private int port;
     @Autowired private UsuarioRepository usuarios;
     @Autowired private PasswordEncoder passwords;
+    @Autowired private org.springframework.jdbc.core.JdbcTemplate jdbc;
 
     @Test
     void trackEnrollmentCreatesCourseEnrollmentsAndProfileChangesPersist() throws Exception {
@@ -71,6 +72,43 @@ class TrilhaPerfilApiIntegrationTest {
             assertThat(profile.path("phone").asText()).isEqualTo("11999999999");
             assertThat(profile.path("notificationsEnabled").asBoolean()).isFalse();
             assertThat(profile.has("senhaHash")).isFalse();
+        }
+    }
+
+    @Test
+    void simultaneousTrackAndCourseEnrollmentsDoNotCreateDuplicates() throws Exception {
+        Usuario user = usuarios.save(new Usuario("Aluno concorrente", email, passwords.encode(PASSWORD),
+                Perfil.COLABORADOR, null));
+        try (HttpClient client = HttpClient.newHttpClient();
+                var executor = java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor()) {
+            String token = login(client);
+            JsonNode trail = JSON.readTree(get(client, "/api/colaborador/trilhas", token).body()).get(0);
+            String trailId = trail.path("id").asText();
+            String courseId = trail.path("courses").get(0).path("id").asText();
+            var start = new java.util.concurrent.CountDownLatch(1);
+            var requests = new java.util.ArrayList<java.util.concurrent.Future<HttpResponse<String>>>();
+            for (int i = 0; i < 8; i++) {
+                String path = i % 2 == 0 ? "/api/colaborador/trilhas/" + trailId + "/inscricao"
+                        : "/api/colaborador/inscricoes/cursos/" + courseId;
+                requests.add(executor.submit(() -> {
+                    start.await();
+                    return post(client, path, token);
+                }));
+            }
+            start.countDown();
+            for (var request : requests) {
+                assertThat(request.get(20, java.util.concurrent.TimeUnit.SECONDS).statusCode()).isEqualTo(200);
+            }
+            assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM inscricoes WHERE usuario_id = ? AND trilha_id = ?",
+                    Integer.class, user.getId().toString(), trailId)).isEqualTo(1);
+            assertThat(JSON.readTree(get(client, "/api/colaborador/meus-cursos", token).body()).size())
+                    .isEqualTo(trail.path("courseCount").asInt());
+            assertThat(post(client, "/api/colaborador/trilhas/" + trailId + "/inscricao", token).statusCode())
+                    .isEqualTo(200);
+            org.assertj.core.api.Assertions.assertThatThrownBy(() -> jdbc.update(
+                    "INSERT INTO inscricoes (id, usuario_id, trilha_id) VALUES (?, ?, ?)",
+                    UUID.randomUUID().toString(), user.getId().toString(), trailId))
+                    .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
         }
     }
 

@@ -34,7 +34,7 @@ As migrações em `src/main/resources/db/migration/` criam o schema (V1), acresc
 - Um `Usuario` pertence a zero ou uma `Empresa`; uma empresa pode ter vários usuários.
 - Um `Curso` pertence a zero ou uma `Categoria`; uma categoria pode classificar vários cursos.
 - Uma `Trilha` pode pertencer a uma empresa e contém vários cursos; um curso pode participar de várias trilhas pela tabela `trilhas_cursos`.
-- Uma `Inscricao` vincula um colaborador a um curso ou uma trilha. A V5 impede destinos vazios ou duplos e inscrições repetidas no mesmo curso.
+- Uma `Inscricao` vincula um colaborador a um curso ou uma trilha. A V5 impede destinos vazios ou duplos e inscrições repetidas no mesmo curso. A V29 também impede inscrições repetidas na mesma trilha e preserva a primeira inscrição se houver duplicatas antigas.
 - Um `ProgressoCurso` guarda percentual, atualização e conclusão por usuário e curso. O percentual só pode ser alterado pelo colaborador inscrito.
 - Uma `Avaliacao` pertence a um curso e contém questões com alternativas. Cada `Tentativa` pertence ao colaborador e guarda suas respostas, nota e aprovação.
 - Um `Certificado` vincula usuário e curso, com código único e data de emissão. Há no máximo um por usuário e curso.
@@ -119,6 +119,7 @@ A Fase 4 não inclui cadastro público, confirmação/recuperação por e-mail n
 - `POST /api/colaborador/inscricoes/cursos/{cursoId}` inscreve o colaborador identificado pelo JWT. Repetir a chamada retorna a inscrição existente sem duplicá-la; curso inexistente retorna 404.
 - `GET /api/colaborador/meus-cursos` lista apenas os cursos inscritos pelo colaborador autenticado, em ordem da inscrição mais recente. A resposta contém dados básicos do curso e `enrolledAt`, sem entidades JPA ou informações de outros usuários.
 - `GET /api/colaborador/trilhas` lista as trilhas cadastradas e calcula o progresso com base nos cursos. `POST /api/colaborador/trilhas/{trilhaId}/inscricao` inscreve na trilha e em seus cursos sem duplicar inscrições.
+- Inscrições em cursos e trilhas bloqueiam o registro do colaborador antes das consultas, evitando duplicação e erros de unicidade em chamadas simultâneas, inclusive quando uma chamada inscreve na trilha e outra em um dos seus cursos.
 - Progresso, aulas concluídas e certificados continuam nas fases seguintes; a Fase 6 não inventa percentuais.
 
 ## Progresso por aula

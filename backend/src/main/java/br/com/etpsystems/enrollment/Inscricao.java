@@ -15,11 +15,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 @Entity
-@Table(name = "inscricoes")
+@Table(name = "inscricoes", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_inscricoes_usuario_curso", columnNames = {"usuario_id", "curso_id"}),
+        @UniqueConstraint(name = "uk_inscricoes_usuario_trilha", columnNames = {"usuario_id", "trilha_id"})
+})
 public class Inscricao {
 
     @Id

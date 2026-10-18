@@ -36,7 +36,7 @@ public class InscricaoService {
 
     @Transactional(readOnly = true)
     public List<MeuCursoResponse> meusCursos(UUID usuarioId) {
-        colaborador(usuarioId);
+        colaborador(usuarioId, false);
         Map<UUID, ProgressoCurso> porCurso = progressos.findByUsuario_Id(usuarioId).stream()
                 .collect(Collectors.toMap(progresso -> progresso.getCurso().getId(), Function.identity()));
         return inscricoes.findByUsuario_IdAndCursoIsNotNullOrderByInscritoEmDesc(usuarioId)
@@ -46,7 +46,7 @@ public class InscricaoService {
 
     @Transactional
     public MeuCursoResponse inscrever(UUID usuarioId, UUID cursoId) {
-        Usuario usuario = colaborador(usuarioId);
+        Usuario usuario = colaborador(usuarioId, true);
         ProgressoCurso progresso = progressos.findByUsuario_IdAndCurso_Id(usuarioId, cursoId).orElse(null);
         return inscricoes.findByUsuario_IdAndCurso_Id(usuarioId, cursoId)
                 .map(inscricao -> MeuCursoResponse.from(inscricao, progresso))
@@ -57,8 +57,9 @@ public class InscricaoService {
                 });
     }
 
-    private Usuario colaborador(UUID id) {
-        Usuario usuario = usuarios.findById(id)
+    private Usuario colaborador(UUID id, boolean bloquear) {
+        var resultado = bloquear ? usuarios.findByIdForUpdate(id) : usuarios.findById(id);
+        Usuario usuario = resultado
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário indisponível"));
         if (usuario.getPerfil() != Perfil.COLABORADOR) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acesso permitido apenas a colaboradores");

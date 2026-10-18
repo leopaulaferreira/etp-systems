@@ -37,7 +37,7 @@ public class TrilhaService {
 
     @Transactional(readOnly = true)
     public List<TrilhaResponse> listar(UUID usuarioId) {
-        colaborador(usuarioId);
+        colaborador(usuarioId, false);
         Map<UUID, ProgressoCurso> porCurso = progressos.findByUsuario_Id(usuarioId).stream()
                 .collect(Collectors.toMap(p -> p.getCurso().getId(), Function.identity()));
         Set<UUID> inscritas = inscricoes.findByUsuario_IdAndTrilhaIsNotNull(usuarioId).stream()
@@ -48,7 +48,7 @@ public class TrilhaService {
 
     @Transactional
     public TrilhaResponse inscrever(UUID usuarioId, UUID trilhaId) {
-        Usuario usuario = colaborador(usuarioId);
+        Usuario usuario = colaborador(usuarioId, true);
         Trilha trilha = trilhas.findById(trilhaId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Trilha não encontrada"));
         if (trilha.getEmpresa() != null && (usuario.getEmpresa() == null
@@ -66,8 +66,9 @@ public class TrilhaService {
         return resposta(trilha, true, porCurso);
     }
 
-    private Usuario colaborador(UUID id) {
-        Usuario usuario = usuarios.findById(id)
+    private Usuario colaborador(UUID id, boolean bloquear) {
+        var resultado = bloquear ? usuarios.findByIdForUpdate(id) : usuarios.findById(id);
+        Usuario usuario = resultado
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário indisponível"));
         if (usuario.getPerfil() != Perfil.COLABORADOR || !usuario.isLoginHabilitado()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acesso permitido apenas a colaboradores");
