@@ -7,6 +7,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-public record EnviarTentativaRequest(@NotEmpty List<@Valid RespostaRequest> respostas) {
+public record EnviarTentativaRequest(@NotEmpty List<@NotNull @Valid RespostaRequest> respostas) {
     public record RespostaRequest(@NotNull UUID questaoId, @NotNull UUID alternativaId) {}
 }

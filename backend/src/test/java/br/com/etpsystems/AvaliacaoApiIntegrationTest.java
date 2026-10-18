@@ -495,6 +495,9 @@ class AvaliacaoApiIntegrationTest {
             }
             assertThat(assessment.path("questions").get(0).path("correctOption").isNull()).isTrue();
             assertThat(post(client, path, firstToken, "{\"respostas\":[]}").statusCode()).isEqualTo(400);
+            assertThat(post(client, path, firstToken, "{\"respostas\":[null]}").statusCode()).isEqualTo(400);
+            assertThat(JSON.readTree(get(client, "/api/colaborador/avaliacoes", firstToken).body())
+                    .get(0).path("attempts").size()).isZero();
 
             List<Map<String, String>> wrong = new ArrayList<>();
             List<Map<String, String>> right = new ArrayList<>();
