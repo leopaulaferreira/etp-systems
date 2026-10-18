@@ -25,6 +25,9 @@ etp:
     empresa-email: ${ETP_DEMO_EMPRESA_EMAIL:rhetp@gmail.com}
     company-name: ${ETP_DEMO_COMPANY_NAME:ETP Demonstração}
   security:
+    login:
+      max-requests: ${LOGIN_MAX_REQUESTS:10}
+      window-seconds: ${LOGIN_WINDOW_SECONDS:60}
     jwt:
       secret: ${JWT_SECRET}
       issuer: etp-systems

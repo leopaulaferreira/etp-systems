@@ -11,6 +11,7 @@ type SupportCopy = {
   terms: string
   close: string
   invalidCredentials: string
+  rateLimited: string
   unavailable: string
   roleMismatch: string
   expiredSession: string
@@ -28,6 +29,7 @@ export const loginSupportCopy: Record<Locale, SupportCopy> = {
     terms: "O ETP Systems é um projeto acadêmico. O acesso exige uma conta cadastrada. Cursos, progresso e certificados ainda incluem conteúdo ilustrativo.",
     close: "Entendi",
     invalidCredentials: "E-mail ou senha inválidos. Confira os dados e tente novamente.",
+    rateLimited: "Muitas tentativas de login. Aguarde um pouco antes de tentar novamente.",
     unavailable: "Não foi possível entrar agora. Confira sua conexão e tente novamente.",
     roleMismatch: "Esta conta pertence ao outro perfil. Selecione Colaborador ou Empresa / RH conforme seu cadastro.",
     expiredSession: "Sua sessão expirou ou foi encerrada. Entre novamente para continuar.",
@@ -43,6 +45,7 @@ export const loginSupportCopy: Record<Locale, SupportCopy> = {
     terms: "ETP Systems is an academic project. Access requires a registered account. Courses, progress and certificates still include sample content.",
     close: "Got it",
     invalidCredentials: "Invalid email or password. Check your details and try again.",
+    rateLimited: "Too many sign-in attempts. Please wait before trying again.",
     unavailable: "Unable to sign in right now. Check your connection and try again.",
     roleMismatch: "This account belongs to the other access type. Select Employee or Company / HR to match your account.",
     expiredSession: "Your session has expired or ended. Sign in again to continue.",
@@ -58,6 +61,7 @@ export const loginSupportCopy: Record<Locale, SupportCopy> = {
     terms: "ETP Systems es un proyecto académico. El acceso requiere una cuenta registrada. Los cursos, avances y certificados aún incluyen contenido ilustrativo.",
     close: "Entendido",
     invalidCredentials: "Correo o contraseña incorrectos. Revisa los datos e inténtalo de nuevo.",
+    rateLimited: "Demasiados intentos. Espera un momento antes de volver a intentarlo.",
     unavailable: "No se pudo iniciar sesión. Comprueba tu conexión e inténtalo de nuevo.",
     roleMismatch: "Esta cuenta pertenece al otro perfil. Selecciona Colaborador o Empresa / RR. HH. según tu cuenta.",
     expiredSession: "Tu sesión ha caducado o finalizado. Vuelve a iniciar sesión.",
@@ -73,6 +77,7 @@ export const loginSupportCopy: Record<Locale, SupportCopy> = {
     terms: "ETP Systems est un projet académique. L’accès exige un compte enregistré. Les cours, progressions et certificats incluent encore des exemples.",
     close: "Compris",
     invalidCredentials: "E-mail ou mot de passe incorrect. Vérifiez vos informations.",
+    rateLimited: "Trop de tentatives. Patientez avant de réessayer.",
     unavailable: "Connexion impossible pour le moment. Vérifiez votre connexion et réessayez.",
     roleMismatch: "Ce compte appartient à l’autre profil. Sélectionnez Collaborateur ou Entreprise / RH selon votre compte.",
     expiredSession: "Votre session a expiré ou a pris fin. Connectez-vous à nouveau.",
@@ -88,6 +93,7 @@ export const loginSupportCopy: Record<Locale, SupportCopy> = {
     terms: "ETP Systems ist ein akademisches Projekt. Der Zugang erfordert ein registriertes Konto. Kurse, Fortschritte und Zertifikate enthalten weiterhin Beispieldaten.",
     close: "Verstanden",
     invalidCredentials: "E-Mail oder Passwort ungültig. Prüfen Sie Ihre Eingaben.",
+    rateLimited: "Zu viele Anmeldeversuche. Bitte warten Sie vor dem nächsten Versuch.",
     unavailable: "Anmeldung derzeit nicht möglich. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
     roleMismatch: "Dieses Konto gehört zum anderen Profil. Wählen Sie Mitarbeiter oder Unternehmen / HR entsprechend Ihrem Konto.",
     expiredSession: "Ihre Sitzung ist abgelaufen oder beendet. Melden Sie sich erneut an.",
@@ -103,6 +109,7 @@ export const loginSupportCopy: Record<Locale, SupportCopy> = {
     terms: "ETP Systems è un progetto accademico. L’accesso richiede un account registrato. Corsi, progressi e certificati includono ancora contenuti illustrativi.",
     close: "Ho capito",
     invalidCredentials: "E-mail o password non valide. Controlla i dati e riprova.",
+    rateLimited: "Troppi tentativi di accesso. Attendi prima di riprovare.",
     unavailable: "Accesso non disponibile al momento. Controlla la connessione e riprova.",
     roleMismatch: "Questo account appartiene all’altro profilo. Seleziona Collaboratore o Azienda / HR secondo il tuo account.",
     expiredSession: "La sessione è scaduta o terminata. Accedi di nuovo.",

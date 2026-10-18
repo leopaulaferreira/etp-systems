@@ -294,3 +294,16 @@ O backend em [`backend/`](backend/README.md) oferece Spring Boot, MySQL, Docker,
 migrações, catálogo, login com BCrypt/JWT, inscrições, progresso, avaliações,
 certificados, painéis do colaborador e da empresa, trilhas e perfil. Consulte o guia
 para configurar as contas locais, usar o Swagger e executar os testes.
+
+### Limite de solicitações de login
+
+O backend permite, por padrão, 10 solicitações de login por IP em uma janela de
+60 segundos, contando também logins válidos e corpos inválidos. O excesso retorna
+HTTP 429 com `Retry-After`; a tela orienta aguardar. Configure `LOGIN_MAX_REQUESTS`
+e `LOGIN_WINDOW_SECONDS` com valores positivos para ajustar o limite. Usuários
+na mesma rede podem compartilhar o IP e, portanto, o limite.
+
+O controle é mantido em memória por instância e reinicia com o backend. Não confia
+em `X-Forwarded-For` enviado diretamente pelo cliente. Ao publicar atrás de proxy,
+configure a identificação do IP somente por proxies confiáveis ou aplique o limite
+no proxy. Para múltiplas instâncias, use um limitador compartilhado ou no gateway.

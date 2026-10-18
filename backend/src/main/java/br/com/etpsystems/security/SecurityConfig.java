@@ -30,7 +30,7 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, UrlBasedCorsConfigurationSource cors,
-            AuthService accounts) throws Exception {
+            AuthService accounts, LoginRateLimiter loginLimiter) throws Exception {
         JwtGrantedAuthoritiesConverter authorities = new JwtGrantedAuthoritiesConverter();
         authorities.setAuthoritiesClaimName("perfil");
         authorities.setAuthorityPrefix("ROLE_");
@@ -38,6 +38,8 @@ public class SecurityConfig {
         converter.setJwtGrantedAuthoritiesConverter(authorities);
 
         return http
+                .addFilterBefore(new LoginRateLimitFilter(loginLimiter),
+                        org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter.class)
                 // A API aceita autenticação somente por Bearer; não usa cookies de sessão.
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(config -> config.configurationSource(cors))

@@ -48,7 +48,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [help, setHelp] = useState<HelpTopic | null>(null)
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
-  const [submitError, setSubmitError] = useState<'invalidCredentials' | 'unavailable' | 'roleMismatch' | null>(null)
+  const [submitError, setSubmitError] = useState<'invalidCredentials' | 'rateLimited' | 'unavailable' | 'roleMismatch' | null>(null)
   const emailRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
   const request = useRef<AbortController | null>(null)
@@ -92,6 +92,7 @@ export default function LoginPage() {
     } catch (error) {
       if (!controller.signal.aborted) {
         setSubmitError(error instanceof AccountRoleError ? 'roleMismatch'
+          : error instanceof ApiError && error.status === 429 ? 'rateLimited'
           : error instanceof ApiError && (error.status === 401 || error.status === 400) ? 'invalidCredentials' : 'unavailable')
       }
     } finally {

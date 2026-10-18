@@ -24,6 +24,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
         "spring.autoconfigure.exclude=org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration",
         "etp.demo.enabled=false",
+        "etp.security.login.max-requests=3",
         "DB_PASSWORD=test"
 })
 class ApiSmokeTest {
@@ -78,6 +79,25 @@ class ApiSmokeTest {
             HttpResponse<String> swagger = get(client, "/swagger-ui/index.html");
             assertThat(swagger.statusCode()).isEqualTo(200);
             assertThat(swagger.body()).contains("swagger-ui");
+        }
+    }
+
+    @Test
+    void loginLimitRunsBeforeBodyValidationAndPreservesCors() throws Exception {
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            var request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/api/auth/login"))
+                    .header("Content-Type", "application/json")
+                    .header("Origin", "http://localhost:5173")
+                    .POST(HttpRequest.BodyPublishers.ofString("{}")) .build();
+            for (int i = 0; i < 3; i++) {
+                assertThat(client.send(request, HttpResponse.BodyHandlers.ofString()).statusCode()).isEqualTo(400);
+            }
+            var blocked = client.send(request, HttpResponse.BodyHandlers.ofString());
+            assertThat(blocked.statusCode()).isEqualTo(429);
+            assertThat(blocked.headers().firstValue("Retry-After")).isPresent();
+            assertThat(blocked.headers().firstValue("Access-Control-Allow-Origin")).contains("http://localhost:5173");
+            assertThat(blocked.body()).contains("Muitas tentativas");
+            assertThat(get(client, "/actuator/health").statusCode()).isEqualTo(200);
         }
     }
 
