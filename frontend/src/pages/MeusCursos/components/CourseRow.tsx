@@ -21,6 +21,13 @@ export default function CourseRow({ course, isSaved, onOpen, onToggleSave }: Cou
         <div className="flex min-w-0 flex-col items-start gap-1.5">
           <CourseBadge type={course.type} />
           <h3 className="text-[13px] font-extrabold leading-snug text-ink-900">{course.title}</h3>
+          {course.lessonCount !== undefined && (
+            <span className={`text-[11px] font-semibold ${course.lessonCount > 0 ? 'text-emerald-400' : 'text-ink-500'}`}>
+              {course.lessonCount > 0
+                ? `${course.lessonCount} ${course.lessonCount === 1 ? 'aula disponível' : 'aulas disponíveis'}`
+                : 'Conteúdo em preparação'}
+            </span>
+          )}
         </div>
       </div>
       <CourseProgress course={course} />

@@ -9,7 +9,7 @@ import SideCourseCard from './components/SideCourseCard'
 import MeusCursosHero from './components/MeusCursosHero'
 import CourseDetailsDialog from './components/CourseDetailsDialog'
 import ContinueCourseCard from './components/ContinueCourseCard'
-import { courseThumbnail, fetchMyCourses, formatCourseDuration } from './myCoursesApi'
+import { courseThumbnail, fetchMyCourses, formatCourseDuration, prioritizeAvailableCourses } from './myCoursesApi'
 import './meus-cursos.css'
 
 export default function MeusCursosPage() {
@@ -25,9 +25,10 @@ export default function MeusCursosPage() {
   const savedIds = new Set(saved.map((course) => course.id))
   const courseIds = new Set(courses.map((course) => course.id))
   const explore = suggestions.filter((course) => !courseIds.has(course.id)).slice(0, 3)
-  const ongoingCourses = courses.filter((course) => course.progress !== 100)
-  const completedCourses = courses.filter((course) => course.progress === 100)
-  const continueCourse = ongoingCourses.find((course) => (course.progress ?? 0) > 0)
+  const ongoingCourses = prioritizeAvailableCourses(courses.filter((course) => course.progress !== 100))
+  const completedCourses = prioritizeAvailableCourses(courses.filter((course) => course.progress === 100))
+  const sortedSaved = prioritizeAvailableCourses(saved)
+  const continueCourse = ongoingCourses.find((course) => (course.lessonCount ?? 0) > 0 && (course.progress ?? 0) > 0)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -93,7 +94,7 @@ export default function MeusCursosPage() {
                   : 'Inscreva-se em um curso no catálogo para começar a estudar.'} {...listProps} />
             </div>
             <aside className="flex min-w-0 flex-col gap-5" aria-label="Cursos salvos e sugestões">
-              <SideCourseCard title="Cursos salvos" actionLabel="Ver todos os salvos" courses={saved}
+              <SideCourseCard title="Cursos salvos" actionLabel="Ver todos os salvos" courses={sortedSaved}
                 onOpen={setSelectedCourse} onAction={showSaved} />
               <SideCourseCard title="Continue explorando" actionLabel="Explorar mais cursos" courses={explore}
                 emptyMessage="Explore o catálogo para encontrar mais cursos." onOpen={setSelectedCourse} to="/cursos" />
@@ -104,7 +105,7 @@ export default function MeusCursosPage() {
             emptyMessage="Você ainda não concluiu nenhum curso." {...listProps} />
         ) : (
           <div className="grid min-w-0 grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
-            <CourseListCard title="Cursos salvos" courses={saved} {...listProps} />
+            <CourseListCard title="Cursos salvos" courses={sortedSaved} {...listProps} />
             <SideCourseCard title="Continue explorando" actionLabel="Explorar mais cursos" courses={explore}
               emptyMessage="Explore o catálogo para encontrar mais cursos." onOpen={setSelectedCourse} to="/cursos" />
           </div>

@@ -8,6 +8,7 @@ export type CourseItem = {
   description?: string
   type: 'CURSO' | 'TRILHA'
   thumbnail: CourseThumbnailKey
+  lessonCount?: number
   progress?: number
   lastLesson?: string
   duration?: string

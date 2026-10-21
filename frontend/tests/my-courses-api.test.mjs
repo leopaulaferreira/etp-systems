@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { enrollCourse, fetchMyCourses, parseMyCourse, updateCourseProgress } from '../src/pages/MeusCursos/myCoursesApi.ts'
+import { enrollCourse, fetchMyCourses, parseMyCourse, updateCourseProgress, prioritizeAvailableCourses } from '../src/pages/MeusCursos/myCoursesApi.ts'
 
 const course = {
   id: '7154c4de-cacd-44fd-9381-a20ad67ba541',
@@ -12,7 +12,7 @@ const course = {
 test('converte a inscrição real e valida o progresso', () => {
   assert.deepEqual(parseMyCourse(course), {
     id: course.id, title: course.title, description: course.description,
-    type: 'CURSO', thumbnail: 'cloud', duration: '6h 30m', progress: 0,
+    type: 'CURSO', thumbnail: 'cloud', duration: '6h 30m', progress: 0, lessonCount: undefined,
     updatedAt: undefined, completedAt: undefined,
   })
   assert.throws(() => parseMyCourse({ ...course, id: 'curso-local' }), /incompletos/)
@@ -67,5 +67,22 @@ test('atualiza progresso por PUT apenas com valor válido', async () => {
     assert.equal(requests.length, 1)
   } finally {
     globalThis.fetch = previous
+  }
+})
+
+
+test('cursos com aulas vêm primeiro sem alterar a lista ou a ordem dentro dos grupos', () => {
+  const items = [
+    { ...parseMyCourse(course), id: 'preparacao', lessonCount: 0 },
+    { ...parseMyCourse(course), id: 'video', lessonCount: 3 },
+    { ...parseMyCourse(course), id: 'desconhecido' },
+    { ...parseMyCourse(course), id: 'texto', lessonCount: 1 },
+  ]
+  const original = structuredClone(items)
+  assert.deepEqual(prioritizeAvailableCourses(items).map(item => item.id), ['video', 'texto', 'preparacao', 'desconhecido'])
+  assert.deepEqual(items, original)
+  assert.equal(parseMyCourse({ ...course, lessonCount: 3 }).lessonCount, 3)
+  for (const invalid of [-1, 1.5, '3', null]) {
+    assert.throws(() => parseMyCourse({ ...course, lessonCount: invalid }), /incompletos/)
   }
 })

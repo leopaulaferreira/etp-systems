@@ -9,6 +9,7 @@ type ApiCourse = {
   icon: string
   durationHours: number
   enrolledAt: string
+  lessonCount?: number
   progress: number
   updatedAt: string | null
   completedAt: string | null
@@ -42,6 +43,7 @@ export function parseMyCourse(value: unknown): CourseItem {
       typeof course.icon !== 'string' ||
       typeof course.durationHours !== 'number' || !Number.isFinite(course.durationHours) || course.durationHours < 0 ||
       typeof course.enrolledAt !== 'string' || Number.isNaN(Date.parse(course.enrolledAt)) ||
+      (course.lessonCount !== undefined && (typeof course.lessonCount !== 'number' || !Number.isSafeInteger(course.lessonCount) || course.lessonCount < 0)) ||
       typeof course.progress !== 'number' || !Number.isFinite(course.progress) || course.progress < 0 || course.progress > 100 ||
       (course.updatedAt !== null && (typeof course.updatedAt !== 'string' || Number.isNaN(Date.parse(course.updatedAt)))) ||
       (course.completedAt !== null && (typeof course.completedAt !== 'string' || Number.isNaN(Date.parse(course.completedAt))))) {
@@ -53,6 +55,7 @@ export function parseMyCourse(value: unknown): CourseItem {
     type: 'CURSO', thumbnail: courseThumbnail(valid.icon),
     duration: formatCourseDuration(valid.durationHours),
     progress: valid.progress,
+    lessonCount: valid.lessonCount,
     updatedAt: valid.updatedAt ? formatDate(valid.updatedAt) : undefined,
     completedAt: valid.completedAt ? formatDate(valid.completedAt) : undefined,
   }
@@ -79,4 +82,9 @@ export async function updateCourseProgress(id: string, percentual: number): Prom
     `/api/colaborador/meus-cursos/${encodeURIComponent(id)}/progresso`,
     undefined, 'PUT', { percentual },
   ))
+}
+
+// Ordenação estável: preserva a ordem recebida dentro de cada grupo.
+export function prioritizeAvailableCourses(courses: CourseItem[]): CourseItem[] {
+  return [...courses].sort((a, b) => Number((b.lessonCount ?? 0) > 0) - Number((a.lessonCount ?? 0) > 0))
 }
