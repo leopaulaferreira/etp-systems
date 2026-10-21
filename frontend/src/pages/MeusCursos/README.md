@@ -19,3 +19,7 @@ O progresso agora é registrado pelo botão **Concluir aula** na página de estu
 ## Retomar a última aula
 
 Ao abrir um curso sem `?aula=`, a página retoma a última aula visitada pela conta nesse navegador. A preferência fica em `localStorage`, separada por ID de usuário e curso. Um link explícito para uma aula tem prioridade. Se a aula tiver sido removida ou o armazenamento estiver bloqueado, a página abre a primeira aula. A preferência não marca aulas como concluídas e não é sincronizada entre dispositivos.
+
+## Disponibilidade de aulas
+
+As listas priorizam cursos com `lessonCount > 0`, preservando a ordem original dentro de cada grupo. A API conta as aulas cadastradas em lote para os cursos inscritos, incluindo aulas em texto e vídeo. A indicação de disponibilidade aparece abaixo do título; o destaque de retomada considera apenas cursos com aulas. Novas aulas passam a contar na próxima consulta, sem manter uma lista fixa de títulos no frontend.
