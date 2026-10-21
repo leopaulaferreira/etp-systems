@@ -116,7 +116,7 @@ export default function CertificadosPage() {
           title={selected.status === 'completed' ? 'Seu certificado' : selected.awaitingRelease ? 'Aguardando liberação' : 'Certificado em andamento'}
           onClose={() => setSelected(null)}
         >
-          <CertificateDetails item={selected} onDownload={download} />
+          <CertificateDetails item={selected} onDownload={download} expanded />
           <p role="status" className="text-xs text-brand-blue-400">
             {announcement}
           </p>

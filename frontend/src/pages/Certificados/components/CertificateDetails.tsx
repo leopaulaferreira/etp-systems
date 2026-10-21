@@ -21,13 +21,15 @@ export default function CertificateDetails({
   item,
   onDownload,
   onOpen,
+  expanded = false,
 }: {
   item: Certificate
   onDownload: (item: Certificate) => void
+  expanded?: boolean
   onOpen?: (item: Certificate) => void
 }) {
   return (
-    <div className="grid min-w-0 items-center gap-6 sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+    <div className={`grid min-w-0 items-center gap-6 ${expanded ? 'grid-cols-1' : 'sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]'}`}>
       <CertificatePreview item={item} />
       <div className="flex min-w-0 flex-col gap-3">
         <CertificateBadge item={item} />

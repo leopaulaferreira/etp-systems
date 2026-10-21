@@ -57,7 +57,7 @@ export default function AssessmentCertificateResult({ courseId }: { courseId: st
             </button>
           </div>
           {expanded && <div id={previewId} className="mt-5 border-t border-ink-200 pt-5">
-            <CertificateDetails item={result.certificate} onDownload={download} />
+            <CertificateDetails item={result.certificate} onDownload={download} expanded />
           </div>}
           {downloadError && <p role="alert" className="mt-3 text-sm text-rose-400">Não foi possível baixar o PDF. Tente novamente.</p>}
         </>
