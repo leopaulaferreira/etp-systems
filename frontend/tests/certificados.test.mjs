@@ -105,3 +105,36 @@ test('PDF não pode ser gerado para um curso em andamento', () => {
     /ainda não está disponível/,
   )
 })
+
+test('prévia escapa dados do titular e identifica documentos ainda não emitidos', async () => {
+  const { certificateSvg } = await import('../src/pages/Certificados/certificateArtwork.ts')
+  const item = { ...certificates[0], holderName: 'Ana <script>alert(1)</script> & Silva' }
+  const svg = certificateSvg(item, 'Nome alternativo')
+  assert(!svg.includes('<script>'))
+  assert(svg.includes('&lt;script&gt;'))
+  assert(svg.includes('&amp;'))
+  assert(!svg.includes('Nome alternativo'))
+  const ongoing = certificateSvg(certificates.find(item => item.status === 'in_progress'), 'Rafael')
+  assert(ongoing.includes('PRÉVIA DO DOCUMENTO'))
+  assert(!ongoing.includes('Certificamos que'))
+})
+
+test('nomes e cursos longos cabem na composição sem perder conteúdo', async () => {
+  const { fitCertificateText, certificateArtwork } = await import('../src/pages/Certificados/certificateArtwork.ts')
+  const name = 'Maria Fernanda de Albuquerque e Vasconcelos dos Santos Oliveira Costa'
+  const title = 'Formação em Comunicação Assertiva, Desenvolvimento de Equipes e Gestão de Projetos no Ambiente Corporativo'
+  const fitted = fitCertificateText(name, 680, 31, 2)
+  assert(fitted.lines.length <= 2)
+  assert.equal(fitted.lines.join(' '), name)
+  const longWord = 'W'.repeat(150)
+  const split = fitCertificateText(longWord, 680, 31, 2)
+  assert(split.lines.length <= 2)
+  assert.equal(split.lines.join(''), longWord)
+  const marks = certificateArtwork({ ...certificates[0], holderName: name, title }, 'Ignorado')
+  const texts = marks.filter(mark => mark.kind === 'text')
+  assert(texts.every(mark => mark.x >= 0 && mark.x < 842 && mark.y > 0 && mark.y < 595))
+  assert.equal(texts.filter(mark => mark.y >= 350 && mark.y < 425).map(mark => mark.value).join(' '), title)
+  const pdf = await createCertificatePdf({ ...certificates[0], holderName: name, title }, 'Ignorado').text()
+  assert(!pdf.includes('Ignorado'))
+  assert(pdf.includes('/BaseFont /Times-Roman'))
+})
