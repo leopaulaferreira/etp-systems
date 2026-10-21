@@ -205,7 +205,9 @@ As tentativas e notas são registradas no backend. LGPD na Prática tem três
 videoaulas; Introdução à Inteligência Artificial tem três videoaulas e uma
 avaliação de seis questões. Gestão de Projetos Ágeis com Scrum tem três videoaulas
 e 18 questões, divididas em seis por aula. Cloud Computing Essencial também tem três videoaulas e 18 questões, com seis por aula. Segurança da Informação e Computação
-em Nuvem têm aulas em texto e avaliações. O progresso é calculado pelas aulas que o colaborador marca como concluídas.
+em Nuvem têm aulas em texto e avaliações. Introdução à Criptografia tem três videoaulas
+e 18 questões, seis por aula, com quatro alternativas, duas tentativas e aprovação
+a partir de 80%. A aprovação emite certificado pelo fluxo existente. O progresso é calculado pelas aulas que o colaborador marca como concluídas.
 
 ---
 
