@@ -13,7 +13,8 @@ import br.com.etpsystems.user.Perfil;
 import br.com.etpsystems.user.Usuario;
 import br.com.etpsystems.user.UsuarioRepository;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,12 +43,13 @@ class ProgressoAulaApiIntegrationTest {
     @Autowired
     private br.com.etpsystems.assessment.AulaRepository aulas;
 
-    @Test
-    void countsLessonsOncePersistsAndRejectsOtherUsersAndCourses() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"Cloud Computing Essencial", "Introdução à Criptografia"})
+    void countsLessonsOncePersistsAndRejectsOtherUsersAndCourses(String courseTitle) throws Exception {
         usuarios.save(new Usuario("Primeiro", firstEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
         usuarios.save(new Usuario("Segundo", otherEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
         UUID cursoId = cursos.findAllByOrderByOrdemExibicaoAscTituloAsc().stream()
-                .filter(curso -> curso.getTitulo().equals("Cloud Computing Essencial")).findFirst().orElseThrow().getId();
+                .filter(curso -> curso.getTitulo().equals(courseTitle)).findFirst().orElseThrow().getId();
         var lessons = aulas.findByCurso_IdOrderByOrdem(cursoId);
         assertThat(lessons).hasSize(3);
         String base = "/api/colaborador/meus-cursos/" + cursoId + "/aulas";
