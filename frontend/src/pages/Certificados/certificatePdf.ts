@@ -1,5 +1,5 @@
 import type { Certificate } from '../../types/certificate'
-import { formatCertificateDate } from './certificates.ts'
+import { certificateArtwork } from './certificateArtwork.ts'
 
 // Os literais usam WinAnsi com escapes octais: acentos em português e offsets
 // do PDF permanecem corretos sem dependências ou serviços externos.
@@ -16,42 +16,34 @@ function pdfText(value: string) {
 
 export function createCertificatePdf(item: Certificate, name: string): Blob {
   if (item.status !== 'completed') throw new Error('O certificado ainda não está disponível.')
-  const titleLines = item.title.split(' ').reduce<string[]>((lines, word) => {
-    const last = lines.length - 1
-    if (last < 0 || `${lines[last]} ${word}`.length > 48) lines.push(word)
-    else lines[last] += ` ${word}`
-    return lines
-  }, [])
-  const text = (value: string, x: number, y: number, size: number, bold = false) =>
-    `BT /${bold ? 'F2' : 'F1'} ${size} Tf ${x} ${y} Td (${pdfText(value)}) Tj ET`
-  const stream = [
-    '0.98 0.99 1 rg 0 0 842 595 re f',
-    '0.15 0.39 0.92 RG 2 w 28 28 786 539 re S',
-    '0.65 0.77 0.96 RG 0.5 w 35 35 772 525 re S',
-    '0.10 0.20 0.40 rg',
-    text('ETP Systems', 70, 502, 18, true),
-    text('CERTIFICADO DE CONCLUSÃO', 70, 446, 28, true),
-    text('Certificamos que', 70, 393, 14),
-    text(name, 70, 354, 26, true),
-    text('concluiu o curso', 70, 321, 14),
-    ...titleLines.map((line, index) => text(line, 70, 284 - index * 29, 22, true)),
-    text(
-      `Carga horária: ${item.hours} horas   |   Concluído em: ${formatCertificateDate(item.issuedAt)}`,
-      70,
-      168,
-      13,
-    ),
-    text(`Código de referência: ${item.code}`, 70, 137, 12),
-    '0.40 0.45 0.55 rg',
-    text('Emitido pelo ETP Systems.', 70, 78, 10),
-  ].join('\n')
+  const color = (hex: string) => [1, 3, 5].map(index => (parseInt(hex.slice(index, index + 2), 16) / 255).toFixed(4)).join(' ')
+  const fonts = { regular: 'F1', bold: 'F2', serif: 'F3', mono: 'F4' }
+  const stream = certificateArtwork(item, name).map(mark => {
+    switch (mark.kind) {
+      case 'rect': return `${color(mark.color)} rg ${mark.x} ${595 - mark.y - mark.height} ${mark.width} ${mark.height} re f`
+      case 'line': return `${color(mark.color)} RG ${mark.weight} w ${mark.x} ${595 - mark.y} m ${mark.endX} ${595 - mark.endY} l S`
+      case 'text': return `${color(mark.color)} rg BT /${fonts[mark.font]} ${mark.size} Tf ${mark.x} ${595 - mark.y} Td (${pdfText(mark.value)}) Tj ET`
+      case 'circle': {
+        const { x, radius: r } = mark
+        const y = 595 - mark.y
+        const k = r * 0.55228475
+        return `${color(mark.color)} RG ${mark.weight} w ${x + r} ${y} m `
+          + `${x + r} ${y + k} ${x + k} ${y + r} ${x} ${y + r} c `
+          + `${x - k} ${y + r} ${x - r} ${y + k} ${x - r} ${y} c `
+          + `${x - r} ${y - k} ${x - k} ${y - r} ${x} ${y - r} c `
+          + `${x + k} ${y - r} ${x + r} ${y - k} ${x + r} ${y} c S`
+      }
+    }
+  }).join('\n')
   const objects = [
     '<< /Type /Catalog /Pages 2 0 R >>',
     '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
-    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> /Contents 4 0 R >>',
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 5 0 R /F2 6 0 R /F3 7 0 R /F4 8 0 R >> >> /Contents 4 0 R >>',
     `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`,
     '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
     '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Times-Roman /Encoding /WinAnsiEncoding >>',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>',
   ]
   let document = '%PDF-1.4\n'
   const offsets = [0]
