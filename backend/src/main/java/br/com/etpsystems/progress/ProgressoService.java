@@ -53,6 +53,6 @@ public class ProgressoService {
         ProgressoCurso progresso = progressos.findByUsuario_IdAndCurso_Id(usuarioId, cursoId)
                 .orElseGet(() -> new ProgressoCurso(usuario, inscricao.getCurso()));
         progresso.atualizar(request.percentual());
-        return MeuCursoResponse.from(inscricao, progressos.saveAndFlush(progresso));
+        return MeuCursoResponse.from(inscricao, progressos.saveAndFlush(progresso), 0);
     }
 }

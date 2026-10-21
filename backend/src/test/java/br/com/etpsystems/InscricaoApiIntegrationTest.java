@@ -43,6 +43,31 @@ class InscricaoApiIntegrationTest {
     private br.com.etpsystems.assessment.AulaRepository aulas;
 
     @Test
+    void reportsActualLessonCountsForEnrolledCourses() throws Exception {
+        usuarios.save(new Usuario("Aluno", firstEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
+        var catalog = cursos.findAllByOrderByOrdemExibicaoAscTituloAsc();
+        UUID availableId = catalog.stream().filter(c -> c.getTitulo().equals("Introdução à Criptografia"))
+                .findFirst().orElseThrow().getId();
+        UUID preparingId = catalog.stream().filter(c -> aulas.countByCurso_Id(c.getId()) == 0)
+                .findFirst().orElseThrow().getId();
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            String token = login(client, firstEmail);
+            var available = post(client, "/api/colaborador/inscricoes/cursos/" + availableId, token);
+            assertThat(available.statusCode()).isEqualTo(200);
+            assertThat(JSON.readTree(available.body()).path("lessonCount").asInt()).isEqualTo(3);
+            var preparing = post(client, "/api/colaborador/inscricoes/cursos/" + preparingId, token);
+            assertThat(preparing.statusCode()).isEqualTo(200);
+            assertThat(JSON.readTree(preparing.body()).path("lessonCount").asInt(-1)).isZero();
+            JsonNode mine = JSON.readTree(get(client, "/api/colaborador/meus-cursos", token).body());
+            assertThat(mine.size()).isEqualTo(2);
+            for (JsonNode item : mine) {
+                assertThat(item.path("lessonCount").asInt(-1))
+                        .isEqualTo(item.path("id").asText().equals(availableId.toString()) ? 3 : 0);
+            }
+        }
+    }
+
+    @Test
     void enrollsOnlyTheAuthenticatedCollaboratorAndKeepsDuplicatesIdempotent() throws Exception {
         usuarios.save(new Usuario("Primeiro", firstEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
         usuarios.save(new Usuario("Segundo", otherEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));

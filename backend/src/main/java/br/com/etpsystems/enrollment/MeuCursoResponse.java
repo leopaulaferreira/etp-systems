@@ -15,14 +15,15 @@ public record MeuCursoResponse(
         Instant enrolledAt,
         double progress,
         Instant updatedAt,
-        Instant completedAt
+        Instant completedAt,
+        long lessonCount
 ) {
-    public static MeuCursoResponse from(Inscricao inscricao, ProgressoCurso progresso) {
+    public static MeuCursoResponse from(Inscricao inscricao, ProgressoCurso progresso, long lessonCount) {
         Curso curso = inscricao.getCurso();
         return new MeuCursoResponse(curso.getId(), curso.getTitulo(), curso.getDescricao(),
                 curso.getIcone(), curso.getDuracaoMinutos() / 60.0, inscricao.getInscritoEm(),
                 progresso == null ? 0 : progresso.getPercentualProgresso().doubleValue(),
                 progresso == null ? null : progresso.getAtualizadoEm(),
-                progresso == null ? null : progresso.getConcluidoEm());
+                progresso == null ? null : progresso.getConcluidoEm(), lessonCount);
     }
 }

@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import br.com.etpsystems.assessment.AulaRepository;
 import br.com.etpsystems.course.Curso;
 import br.com.etpsystems.course.CursoRepository;
 import br.com.etpsystems.progress.ProgressoCurso;
@@ -25,13 +26,15 @@ public class InscricaoService {
     private final UsuarioRepository usuarios;
     private final CursoRepository cursos;
     private final ProgressoRepository progressos;
+    private final AulaRepository aulas;
 
     public InscricaoService(InscricaoRepository inscricoes, UsuarioRepository usuarios, CursoRepository cursos,
-            ProgressoRepository progressos) {
+            ProgressoRepository progressos, AulaRepository aulas) {
         this.inscricoes = inscricoes;
         this.usuarios = usuarios;
         this.cursos = cursos;
         this.progressos = progressos;
+        this.aulas = aulas;
     }
 
     @Transactional(readOnly = true)
@@ -39,9 +42,15 @@ public class InscricaoService {
         colaborador(usuarioId, false);
         Map<UUID, ProgressoCurso> porCurso = progressos.findByUsuario_Id(usuarioId).stream()
                 .collect(Collectors.toMap(progresso -> progresso.getCurso().getId(), Function.identity()));
-        return inscricoes.findByUsuario_IdAndCursoIsNotNullOrderByInscritoEmDesc(usuarioId)
-                .stream().map(inscricao -> MeuCursoResponse.from(inscricao,
-                        porCurso.get(inscricao.getCurso().getId()))).toList();
+        List<Inscricao> minhasInscricoes = inscricoes.findByUsuario_IdAndCursoIsNotNullOrderByInscritoEmDesc(usuarioId);
+        if (minhasInscricoes.isEmpty()) return List.of();
+        Map<UUID, Long> aulasPorCurso = aulas.countByCourses(minhasInscricoes.stream()
+                .map(inscricao -> inscricao.getCurso().getId()).toList()).stream()
+                .collect(Collectors.toMap(AulaRepository.CourseLessonCount::getCourseId,
+                        AulaRepository.CourseLessonCount::getLessonCount));
+        return minhasInscricoes.stream().map(inscricao -> MeuCursoResponse.from(inscricao,
+                porCurso.get(inscricao.getCurso().getId()),
+                aulasPorCurso.getOrDefault(inscricao.getCurso().getId(), 0L))).toList();
     }
 
     @Transactional
@@ -49,11 +58,11 @@ public class InscricaoService {
         Usuario usuario = colaborador(usuarioId, true);
         ProgressoCurso progresso = progressos.findByUsuario_IdAndCurso_Id(usuarioId, cursoId).orElse(null);
         return inscricoes.findByUsuario_IdAndCurso_Id(usuarioId, cursoId)
-                .map(inscricao -> MeuCursoResponse.from(inscricao, progresso))
+                .map(inscricao -> MeuCursoResponse.from(inscricao, progresso, aulas.countByCurso_Id(cursoId)))
                 .orElseGet(() -> {
                     Curso curso = cursos.findById(cursoId)
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Curso não encontrado"));
-                    return MeuCursoResponse.from(inscricoes.save(new Inscricao(usuario, curso)), null);
+                    return MeuCursoResponse.from(inscricoes.save(new Inscricao(usuario, curso)), null, aulas.countByCurso_Id(cursoId));
                 });
     }
 
