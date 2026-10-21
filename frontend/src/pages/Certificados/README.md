@@ -2,8 +2,10 @@
 
 A página `/certificados` usa a sessão JWT e consulta `GET /api/colaborador/certificados`. A API retorna certificados emitidos para o usuário autenticado, com nome do titular, curso, código único e data de emissão. A página também combina inscrições e avaliações disponíveis para mostrar cursos que ainda aguardam certificação. Esses cursos não permitem download.
 
-A aprovação em uma avaliação emite um certificado quando o curso está habilitado para certificação. O progresso informado manualmente não autoriza a emissão. Nesta fase, Segurança da Informação e Computação em Nuvem estão habilitados; LGPD na Prática aguarda a terceira videoaula e a revisão das questões.
+A aprovação em uma avaliação emite um certificado quando o curso está habilitado para certificação. O progresso informado manualmente não autoriza a emissão. A habilitação de cada curso é definida no backend; cursos recentes, incluindo Introdução à Criptografia, já usam esse fluxo.
 
 A busca, os filtros e a ordenação atuam sobre os dados recebidos da API. O PDF é gerado localmente com o nome do titular e o código fornecidos pelo backend. Os downloads são contabilizados apenas durante a visita atual; não existe histórico persistente de downloads ou verificação pública do código. Em caso de falha na API, a página mostra uma opção para tentar novamente.
 
 Validação em `frontend/`: `npm run test:certificados`, `npm run build` e `npm run lint`. O arquivo `tests/fixtures/certificados.fixture.ts` permanece como fixture dos testes de filtros e PDF; a página não o utiliza.
+
+A prévia e o PDF compartilham a composição vetorial de `certificateArtwork.ts`: A4 paisagem, fundo marfim, azul profundo e detalhes dourados. Nomes e títulos longos recebem quebra de linha e ajuste de fonte. O selo é decorativo e institucional, sem representar assinatura digital ou acreditação externa. Documentos ainda não emitidos são identificados como prévia. A abertura do certificado mostra o documento acima dos detalhes para aproveitar a largura disponível.
