@@ -208,3 +208,15 @@ Vídeos em `frontend/public/videos/comunicacao-aula-{1,2,3}.mp4`:
 1. Fundamentos da Comunicação Assertiva — origem: `Assertividade__O_Meio-Termo_aula1.mp4`.
 2. Feedback e Conversas Difíceis — origem: `Assertividade_aula2.mp4`.
 3. Comunicação no Trabalho em Equipe — origem: `Comunicação_Assertiva.mp4`.
+
+### SQL para Iniciantes
+
+As migrações V32–V34 adicionam três videoaulas e 18 questões (seis por aula) ao curso existente, preservando seu ID e suas inscrições. Cada questão tem quatro alternativas, uma resposta correta e uma explicação. A avaliação segue o padrão dos demais cursos: nota mínima de 80%, duas tentativas iniciais e certificado após aprovação. Com 18 questões, 14 acertos resultam em 78% (reprovação) e 15 em 83% (aprovação). Gabarito e explicações são liberados após aprovação ou esgotamento das tentativas.
+
+| Aula | Vídeo | Arquivo de origem |
+| --- | --- | --- |
+| Introdução a Bancos de Dados e SQL | `frontend/public/videos/sql-aula-1.mp4` | `Introdução_a_Banco_de_Dados_aula1.mp4` |
+| Consultando Dados com SELECT | `frontend/public/videos/sql-aula-2.mp4` | `Consultando_com_SELECT_aula2.mp4` |
+| Manipulando Dados e Trabalhando com Relacionamentos | `frontend/public/videos/sql-aula-3.mp4` | `Aula_3__Manipulando_Dados_aula3.mp4` |
+
+Os testes de SQL em `AvaliacaoApiIntegrationTest` verificam a inscrição, a ordem das aulas, as 18 questões e seu gabarito, os exemplos SQL, os limites de aprovação, a revisão das respostas e a emissão do certificado. Execute com banco de testes e `ETP_DB_TEST=true`, conforme a seção de verificação acima.
