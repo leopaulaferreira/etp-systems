@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import {
   Accessibility, Bell, BookOpen, Check, ChevronRight, LockKeyhole, Target, Play, FileText, PencilLine,
@@ -24,8 +24,6 @@ type AccountDraft = {
   notificationsEnabled: boolean
 }
 type StudySettings = {
-  objective: string
-  difficulty: string
   videos: boolean
   articles: boolean
   exercises: boolean
@@ -38,8 +36,6 @@ const STORAGE_KEY = 'etp-study-settings-v1'
 const objectives = ['Aprimorar habilidades profissionais', 'Preparar-me para uma nova função', 'Explorar novos temas']
 const difficulties = ['Iniciante', 'Intermediário', 'Avançado']
 const defaultStudy: StudySettings = {
-  objective: objectives[0],
-  difficulty: difficulties[1],
   videos: true,
   articles: true,
   exercises: true,
@@ -95,8 +91,6 @@ function readStudySettings(storageKey: string): StudySettings {
     if (saved && typeof saved === 'object') {
       const values = saved as Record<string, unknown>
       return {
-        objective: objectives.includes(values.objective as string) ? values.objective as string : defaultStudy.objective,
-        difficulty: difficulties.includes(values.difficulty as string) ? values.difficulty as string : defaultStudy.difficulty,
         videos: typeof values.videos === 'boolean' ? values.videos : defaultStudy.videos,
         articles: typeof values.articles === 'boolean' ? values.articles : defaultStudy.articles,
         exercises: typeof values.exercises === 'boolean' ? values.exercises : defaultStudy.exercises,
@@ -126,6 +120,8 @@ export default function ConfiguracoesPage() {
   const [accountDraftState, setAccount] = useState<AccountDraft | null>(null)
   const account = accountDraftState ?? accountDraft(profile)
   const [study, setStudy] = useState(() => readStudySettings(studyStorageKey))
+  const [learningDraft, setLearningDraft] = useState<Partial<Record<'learningFocus' | 'experienceLevel', { value: string; revision: number }>>>({})
+  const learningRevision = useRef(0)
   const [saved, setSaved] = useState(false)
   const [securityNotice, setSecurityNotice] = useState(false)
   const [accountError, setAccountError] = useState('')
@@ -147,15 +143,30 @@ export default function ConfiguracoesPage() {
   function changeStudy<K extends keyof StudySettings>(key: K, value: StudySettings[K]) {
     const next = { ...study, [key]: value }
     setStudy(next)
-    if (key === 'objective' || key === 'difficulty') {
-      void updateProfile(key === 'objective' ? { learningFocus: String(value) } : { experienceLevel: String(value) })
-        .catch(() => setFeedback('Não foi possível salvar o perfil de aprendizagem.'))
-    }
     try {
       window.localStorage.setItem(studyStorageKey, JSON.stringify(next))
       setFeedback('Preferências salvas automaticamente.')
     } catch { setFeedback('Preferências aplicadas nesta sessão; armazenamento indisponível.') }
     setSaved(false)
+  }
+
+  async function changeLearning(key: 'learningFocus' | 'experienceLevel', value: string) {
+    const revision = ++learningRevision.current
+    setLearningDraft((current) => ({ ...current, [key]: { value, revision } }))
+    setFeedback('Salvando perfil de aprendizagem...')
+    try {
+      await updateProfile({ [key]: value })
+      if (revision === learningRevision.current) setFeedback('Perfil de aprendizagem salvo.')
+    } catch {
+      if (revision === learningRevision.current) setFeedback('Não foi possível salvar o perfil de aprendizagem. Tente novamente.')
+    } finally {
+      setLearningDraft((current) => {
+        if (current[key]?.revision !== revision) return current
+        const next = { ...current }
+        delete next[key]
+        return next
+      })
+    }
   }
 
   function exportData() {
@@ -361,13 +372,17 @@ export default function ConfiguracoesPage() {
                     <div className="grid min-w-0 grid-cols-1 gap-3 xl:grid-cols-2">
                       <label className="flex min-w-0 flex-col gap-1.5 text-[11px] font-semibold text-ink-500">
                         Objetivo de aprendizagem
-                        <select className={`${inputClass} min-w-0`} value={study.objective} onChange={(event) => changeStudy('objective', event.target.value)}>
+                        <select className={`${inputClass} min-w-0`} value={learningDraft.learningFocus?.value ?? profile.learningFocus} onChange={(event) => { void changeLearning('learningFocus', event.target.value) }}>
+                          <option value="">Não informado</option>
+                          {profile.learningFocus && !objectives.includes(profile.learningFocus) && <option>{profile.learningFocus}</option>}
                           {objectives.map((objective) => <option key={objective}>{objective}</option>)}
                         </select>
                       </label>
                       <label className="flex min-w-0 flex-col gap-1.5 text-[11px] font-semibold text-ink-500">
                         Nível de dificuldade preferido
-                        <select className={`${inputClass} min-w-0`} value={study.difficulty} onChange={(event) => changeStudy('difficulty', event.target.value)}>
+                        <select className={`${inputClass} min-w-0`} value={learningDraft.experienceLevel?.value ?? profile.experienceLevel} onChange={(event) => { void changeLearning('experienceLevel', event.target.value) }}>
+                          <option value="">Não informado</option>
+                          {profile.experienceLevel && !difficulties.includes(profile.experienceLevel) && <option>{profile.experienceLevel}</option>}
                           {difficulties.map((difficulty) => <option key={difficulty}>{difficulty}</option>)}
                         </select>
                       </label>
@@ -407,7 +422,7 @@ export default function ConfiguracoesPage() {
                     </div>
                   </div>
                 </div>
-                <p className="mt-3 text-[11px] leading-4 text-ink-500">Salvo automaticamente neste navegador. Os lembretes podem ser conferidos na prévia de Notificações.</p>
+                <p className="mt-3 text-[11px] leading-4 text-ink-500">Objetivo e nível são salvos na sua conta. Formatos e lembretes ficam neste navegador; os lembretes podem ser conferidos na prévia de Notificações.</p>
               </>
             )}
 

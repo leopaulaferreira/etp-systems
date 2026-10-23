@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import { fetchProfile, saveProfile, type CurrentUser, type EditableProfile } from './profileApi'
+import { createProfileEditor } from './profileEditor'
 
 type ProfileContextValue = {
   profile: CurrentUser
@@ -18,6 +19,10 @@ const emptyProfile: CurrentUser = {
 export function ProfileProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
   const [loaded, setLoaded] = useState<{ id: string; profile: CurrentUser } | null>(null)
+  // App remonta este provider quando a conta muda.
+  const [editor] = useState(() => createProfileEditor({ read: fetchProfile, save: saveProfile },
+    (profile) => { if (user) setLoaded({ id: user.id, profile }) }))
+  const lifecycle = useRef<AbortController | null>(null)
   const base: CurrentUser = { ...emptyProfile, name: user?.nome ?? '', email: user?.email ?? '',
     role: user?.perfil === 'EMPRESA' ? 'Empresa / RH' : 'Colaborador' }
   const profile = loaded && loaded.id === user?.id ? loaded.profile : base
@@ -25,32 +30,20 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!user || user.perfil !== 'COLABORADOR') return
     const controller = new AbortController()
-    fetchProfile(controller.signal).then((data) => {
-      if (!controller.signal.aborted) setLoaded({ id: user.id, profile: data })
-    }).catch(() => { /* A identidade da sessão continua visível se o perfil não carregar. */ })
+    lifecycle.current = controller
+    editor.load(controller.signal)
+      .catch(() => { /* A identidade da sessão continua visível se o perfil não carregar. */ })
     return () => controller.abort()
-  }, [user])
+  }, [user, editor])
 
   async function updateProfile(changes: Partial<EditableProfile>) {
     if (!user || user.perfil !== 'COLABORADOR') return
-    const current = loaded?.id === user.id ? loaded.profile : await fetchProfile()
-    const saved = await saveProfile({
-      name: changes.name ?? current.name, phone: changes.phone ?? current.phone,
-      location: changes.location ?? current.location, position: changes.position ?? current.position,
-      learningFocus: changes.learningFocus ?? current.learningFocus,
-      experienceLevel: changes.experienceLevel ?? current.experienceLevel,
-      notificationsEnabled: changes.notificationsEnabled ?? current.notificationsEnabled,
-    })
-    setLoaded({ id: user.id, profile: saved })
+    await editor.update(changes, lifecycle.current?.signal)
   }
 
   async function resetProfile(): Promise<CurrentUser> {
     if (!user || user.perfil !== 'COLABORADOR') return base
-    const current = loaded?.id === user.id ? loaded.profile : await fetchProfile()
-    const saved = await saveProfile({ name: current.name, phone: '', location: '', position: '',
-      learningFocus: '', experienceLevel: '', notificationsEnabled: true })
-    setLoaded({ id: user.id, profile: saved })
-    return saved
+    return editor.reset(lifecycle.current?.signal)
   }
 
   return <ProfileContext.Provider value={{ profile, updateProfile, resetProfile }}>{children}</ProfileContext.Provider>

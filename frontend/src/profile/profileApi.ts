@@ -39,6 +39,6 @@ export async function fetchProfile(signal?: AbortSignal): Promise<CurrentUser> {
   return parseProfile(await authSession.request('/api/colaborador/perfil', signal))
 }
 
-export async function saveProfile(profile: EditableProfile): Promise<CurrentUser> {
-  return parseProfile(await authSession.request('/api/colaborador/perfil', undefined, 'PUT', profile))
+export async function saveProfile(profile: EditableProfile, signal?: AbortSignal): Promise<CurrentUser> {
+  return parseProfile(await authSession.request('/api/colaborador/perfil', signal, 'PUT', profile))
 }
