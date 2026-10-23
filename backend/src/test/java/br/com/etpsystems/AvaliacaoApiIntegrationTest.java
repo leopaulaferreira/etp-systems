@@ -558,6 +558,118 @@ class AvaliacaoApiIntegrationTest {
     }
 
     @Test
+    void sqlCourseHasThreeVideoLessonsInOrder() throws Exception {
+        usuarios.save(new Usuario("Aluno SQL", firstEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
+        UUID courseId = cursos.findAllByOrderByOrdemExibicaoAscTituloAsc().stream()
+                .filter(course -> course.getTitulo().equals("SQL para Iniciantes"))
+                .findFirst().orElseThrow().getId();
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            String token = login(client, firstEmail);
+            String path = "/api/colaborador/cursos/" + courseId + "/aulas";
+            assertThat(get(client, path, token).statusCode()).isEqualTo(404);
+            assertThat(post(client, "/api/colaborador/inscricoes/cursos/" + courseId, token, null).statusCode())
+                    .isEqualTo(200);
+            JsonNode lessons = JSON.readTree(get(client, path, token).body());
+            assertThat(lessons.size()).isEqualTo(3);
+            String[] titles = {"Introdução a Bancos de Dados e SQL", "Consultando Dados com SELECT",
+                    "Manipulando Dados e Trabalhando com Relacionamentos"};
+            for (int index = 0; index < lessons.size(); index++) {
+                assertThat(lessons.get(index).path("order").asInt()).isEqualTo(index + 1);
+                assertThat(lessons.get(index).path("title").asText()).isEqualTo(titles[index]);
+                assertThat(lessons.get(index).path("content").asText()).isEmpty();
+                assertThat(lessons.get(index).path("videoUrl").asText())
+                        .isEqualTo("/videos/sql-aula-" + (index + 1) + ".mp4");
+            }
+        }
+    }
+
+    @Test
+    void sqlAssessmentHasEighteenQuestionsAndGradesThePassingThreshold() throws Exception {
+        usuarios.save(new Usuario("Aluno SQL", firstEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
+        UUID courseId = cursos.findAllByOrderByOrdemExibicaoAscTituloAsc().stream()
+                .filter(course -> course.getTitulo().equals("SQL para Iniciantes"))
+                .findFirst().orElseThrow().getId();
+        List<Integer> correctCounts = jdbc.queryForList("""
+                SELECT SUM(o.correta) FROM questoes q
+                JOIN avaliacoes a ON a.id = q.avaliacao_id
+                JOIN alternativas o ON o.questao_id = q.id
+                WHERE a.curso_id = ? GROUP BY q.id
+                """, Integer.class, courseId.toString());
+        assertThat(correctCounts).hasSize(18).allMatch(count -> count == 1);
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            String token = login(client, firstEmail);
+            assertThat(post(client, "/api/colaborador/inscricoes/cursos/" + courseId, token, null).statusCode())
+                    .isEqualTo(200);
+            JsonNode assessment = JSON.readTree(get(client, "/api/colaborador/avaliacoes", token).body()).get(0);
+            assertThat(assessment.path("courseId").asText()).isEqualTo(courseId.toString());
+            assertThat(assessment.path("estimatedMinutes").asInt()).isEqualTo(18);
+            assertThat(assessment.path("minimumScore").asInt()).isEqualTo(80);
+            assertThat(assessment.path("maxAttempts").asInt()).isEqualTo(2);
+            JsonNode questions = assessment.path("questions");
+            assertThat(questions.size()).isEqualTo(18);
+            assertThat(questions.get(0).path("prompt").asText()).isEqualTo("Qual é a principal finalidade de um banco de dados?");
+            assertThat(questions.get(6).path("prompt").asText())
+                    .isEqualTo("Qual comando SQL é utilizado para consultar informações?");
+            assertThat(questions.get(12).path("prompt").asText())
+                    .isEqualTo("Qual comando SQL é utilizado para adicionar um novo registro?");
+
+            assertThat(questions.get(5).path("prompt").asText())
+                    .contains("SELECT * FROM clientes;");
+            assertThat(questions.get(10).path("prompt").asText())
+                    .contains("WHERE nivel = 'Iniciante';");
+
+            int[] correctOptions = {1, 0, 1, 0, 1, 2, 2, 0, 1, 2, 1, 1, 1, 0, 0, 2, 1, 0};
+            List<Map<String, String>> fourteenRight = new ArrayList<>();
+            List<Map<String, String>> fifteenRight = new ArrayList<>();
+            for (int index = 0; index < questions.size(); index++) {
+                JsonNode question = questions.get(index);
+                assertThat(question.path("options").size()).isEqualTo(4);
+                assertThat(question.path("optionIds").size()).isEqualTo(4);
+                assertThat(question.path("correctOption").isNull()).isTrue();
+                assertThat(question.path("explanation").isNull()).isTrue();
+                int wrongOption = (correctOptions[index] + 1) % 4;
+                fourteenRight.add(Map.of("questaoId", question.path("id").asText(),
+                        "alternativaId", question.path("optionIds").get(index < 14 ? correctOptions[index] : wrongOption).asText()));
+                fifteenRight.add(Map.of("questaoId", question.path("id").asText(),
+                        "alternativaId", question.path("optionIds").get(index < 15 ? correctOptions[index] : wrongOption).asText()));
+            }
+            String path = "/api/colaborador/avaliacoes/" + assessment.path("id").asText() + "/tentativas";
+            assertThat(post(client, path, token, JSON.writeValueAsString(
+                    Map.of("respostas", fourteenRight.subList(0, 17)))).statusCode()).isEqualTo(400);
+            HttpResponse<String> first = post(client, path, token,
+                    JSON.writeValueAsString(Map.of("respostas", fourteenRight)));
+            assertThat(first.statusCode()).isEqualTo(200);
+            JsonNode failed = JSON.readTree(first.body());
+            assertThat(failed.path("attempts").size()).isEqualTo(1);
+            assertThat(failed.path("attempts").get(0).path("score").asInt()).isEqualTo(78);
+            assertThat(failed.path("attempts").get(0).path("passed").asBoolean()).isFalse();
+            for (JsonNode question : failed.path("questions")) {
+                assertThat(question.path("correctOption").isNull()).isTrue();
+                assertThat(question.path("explanation").isNull()).isTrue();
+            }
+
+            assertThat(JSON.readTree(get(client, "/api/colaborador/certificados", token).body()).size()).isZero();
+            HttpResponse<String> second = post(client, path, token,
+                    JSON.writeValueAsString(Map.of("respostas", fifteenRight)));
+            assertThat(second.statusCode()).isEqualTo(200);
+            JsonNode passed = JSON.readTree(second.body());
+            assertThat(passed.path("attempts").get(1).path("score").asInt()).isEqualTo(83);
+            assertThat(passed.path("attempts").get(1).path("passed").asBoolean()).isTrue();
+            assertThat(passed.path("attempts").get(1).path("answers").size()).isEqualTo(18);
+            for (int index = 0; index < questions.size(); index++) {
+                assertThat(passed.path("questions").get(index).path("correctOption").asInt())
+                        .isEqualTo(correctOptions[index]);
+                assertThat(passed.path("questions").get(index).path("explanation").asText()).isNotBlank();
+            }
+            JsonNode certificates = JSON.readTree(get(client, "/api/colaborador/certificados", token).body());
+            assertThat(certificates.size()).isEqualTo(1);
+            assertThat(certificates.get(0).path("courseId").asText()).isEqualTo(courseId.toString());
+            assertThat(post(client, path, token,
+                    JSON.writeValueAsString(Map.of("respostas", fifteenRight))).statusCode()).isEqualTo(409);
+        }
+    }
+
+    @Test
     void gradesOnlyEnrolledUserAndPersistsAttemptsWithoutLeakingAnswersEarly() throws Exception {
         usuarios.save(new Usuario("Primeiro", firstEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
         usuarios.save(new Usuario("Segundo", otherEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
