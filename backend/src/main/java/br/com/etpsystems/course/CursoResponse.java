@@ -10,9 +10,10 @@ public record CursoResponse(
         String level,
         double durationHours,
         String icon,
-        boolean featured
+        boolean featured,
+        long lessonCount
 ) {
-    static CursoResponse from(Curso curso) {
+    static CursoResponse from(Curso curso, long lessonCount) {
         return new CursoResponse(
                 curso.getId(),
                 curso.getTitulo(),
@@ -21,6 +22,6 @@ public record CursoResponse(
                 curso.getNivel(),
                 curso.getDuracaoMinutos() / 60.0,
                 curso.getIcone(),
-                curso.isDestaque());
+                curso.isDestaque(), lessonCount);
     }
 }

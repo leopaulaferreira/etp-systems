@@ -15,5 +15,6 @@ export type CatalogCourse = {
   durationHours: number
   students?: number
   icon: CourseIcon
+  lessonCount?: number
   featured?: boolean
 }

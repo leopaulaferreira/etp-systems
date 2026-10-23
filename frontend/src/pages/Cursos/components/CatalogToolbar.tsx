@@ -51,7 +51,7 @@ export default function CatalogToolbar({
             onChange={(event) => onChange({ order: event.target.value as CourseOrder })}
             className="min-h-12 min-w-0 flex-1 bg-panel py-3 text-sm text-ink-700 outline-none"
           >
-            <option value="relevance">Mais relevantes</option>
+            <option value="relevance">Com aulas primeiro</option>
             {showPopular && <option value="popular">Mais populares</option>}
             <option value="duration">Menor duração</option>
             <option value="title">Nome (A–Z)</option>

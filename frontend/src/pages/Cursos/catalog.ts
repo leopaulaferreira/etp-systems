@@ -31,6 +31,7 @@ export function selectCourses(courses: CatalogCourse[], filters: CatalogFilters)
       (filters.level === 'Todos' || course.level === filters.level) &&
       normalize(`${course.title} ${course.description} ${course.category}`).includes(query),
   )
+  if (filters.order === 'relevance') result.sort((a, b) => Number((b.lessonCount ?? 0) > 0) - Number((a.lessonCount ?? 0) > 0))
   if (filters.order === 'title') result.sort((a, b) => a.title.localeCompare(b.title, 'pt-BR'))
   if (filters.order === 'duration') result.sort((a, b) => a.durationHours - b.durationHours)
   if (filters.order === 'popular') result.sort((a, b) => (b.students ?? 0) - (a.students ?? 0))

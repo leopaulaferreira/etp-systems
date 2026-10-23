@@ -43,6 +43,7 @@ export default function MeusCursosPage() {
         id: course.id,
         title: course.title,
         description: course.description,
+        lessonCount: course.lessonCount,
         type: 'CURSO',
         thumbnail: courseThumbnail(course.icon),
         duration: formatCourseDuration(course.durationHours),

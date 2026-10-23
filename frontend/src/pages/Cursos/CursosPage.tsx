@@ -42,7 +42,7 @@ export default function CursosPage() {
   const filteredCourses = useMemo(() => selectCourses(courses, filters), [courses, filters])
   const visibleCourses = filteredCourses.slice(0, visibleCount)
   const selectedCourse = details?.id === selectedId ? details : courses.find((course) => course.id === selectedId)
-  const featured = courses.find((course) => course.featured)
+  const featured = courses.find((course) => course.featured && (course.lessonCount ?? 0) > 0)
   const categories = [...new Set(courses.map((course) => course.category))]
   const isFiltered =
     filters.query.trim() !== '' || filters.category !== 'Todas' || filters.level !== 'Todos'

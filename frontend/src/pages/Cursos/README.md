@@ -7,3 +7,5 @@ O diálogo permite inscrição real em cursos pelo colaborador. A página `/curs
 Para associar um novo MP4 a uma aula, coloque-o em `frontend/public/videos/` e atualize a URL da aula em uma migração. O frontend também aceita embeds de `www.youtube-nocookie.com` no formato `/embed/ID`.
 
 Validação: `npm run build`, `npm run lint` e `npm run test:cursos` em `frontend/`.
+
+A ordenação padrão **Com aulas primeiro** usa `lessonCount`, calculado no backend a partir das aulas cadastradas (em vídeo ou texto). A prioridade é aplicada antes da paginação e preserva a ordem dentro de cada grupo. Busca e filtros mantêm essa prioridade; ordens explícitas por nome, duração ou popularidade continuam disponíveis. Os cards informam a quantidade de aulas ou que o conteúdo está em preparação. O destaque só aparece para cursos com aulas.

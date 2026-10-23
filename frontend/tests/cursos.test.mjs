@@ -88,3 +88,18 @@ test('duração fracionada é apresentada em horas e minutos', () => {
   assert.equal(formatDuration(6.5), '6h 30min')
   assert.equal(formatDuration(4), '4h')
 })
+
+test('ordem padrão coloca todas as aulas disponíveis antes da paginação e mantém os filtros', () => {
+  const courses = Array.from({ length: 28 }, (_, index) => ({
+    ...catalogCourses[0], id: String(index), title: `Curso ${String(index).padStart(2, '0')}`,
+    lessonCount: [4, 12, 21, 27].includes(index) ? 3 : 0,
+  }))
+  const original = structuredClone(courses)
+  const result = selectCourses(courses, initialFilters)
+  assert.deepEqual(result.slice(0, 4).map(course => course.id), ['4', '12', '21', '27'])
+  assert(result.slice(4).every(course => course.lessonCount === 0))
+  const filtered = selectCourses(courses, { ...initialFilters, query: 'Curso 2' })
+  assert.deepEqual(filtered.slice(0, 2).map(course => course.id), ['21', '27'])
+  assert.equal(selectCourses(courses, { ...initialFilters, order: 'title' })[0].id, '0')
+  assert.deepEqual(courses, original)
+})

@@ -45,6 +45,28 @@ class CursoApiIntegrationTest {
         }
     }
 
+    @Test
+    void catalogAndDetailsReportActualLessonAvailability() throws Exception {
+        var json = tools.jackson.databind.json.JsonMapper.builder().build();
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            var catalog = json.readTree(get(client, "/api/cursos").body());
+            boolean foundAvailable = false, foundPreparing = false;
+            for (var course : catalog) {
+                assertThat(course.path("lessonCount").isIntegralNumber()).isTrue();
+                assertThat(course.path("lessonCount").asLong()).isGreaterThanOrEqualTo(0);
+                if (course.path("lessonCount").asInt() == 0) foundPreparing = true;
+                if (course.path("title").asText().equals("Introdução à Criptografia")) {
+                    foundAvailable = true;
+                    assertThat(course.path("lessonCount").asInt()).isEqualTo(3);
+                    var details = json.readTree(get(client, "/api/cursos/" + course.path("id").asText()).body());
+                    assertThat(details.path("lessonCount").asInt()).isEqualTo(3);
+                }
+            }
+            assertThat(foundAvailable).isTrue();
+            assertThat(foundPreparing).isTrue();
+        }
+    }
+
     private HttpResponse<String> get(HttpClient client, String path) throws Exception {
         HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + path)).GET().build();
         return client.send(request, HttpResponse.BodyHandlers.ofString());

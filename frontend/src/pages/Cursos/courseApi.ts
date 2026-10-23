@@ -16,6 +16,7 @@ export function parseCourse(value: unknown): CatalogCourse {
       typeof course.category !== 'string' || !course.category ||
       typeof course.level !== 'string' || !levels.has(course.level as CourseLevel) ||
       typeof course.durationHours !== 'number' || !Number.isFinite(course.durationHours) || course.durationHours < 0 ||
+      (course.lessonCount !== undefined && (typeof course.lessonCount !== 'number' || !Number.isSafeInteger(course.lessonCount) || course.lessonCount < 0)) ||
       typeof course.featured !== 'boolean') {
     throw new Error('Dados de curso incompletos')
   }
@@ -29,6 +30,7 @@ export function parseCourse(value: unknown): CatalogCourse {
     icon: typeof course.icon === 'string' && icons.has(course.icon as CourseIcon)
       ? course.icon as CourseIcon : 'code',
     featured: course.featured,
+    ...(course.lessonCount !== undefined ? { lessonCount: course.lessonCount as number } : {}),
   }
 }
 

@@ -39,3 +39,11 @@ test('resposta HTTP com erro preserva a possibilidade de usar o catálogo local'
     globalThis.fetch = previous
   }
 })
+
+test('preserva a disponibilidade real de aulas e rejeita contagens inválidas', () => {
+  assert.equal(parseCourse({ ...sample, lessonCount: 3 }).lessonCount, 3)
+  assert.equal(parseCourse({ ...sample, lessonCount: 0 }).lessonCount, 0)
+  for (const lessonCount of [-1, 1.5, '3', null]) {
+    assert.throws(() => parseCourse({ ...sample, lessonCount }), /incompletos/)
+  }
+})

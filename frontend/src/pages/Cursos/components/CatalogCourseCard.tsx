@@ -23,6 +23,13 @@ export default function CatalogCourseCard({ course, onOpen }: CatalogCourseCardP
       </div>
       <p className="text-[13px] leading-6 text-ink-500">{course.description}</p>
       <div className="mt-auto flex flex-col gap-4 pt-1">
+        {course.lessonCount !== undefined && (
+          <p className={`text-xs font-semibold ${course.lessonCount > 0 ? 'text-emerald-400' : 'text-ink-500'}`}>
+            {course.lessonCount > 0
+              ? `${course.lessonCount} ${course.lessonCount === 1 ? 'aula disponível' : 'aulas disponíveis'}`
+              : 'Conteúdo em preparação'}
+          </p>
+        )}
         <CourseMetadata course={course} />
         <button
           type="button"
