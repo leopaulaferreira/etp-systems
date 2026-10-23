@@ -72,7 +72,14 @@ class TentativaExtraApiIntegrationTest {
             String assessmentId = JSON.readTree(get(client, "/api/colaborador/avaliacoes", token).body()).get(0).path("id").asText();
             String submit = "/api/colaborador/avaliacoes/" + assessmentId + "/tentativas";
             String wrong = JSON.writeValueAsString(Map.of("respostas", answers(assessmentId, false)));
-            for (int i = 0; i < 2; i++) assertThat(post(client, submit, token, wrong).statusCode()).isEqualTo(200);
+            for (int i = 0; i < 2; i++) {
+                var response = post(client, submit, token, wrong);
+                assertThat(response.statusCode()).isEqualTo(200);
+                for (JsonNode question : JSON.readTree(response.body()).path("questions")) {
+                    assertThat(question.path("correctOption").isNull()).isTrue();
+                    assertThat(question.path("explanation").isNull()).isTrue();
+                }
+            }
             assertThat(post(client, submit, token, wrong).statusCode()).isEqualTo(409);
             assertThat(post(client, endpoint, rh, "{\"reason\":\"   \"}").statusCode()).isEqualTo(400);
             assertThat(post(client, endpoint, rh, JSON.writeValueAsString(Map.of("reason", "x".repeat(501)))).statusCode()).isEqualTo(400);

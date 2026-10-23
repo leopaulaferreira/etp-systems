@@ -364,7 +364,7 @@ export default function AssessmentDialog({
                   )
                 })}
               </ol>
-            </div> : <p className="rounded-xl border border-ink-200 bg-panel-alt p-4 text-sm leading-6 text-ink-500">Revise a aula antes de tentar novamente. A correção detalhada aparece após a aprovação ou ao terminar as tentativas.</p>}
+            </div> : <p className="rounded-xl border border-ink-200 bg-panel-alt p-4 text-sm leading-6 text-ink-500">Revise a aula antes de tentar novamente. A correção detalhada aparece somente após a aprovação. Se as tentativas acabaram, consulte o RH sobre uma oportunidade extra.</p>}
             <div className="flex flex-wrap gap-3">
               {canStart(item) && (
                 <button type="button" onClick={start} className={secondary}>

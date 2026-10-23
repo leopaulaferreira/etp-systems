@@ -18,7 +18,8 @@ public record AvaliacaoResponse(
 
     static AvaliacaoResponse from(Avaliacao avaliacao, List<Tentativa> tentativas, int limiteTentativas) {
         boolean passou = tentativas.stream().anyMatch(Tentativa::isAprovado);
-        boolean podeRevisar = passou || tentativas.size() >= limiteTentativas;
+        // O RH pode liberar novas tentativas mesmo após esgotar o limite atual.
+        boolean podeRevisar = passou;
         List<QuestaoResponse> questoes = avaliacao.getQuestoes().stream().map(questao -> {
             List<Alternativa> alternativas = questao.getAlternativas();
             int correta = -1;

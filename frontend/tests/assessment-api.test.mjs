@@ -23,7 +23,7 @@ function response() {
   }
 }
 
-test('nota vinda da API funciona sem expor o gabarito antes da última tentativa', () => {
+test('nota vinda da API funciona sem expor o gabarito antes da aprovação', () => {
   const assessment = parseAssessment(response())
   assert.equal(assessment.questions[0].correctOption, undefined)
   assert.equal(latestScore(assessment), 0)

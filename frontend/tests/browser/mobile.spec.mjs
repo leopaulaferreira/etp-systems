@@ -118,6 +118,8 @@ test('última reprovação mantém o resultado legível e bloqueia nova tentativ
   await page.getByRole('button', { name: 'Tentar novamente (1)' }).click()
   await answer(page, false)
   await expect(page.getByText('Você utilizou todas as tentativas desta avaliação.')).toBeVisible()
+  await expect(page.getByText('A correção detalhada aparece somente após a aprovação.', { exact: false })).toBeVisible()
+  await expect(page.getByText('Resposta correta:', { exact: false })).toHaveCount(0)
   await expect(page.getByRole('button', { name: /Tentar novamente/ })).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Baixar PDF' })).toHaveCount(0)
   await fits(page)
