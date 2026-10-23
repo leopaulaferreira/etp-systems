@@ -16,9 +16,11 @@ Aplicação única (SPA), com Login como rota pública e as demais telas como ro
 
 ## Como rodar
 
+Use Node 22.18+ para os comandos de desenvolvimento e testes.
+
 ```bash
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
 
@@ -83,16 +85,16 @@ no servidor: uma cópia do JWT permanece válida até expirar. O token em
 cookies HttpOnly exigirá adaptar o backend e a proteção CSRF.
 
 O catálogo envia Bearer nas consultas. Falhas de disponibilidade mostram erro e opção de tentar novamente. Um 401 encaminha para autenticação. O catálogo permite a inscrição real em cursos.
-`/meus-cursos` consulta os cursos da conta pelo JWT e permite atualizar manualmente o percentual de progresso. Cursos em 100% aparecem na aba Concluídos.
+`/meus-cursos` consulta os cursos da conta pelo JWT e acompanha a conclusão das aulas; o endpoint de progresso manual fica restrito a cursos sem aulas. Cursos em 100% aparecem na aba Concluídos.
 Cadastro, recuperação por e-mail e login Google/Microsoft continuam indisponíveis;
 os textos da tela explicam isso sem aceitar credenciais fictícias.
 
-O perfil do colaborador é carregado e salvo pela API. E-mail e empresa são somente leitura na tela de Configurações. As preferências de formato, lembretes e acessibilidade continuam locais ao navegador. As configurações de contato da empresa também continuam locais. Respostas de avaliações ainda não enviadas ficam em memória e reiniciam quando a conta muda.
+O perfil do colaborador, incluindo objetivo e nível de aprendizagem, é carregado e salvo pela API. As gravações são ordenadas para preservar alterações rápidas. E-mail e empresa são somente leitura na tela de Configurações. As preferências de formato, lembretes e acessibilidade continuam locais ao navegador. As configurações de contato da empresa também continuam locais. Respostas de avaliações ainda não enviadas ficam em memória e reiniciam quando a conta muda.
 
 O [Painel da empresa](src/pages/Empresa/README.md) consulta os colaboradores da organização e seu progresso no banco. Ele atualiza os dados ao voltar para a aba.
 
 Validação: `npm run build`, `npm run lint`, `npm run test:auth` e
-`node --experimental-strip-types --test tests/*.test.mjs`. No navegador, verificar
+`npm test`. No navegador, verificar
 ambos os perfis, senha incorreta, recarga, logout, expiração, falha de rede e retry.
 
 ## Status atual

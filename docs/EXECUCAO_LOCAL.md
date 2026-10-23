@@ -53,7 +53,7 @@ Reiniciar não redefine senhas de contas existentes. Mudar `ETP_DEMO_PASSWORD` n
 
 - **Porta ocupada:** ajuste `ETP_FRONTEND_PORT`, `ETP_BACKEND_PORT` ou `DB_PORT` em `backend/.env` e execute `./etp iniciar` novamente. O proxy entre frontend e API é configurado pelo Compose, independentemente das portas externas.
 - **Docker indisponível:** abra o Docker Desktop ou inicie o serviço Docker e confira o acesso do seu usuário. No Windows, habilite a integração com sua distribuição WSL2.
-- **Credencial obrigatória vazia:** preencha `DB_PASSWORD`, `DB_ROOT_PASSWORD` e `JWT_SECRET`. Use `openssl rand -hex 32` para gerar uma chave JWT.
+- **Credencial obrigatória vazia:** preencha `DB_PASSWORD`, `DB_ROOT_PASSWORD` e `JWT_SECRET`. Use `openssl rand -base64 32` para gerar uma chave JWT.
 - **Banco existente rejeita a senha:** o volume preserva as credenciais da primeira criação. Restaure as credenciais corretas no `.env`; não apague o volume para resolver isso.
 - **Serviço não ficou pronto:** consulte `./etp status` e os logs do serviço. Depois de corrigir o problema, repita `./etp iniciar`. Serviços já iniciados ficam disponíveis para diagnóstico até executar `./etp parar`.
 - **Sem permissão para executar o arquivo:** use `bash ./etp iniciar`.

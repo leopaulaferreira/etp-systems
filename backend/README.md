@@ -104,7 +104,7 @@ A resposta contém `accessToken`, `tokenType: "Bearer"`, `expiresIn` em segundos
 | `GET /api/auth/me` | JWT válido de colaborador ou empresa |
 | `GET /api/cursos` e `GET /api/cursos/{id}` | Públicas durante a integração gradual |
 | Health check, Swagger e OpenAPI (`GET`) | Públicos |
-| `/api/empresa/**` | Reservadas ao perfil `EMPRESA`; funcionalidades entram nas próximas fases |
+| `/api/empresa/**` | Reservadas ao perfil `EMPRESA`; painel da organização e liberação de tentativas extras |
 | `/api/colaborador/**` | Reservadas ao perfil `COLABORADOR`; inscrições, progresso, aulas e avaliações estão disponíveis |
 | Demais rotas | Bloqueadas por padrão |
 
@@ -140,7 +140,7 @@ Seis cursos têm aulas e avaliação: **LGPD na Prática**, **Fundamentos de Seg
 - `GET /api/colaborador/avaliacoes` lista questões, opções e histórico de tentativas dos cursos inscritos.
 - `POST /api/colaborador/avaliacoes/{id}/tentativas` recebe `{"respostas":[{"questaoId":"<uuid>","alternativaId":"<uuid>"}]}` com uma resposta válida para cada questão. O servidor calcula e grava a nota; resposta incompleta ou opção de outra questão retorna 400. Curso não inscrito retorna 404. Avaliação aprovada ou duas tentativas usadas retornam 409.
 
-A nota mínima é 80%. Cada questão tem quatro alternativas. O gabarito e as explicações só são enviados após aprovação ou após esgotar as duas tentativas. Antes disso, o frontend recebe apenas perguntas e opções. As respostas em edição ficam em memória no frontend enquanto o usuário navega na sessão; a tentativa passa a existir no banco quando o colaborador envia todas as respostas. O progresso manual da Fase 7 e a aprovação na avaliação são dados independentes.
+A nota mínima é 80%. Cada questão tem quatro alternativas. O gabarito e as explicações só são enviados após aprovação, mesmo quando o limite de tentativas se esgota. Antes disso, o frontend recebe perguntas e opções, além das próprias respostas e notas no histórico. As respostas em edição ficam em memória no frontend enquanto o usuário navega na sessão; a tentativa passa a existir no banco quando o colaborador envia todas as respostas. O progresso manual da Fase 7 e a aprovação na avaliação são dados independentes.
 
 Para adicionar outro vídeo, coloque um MP4 em `frontend/public/videos/` e crie uma **nova migração Flyway** que preencha `aulas.video_url` com `/videos/nome-do-video.mp4`. A página também aceita URLs de incorporação `https://www.youtube-nocookie.com/embed/ID`. Não edite migrações já aplicadas, pois o Flyway verifica o checksum. A aplicação não armazena arquivos de vídeo no MySQL. A terceira aula de LGPD aborda prevenção e resposta a incidentes; a avaliação inclui a questão de incidente adicionada na V18.
 
@@ -180,14 +180,14 @@ A migração V14 cria quatro trilhas globais com cursos do catálogo. A inscriç
 - `GET /v3/api-docs` fornece o documento OpenAPI JSON.
 - `GET /api/cursos` retorna o catálogo na ordem de exibição; `GET /api/cursos/{id}` retorna um curso pelo UUID, com 404 para curso ausente.
 - `mvn -f backend/pom.xml verify` executa build e testes de saúde, documentação, login, tokens, permissões e CORS sem exigir MySQL. Os testes usam uma chave JWT própria, que não é empacotada na aplicação.
-- Com MySQL ativo e as variáveis locais carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml verify` inclui os testes de entidades, catálogo, autenticação, inscrições, progresso, avaliações, certificados, dashboards do colaborador e da empresa com banco real, incluindo trilhas e perfil. Sem essa variável, os testes de banco são ignorados.
+- Com um MySQL dedicado a testes ativo e as variáveis de conexão carregadas, `ETP_DB_TEST=true mvn -f backend/pom.xml verify` inclui os testes de entidades, catálogo, autenticação, inscrições, progresso, avaliações, certificados, dashboards do colaborador e da empresa com banco real, incluindo trilhas e perfil. Sem essa variável, os testes de banco são ignorados.
 - `AuthDatabaseIntegrationTest` cria contas e empresa temporárias com identificadores únicos, valida BCrypt/login e inicialização repetida, e remove os registros ao terminar. `DomainMappingIntegrationTest` reverte suas inserções por transação. As migrações Flyway permanecem aplicadas.
 
 O Actuator expõe somente o endpoint de health. Login, catálogo, Meus Cursos, aulas, avaliações, certificados e painéis do colaborador e da empresa estão integrados ao frontend. Cursos, Trilhas, Perfil e Relatórios usam dados persistidos; em falhas de disponibilidade, exibem um estado de erro e permitem tentar novamente. O catálogo não recorre a dados fictícios. As preferências de formato e acessibilidade ainda são locais ao navegador.
 
 ### Cloud Computing Essencial
 
-Três videoaulas locais em `frontend/public/videos/cloud-aula-{1,2,3}.mp4`: Fundamentos de Cloud Computing; Serviços e Modelos de Nuvem; Cloud na Prática: Benefícios, Cuidados e Casos de Uso. A avaliação tem 18 questões (seis por aula), quatro alternativas por questão, nota mínima de 80% e duas tentativas. Com 18 questões, 14 acertos resultam em 78% e 15 em 83%. Gabarito e explicações aparecem após aprovação ou esgotamento das tentativas, seguindo o fluxo existente.
+Três videoaulas locais em `frontend/public/videos/cloud-aula-{1,2,3}.mp4`: Fundamentos de Cloud Computing; Serviços e Modelos de Nuvem; Cloud na Prática: Benefícios, Cuidados e Casos de Uso. A avaliação tem 18 questões (seis por aula), quatro alternativas por questão, nota mínima de 80% e duas tentativas. Com 18 questões, 14 acertos resultam em 78% e 15 em 83%. Gabarito e explicações aparecem somente após aprovação.
 
 ## Tentativas extras — V26
 
@@ -195,7 +195,7 @@ Três videoaulas locais em `frontend/public/videos/cloud-aula-{1,2,3}.mp4`: Fund
 
 É necessário ser RH ativo da mesma empresa do colaborador, existir inscrição e avaliação, não haver aprovação e todas as tentativas disponíveis terem sido usadas. O motivo é obrigatório, com até 500 caracteres. A V26 registra responsável (ID e nome preservado), motivo, data e quantidade de tentativas usadas no momento. Bloqueio da avaliação e restrição única impedem liberações duplicadas em chamadas concorrentes. Notas anteriores permanecem no histórico; aprovação na tentativa extra também emite certificado.
 
-A tentativa extra reutiliza as questões do curso; o colaborador pode já ter consultado a correção após esgotar o limite original. A API volta a ocultar o gabarito enquanto existe uma tentativa disponível.
+A tentativa extra reutiliza as questões do curso. O gabarito e as explicações permanecem ocultos até a aprovação, inclusive quando o limite original ou extra se esgota. Notas e respostas enviadas continuam no histórico. A mudança não desfaz correções já consultadas em versões anteriores.
 
 Validação: `TentativaExtraApiIntegrationTest`, com banco temporário, verifica autorização, isolamento entre empresas e colaboradores, motivo, concorrência, histórico e certificado após a terceira tentativa.
 

@@ -1,311 +1,129 @@
 # ETP Systems
-### Plataforma de Gestão de Aprendizagem e Desenvolvimento Corporativo
 
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
-![Projeto Acadêmico](https://img.shields.io/badge/projeto-acadêmico-blue)
-![Backend](https://img.shields.io/badge/backend-Spring%20Boot-green)
-![Frontend](https://img.shields.io/badge/frontend-React%20%7C%20TypeScript-blue)
-![Database](https://img.shields.io/badge/database-MySQL-orange)
+**Plataforma de aprendizagem e desenvolvimento corporativo**, desenvolvida como projeto acadêmico do curso de Análise e Desenvolvimento de Sistemas da Universidade Municipal de São Caetano do Sul (USCS).
 
-Projeto acadêmico desenvolvido no curso de **Análise e Desenvolvimento de Sistemas
-da Universidade Municipal de São Caetano do Sul (USCS)**.
+O ETP reúne cursos, trilhas, avaliações e certificados. Colaboradores acompanham seus estudos; profissionais de Empresa/RH consultam o progresso da organização e autorizam tentativas extras de avaliação.
+
+**Status:** em desenvolvimento. Os principais fluxos usam a API e o banco reais; funcionalidades ainda planejadas estão descritas abaixo.
 
 ## Executar localmente
 
-Com Docker em execução, na pasta do projeto:
+Pré-requisitos: Docker em execução com Compose v2.20+, Bash (Linux/macOS ou WSL2) e OpenSSL para gerar a configuração. A primeira execução precisa de internet. Java, Maven, Node e MySQL rodam nos containers.
+
+Na raiz do repositório:
 
 ```sh
 ./etp iniciar
 ```
 
-O comando configura o ambiente na primeira execução e inicia banco, backend e frontend. Acesse o endereço exibido no terminal (padrão: **http://127.0.0.1:5174**). Para parar sem apagar os dados: `./etp parar`.
+O comando cria `backend/.env` se necessário, gera credenciais locais, inicia os serviços e aguarda ficarem prontos. Arquivos de configuração existentes são preservados. As migrações são aplicadas automaticamente; não execute `database/schema.sql` manualmente.
 
-Consulte o [guia curto de execução](docs/EXECUCAO_LOCAL.md) para pré-requisitos, contas de demonstração e solução de problemas.
+| Serviço | Endereço padrão |
+| --- | --- |
+| Aplicação | http://127.0.0.1:5174 |
+| API | http://127.0.0.1:18080 |
+| Swagger | http://127.0.0.1:18080/swagger-ui/index.html |
+| MySQL | `127.0.0.1:3307` |
 
----
+Os endereços efetivos aparecem no terminal. As portas do Compose ficam acessíveis somente neste computador.
 
-# 📚 Sobre o Projeto
+### Contas de demonstração
 
-O **ETP Systems** é uma plataforma de aprendizagem corporativa criada para apoiar
-organizações na gestão da capacitação e do desenvolvimento profissional de seus
-colaboradores.
+Na configuração gerada pelo comando:
 
-A solução centraliza **cursos, trilhas de aprendizagem, avaliações, acompanhamento
-de progresso e certificações** em um único ambiente, permitindo que colaboradores
-acompanhem sua própria evolução enquanto empresas, gestores e setores de Recursos
-Humanos obtêm maior visibilidade sobre o desenvolvimento de suas equipes.
+| Perfil no login | E-mail padrão |
+| --- | --- |
+| Colaborador | `etp@gmail.com` |
+| Empresa / RH | `rhetp@gmail.com` |
 
-O projeto busca responder a um problema recorrente em ambientes corporativos:
-a dificuldade de **organizar treinamentos, acompanhar a evolução dos participantes
-e transformar dados de aprendizagem em informações úteis para colaboradores e
-gestores**.
+A senha inicial está em `ETP_DEMO_PASSWORD` no arquivo `backend/.env`. Alterar esse valor depois não redefine senhas de contas já criadas. Não versione o arquivo de credenciais.
 
----
-
-# 🎯 Problema que o ETP busca resolver
-
-Processos de capacitação corporativa podem envolver diferentes cursos, plataformas,
-avaliações e registros, tornando difícil acompanhar de forma centralizada:
-
-- quais treinamentos cada colaborador está realizando;
-- quais competências estão sendo desenvolvidas;
-- o progresso individual e coletivo;
-- resultados de avaliações;
-- trilhas de aprendizagem;
-- cursos concluídos e certificados obtidos;
-- necessidades de desenvolvimento das equipes.
-
-O **ETP Systems** propõe reunir essas informações em uma única plataforma,
-facilitando tanto a experiência de aprendizagem do colaborador quanto a gestão
-do desenvolvimento profissional pela organização.
-
----
-
-# 💡 Proposta da Solução
-
-O ETP Systems funciona a partir de dois perfis principais.
-
-## 👤 Colaborador
-
-O colaborador pode:
-
-- acessar cursos e treinamentos;
-- seguir trilhas de aprendizagem;
-- acompanhar cursos em andamento;
-- visualizar seu progresso;
-- realizar avaliações;
-- acompanhar notas e resultados;
-- consultar certificados;
-- visualizar seu histórico de aprendizagem;
-- receber recomendações de conteúdo.
-
-## 🏢 Empresa / RH
-
-O perfil organizacional será responsável por funcionalidades de gestão, como:
-
-- acompanhar colaboradores;
-- visualizar progresso das equipes;
-- consultar resultados de avaliações;
-- acompanhar cursos e trilhas concluídas;
-- visualizar indicadores de aprendizagem;
-- organizar conteúdos e programas de capacitação;
-- identificar necessidades de desenvolvimento.
-
-A separação entre os dois perfis permite que o sistema atenda tanto quem aprende
-quanto quem organiza e acompanha o processo de capacitação.
-
----
-
-# 🎯 Objetivos do Projeto
-
-O ETP Systems tem como objetivos:
-
-- centralizar processos de **aprendizagem corporativa**;
-- estruturar **trilhas de desenvolvimento profissional**;
-- facilitar o acompanhamento do **progresso dos colaboradores**;
-- disponibilizar mecanismos de **avaliação da aprendizagem**;
-- registrar cursos concluídos e **certificações**;
-- fornecer informações para apoiar gestores e setores de **Recursos Humanos**;
-- tornar processos de capacitação mais **organizados, acessíveis e mensuráveis**;
-- contribuir para iniciativas de **desenvolvimento e valorização de talentos**.
-
-Resultados organizacionais mais amplos, como retenção de talentos, mobilidade
-interna ou redução da dependência de recrutamento externo, são tratados como
-impactos potenciais e dependerão de validação futura.
-
----
-
-# 🖼️ Prévia da Interface
-
-## Dashboard
-
-O dashboard apresenta uma visão geral da experiência de aprendizagem do colaborador,
-reunindo indicadores, atalhos para cursos e informações sobre o progresso dentro da
-plataforma.
-
-Ele funciona como o ponto central de navegação do ETP Systems após a autenticação,
-conectando o usuário às principais áreas da aplicação.
-
-<img width="1920" height="1080" alt="Captura de tela de 2026-09-30 12-32-13" src="https://github.com/user-attachments/assets/16faf94b-bc0e-4697-9576-d2d00463929a" />
-
-
----
-
-# 🖥️ Funcionalidades
-
-## 🔐 Autenticação
-
-- login de usuário;
-- autenticação real por JWT;
-- rotas públicas e protegidas;
-- separação entre perfis de acesso;
-- logout.
-
-O login do frontend está integrado à API com BCrypt e JWT. A sessão é validada ao
-recarregar, respeita os perfis Colaborador e Empresa e é encerrada no logout ou na expiração.
-
----
-
-## 📊 Dashboard
-
-- visão geral da aprendizagem;
-- indicadores de progresso;
-- acesso rápido às principais áreas;
-- indicadores reais de cursos, avaliações, certificados e horas certificadas;
-- sugestões do catálogo e acesso ao curso em andamento.
-
----
-
-## 🎓 Cursos
-
-- catálogo de cursos;
-- busca por conteúdo;
-- filtros por categoria;
-- filtros por nível;
-- ordenação;
-- detalhes dos cursos;
-- carregamento progressivo dos resultados.
-
----
-
-## 🛤️ Trilhas de Aprendizagem
-
-Quatro trilhas reúnem cursos do catálogo em jornadas de desenvolvimento. O
-colaborador pode se inscrever em uma trilha e acompanhar seu progresso, calculado
-pela média do progresso dos cursos que a compõem. A inscrição na trilha também
-inscreve o colaborador nos cursos relacionados.
-
----
-
-## 📚 Meus Cursos
-
-Área destinada ao acompanhamento dos cursos do colaborador, incluindo:
-
-- cursos em andamento;
-- progresso;
-- cursos concluídos;
-- continuidade da aprendizagem.
-
----
-
-## 📝 Avaliações
-
-O módulo de avaliações permite:
-
-- avaliações de cursos em que o colaborador se inscreveu;
-- questões de múltipla escolha;
-- controle de tentativas;
-- cálculo de notas;
-- nota mínima para aprovação;
-- apresentação de resultados;
-- feedback das respostas;
-- indicadores de desempenho.
-
-As tentativas e notas são registradas no backend. LGPD na Prática tem três
-videoaulas; Introdução à Inteligência Artificial tem três videoaulas e uma
-avaliação de seis questões. Gestão de Projetos Ágeis com Scrum tem três videoaulas
-e 18 questões, divididas em seis por aula. Cloud Computing Essencial também tem três videoaulas e 18 questões, com seis por aula. Segurança da Informação e Computação
-em Nuvem têm aulas em texto e avaliações. Introdução à Criptografia tem três videoaulas
-e 18 questões, seis por aula, com quatro alternativas, duas tentativas e aprovação
-a partir de 80%. A aprovação emite certificado pelo fluxo existente. O progresso é calculado pelas aulas que o colaborador marca como concluídas.
-
----
-
-## 🏆 Certificados
-
-Certificados são emitidos após aprovação em avaliações de cursos habilitados,
-com código único e consulta na API. A página de Certificados mostra os documentos
-emitidos e permite baixar PDF. LGPD, IA, Scrum e Cloud Computing Essencial
-também emitem certificados após aprovação. Aprovações anteriores foram recuperadas,
-preservando a primeira data de aprovação e concluindo o progresso do curso.
-
-O Perfil consulta cursos em andamento, avaliações e certificados da conta autenticada.
-Os dados editáveis do colaborador são carregados e salvos na API; e-mail e empresa
-continuam vinculados à conta. Preferências de formato, lembretes e acessibilidade
-ficam apenas no navegador.
-
----
-
-## 📈 Gestão Empresarial
-
-A interface de Empresa/RH já permite visualizar um painel e consultar:
-
-- colaboradores;
-- progresso individual;
-- desempenho das equipes;
-- avaliações;
-- cursos concluídos;
-- certificações;
-- indicadores de aprendizagem.
-
-Essas telas consultam a API com os dados da empresa vinculada à conta RH
-autenticada. Colaboradores, progresso, avaliações e certificados vêm dos registros
-persistidos, com isolamento entre organizações. Configurações de contato da
-empresa ainda são locais ao navegador. Consulte o
-[guia do backend](backend/README.md#empresa--rh--fase-11) para os detalhes da API e
-dos dados de demonstração opcionais.
-
----
-
-## 📈 Relatórios
-
-O colaborador pode consultar seus indicadores de aprendizagem, evolução mensal,
-distribuição do progresso e histórico de avaliações. Os números são calculados a
-partir das inscrições, tentativas, certificados e trilhas da própria conta. A página
-permite filtrar o histórico e exportar um CSV da atividade do ano corrente. Horas
-certificadas representam a carga horária dos cursos certificados, não o tempo de
-estudo medido.
-
----
-
-# 🤖 Tutor Inteligente
-
-O projeto prevê a implementação de um **assistente de aprendizagem baseado em
-Inteligência Artificial**.
-
-O tutor poderá utilizar o contexto do curso e do módulo estudado para auxiliar
-o colaborador com funções como:
-
-- explicar conteúdos de maneiras diferentes;
-- esclarecer dúvidas;
-- gerar exemplos;
-- resumir conteúdos;
-- criar exercícios de apoio;
-- fornecer explicações adicionais durante o processo de aprendizagem.
-
-A integração está planejada para utilizar uma API de IA através do backend,
-mantendo o frontend desacoplado do provedor utilizado.
-
-Arquitetura prevista:
-
-```text
-TutorService
-     │
-     ▼
- AiProvider
-     │
-     ├── GeminiProvider
-     │
-     └── outros provedores futuramente
-
+```sh
+./etp parar          # Para os serviços e preserva os dados
+./etp status         # Consulta o estado dos containers
+./etp logs backend   # Acompanha os logs da API
+./etp configurar    # Prepara a configuração sem iniciar os serviços
 ```
 
-## Backend
+Consulte o [guia de execução local](docs/EXECUCAO_LOCAL.md) para configurar portas, usar um `.env` existente e resolver problemas. Para desenvolver sem containers de aplicação, consulte os guias de [backend](backend/README.md) e [frontend](frontend/README.md).
 
-O backend em [`backend/`](backend/README.md) oferece Spring Boot, MySQL, Docker,
-migrações, catálogo, login com BCrypt/JWT, inscrições, progresso, avaliações,
-certificados, painéis do colaborador e da empresa, trilhas e perfil. Consulte o guia
-para configurar as contas locais, usar o Swagger e executar os testes.
+## Funcionalidades disponíveis
 
-### Limite de solicitações de login
+| Área | Comportamento atual |
+| --- | --- |
+| Autenticação | Login com BCrypt e JWT, validação da conta no banco, permissões por perfil, expiração e logout local |
+| Cursos | Catálogo com busca, filtros, detalhes, inscrição e prioridade para cursos com aulas disponíveis |
+| Meus Cursos | Inscrições da conta, retomada da última aula e progresso por conclusão de aulas |
+| Trilhas | Inscrição nos cursos da trilha e acompanhamento do progresso agregado |
+| Avaliações | Correção no servidor, histórico de notas, limite de tentativas e proteção das respostas em edição |
+| Certificados | Emissão após aprovação em cursos habilitados, consulta e download de PDF |
+| Dashboard e relatórios | Indicadores reais, atividade de aprendizagem e exportação CSV |
+| Perfil | Dados pessoais, objetivo de aprendizagem, nível e preferência de notificações persistidos na API |
+| Empresa / RH | Colaboradores, progresso, notas e certificados da própria organização; liberação individual de tentativa extra com motivo e histórico |
 
-O backend permite, por padrão, 10 solicitações de login por IP em uma janela de
-60 segundos, contando também logins válidos e corpos inválidos. O excesso retorna
-HTTP 429 com `Retry-After`; a tela orienta aguardar. Configure `LOGIN_MAX_REQUESTS`
-e `LOGIN_WINDOW_SECONDS` com valores positivos para ajustar o limite. Usuários
-na mesma rede podem compartilhar o IP e, portanto, o limite.
+### Regras de aprendizagem
 
-O controle é mantido em memória por instância e reinicia com o backend. Não confia
-em `X-Forwarded-For` enviado diretamente pelo cliente. Ao publicar atrás de proxy,
-configure a identificação do IP somente por proxies confiáveis ou aplique o limite
-no proxy. Para múltiplas instâncias, use um limitador compartilhado ou no gateway.
+- Cursos com aulas calculam o progresso pelas aulas marcadas como concluídas. Cursos sem aulas mantêm o endpoint de progresso manual.
+- A aprovação na avaliação emite certificado quando o curso está habilitado para certificação e leva o progresso do curso a 100%.
+- As avaliações publicadas usam nota mínima de 80% e duas tentativas iniciais. O RH pode liberar uma tentativa extra quando elas se esgotam, desde que não haja aprovação.
+- **Gabarito e explicações são enviados somente após aprovação**, inclusive quando as tentativas se esgotam. Nota e respostas enviadas continuam disponíveis. A tentativa extra reutiliza as questões do curso.
+- Respostas ainda não enviadas ficam em memória durante a sessão. Navegação, recarga e logout têm avisos para evitar perda acidental; isso não representa salvamento no servidor.
+- Horas certificadas representam a carga horária dos cursos certificados, não tempo de estudo medido.
+
+### Limites atuais e próximos passos
+
+- Formatos de conteúdo, lembretes e acessibilidade são preferências do navegador. Os controles não enviam notificações por e-mail ou push.
+- Configurações de contato da empresa também são locais. A solicitação de suporte é simulada.
+- Cadastro, recuperação de senha por e-mail e login Google/Microsoft ainda não estão disponíveis.
+- O tutor com inteligência artificial está planejado. A proposta é integrar um provedor pelo backend para explicar conteúdos, responder dúvidas e apoiar o estudo.
+- O ambiente Docker documentado é de desenvolvimento: o frontend usa o servidor do Vite.
+
+## Organização do projeto
+
+| Diretório | Conteúdo |
+| --- | --- |
+| [`backend/`](backend/README.md) | API Java 21+, Spring Boot, Spring Security, JPA e migrações Flyway |
+| [`frontend/`](frontend/README.md) | SPA React, TypeScript, Vite e Tailwind CSS |
+| [`database/`](database/README.md) | Documentação do banco e esquema histórico de referência |
+| [`docs/`](docs/README.md) | Guia local, materiais acadêmicos, apresentações e mockups |
+| `tests/` | Verificação do script de inicialização local |
+
+As migrações em `backend/src/main/resources/db/migration/` são a fonte de evolução do banco MySQL. O Hibernate valida o esquema na inicialização.
+
+## Validação
+
+Os comandos abaixo usam as ferramentas instaladas no computador. Execute-os na raiz do repositório; para o frontend, use Node 22.18+ e instale as dependências com `npm --prefix frontend ci`.
+
+```sh
+mvn -f backend/pom.xml verify
+npm --prefix frontend run build
+npm --prefix frontend run lint
+npm --prefix frontend test
+bash tests/local-startup.sh
+```
+
+O Maven padrão executa os testes que não dependem de MySQL, incluindo autenticação, permissões e regras de exposição do gabarito. **Os testes de integração com banco são ignorados sem `ETP_DB_TEST=true`.** Para executá-los, configure um banco dedicado e suas variáveis de conexão conforme o [guia do backend](backend/README.md#verificação); a suíte aplica migrações e cria dados de teste.
+
+Testes de navegador, em cinco tamanhos de tela:
+
+```sh
+cd frontend
+npx playwright install chromium
+npm run test:mobile
+```
+
+Eles iniciam o Vite e simulam as respostas da API, sem consumir tentativas de contas reais. Consulte os [cenários e limites dos testes de interface](frontend/tests/browser/README.md).
+
+## Autenticação e configuração
+
+`JWT_SECRET` deve representar pelo menos 32 bytes em Base64; para gerar uma chave, use `openssl rand -base64 32`. A duração do token é configurada por `JWT_EXPIRATION_MINUTES` (padrão: 60; permitido: 1–1440). O backend valida assinatura HS256, emissor, expiração, identificador e perfil, além de conferir se a conta continua habilitada.
+
+O token fica em `sessionStorage`, por aba. Logout remove a sessão local; não há renovação automática nem revogação individual do token no servidor.
+
+O login permite, por padrão, 10 solicitações por IP em 60 segundos, incluindo logins válidos e corpos inválidos. O excesso retorna HTTP 429 com `Retry-After`. Configure `LOGIN_MAX_REQUESTS` e `LOGIN_WINDOW_SECONDS` para ajustar os limites. O controle é em memória por instância; atrás de proxy, configure a identificação confiável do IP ou aplique o limite no proxy.
+
+## Prévia
+
+![Dashboard do ETP Systems](https://github.com/user-attachments/assets/16faf94b-bc0e-4697-9576-d2d00463929a)
+
+Mais telas e materiais estão em [`docs/mockup/`](docs/mockup/).
