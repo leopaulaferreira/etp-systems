@@ -21,3 +21,5 @@ O botão **Atualizar avaliações** consulta novamente o limite individual, incl
 Comunicação Assertiva usa o tema `communication`, com ícone de conversa. As questões 1–6 correspondem aos fundamentos; 7–12 a feedback e conversas difíceis; 13–18 à comunicação em equipe.
 
 Introdução à Criptografia usa o tema `security`. As questões 1–6 cobrem fundamentos; 7–12, criptografia simétrica, assimétrica e hash; 13–18, HTTPS, senhas e assinaturas digitais. As três videoaulas estão em `/videos/criptografia-aula-1.mp4`, `/videos/criptografia-aula-2.mp4` e `/videos/criptografia-aula-3.mp4`.
+
+Fundamentos da Gestão do Tempo reutiliza o cadastro antes chamado Gestão do Tempo e Prioridades. Tem três videoaulas e 18 questões, seis por aula, com quatro alternativas, explicações, nota mínima de 80% e duas tentativas. A aprovação emite certificado. O tema `workspace` usa um ícone de relógio. Os vídeos estão em `/videos/gestao-tempo-aula-1.mp4`, `/videos/gestao-tempo-aula-2.mp4` e `/videos/gestao-tempo-aula-3.mp4`.

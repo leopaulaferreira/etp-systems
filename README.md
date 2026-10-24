@@ -127,3 +127,7 @@ O login permite, por padrão, 10 solicitações por IP em 60 segundos, incluindo
 ![Dashboard do ETP Systems](https://github.com/user-attachments/assets/16faf94b-bc0e-4697-9576-d2d00463929a)
 
 Mais telas e materiais estão em [`docs/mockup/`](docs/mockup/).
+
+### Conteúdo de Gestão do Tempo
+
+O curso **Fundamentos da Gestão do Tempo** (antes **Gestão do Tempo e Prioridades**) inclui três aulas: fundamentos, definição de prioridades e produtividade no dia a dia. A avaliação tem 18 questões, seis por aula, quatro alternativas por questão, duas tentativas iniciais e aprovação a partir de 80%, com emissão de certificado. O cadastro existente é preservado pelas migrações V35 e V36.
