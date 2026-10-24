@@ -44,7 +44,7 @@ class ProgressoAulaApiIntegrationTest {
     private br.com.etpsystems.assessment.AulaRepository aulas;
 
     @ParameterizedTest
-    @ValueSource(strings = {"Cloud Computing Essencial", "Introdução à Criptografia"})
+    @ValueSource(strings = {"Cloud Computing Essencial", "Introdução à Criptografia", "Fundamentos da Gestão do Tempo"})
     void countsLessonsOncePersistsAndRejectsOtherUsersAndCourses(String courseTitle) throws Exception {
         usuarios.save(new Usuario("Primeiro", firstEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
         usuarios.save(new Usuario("Segundo", otherEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));

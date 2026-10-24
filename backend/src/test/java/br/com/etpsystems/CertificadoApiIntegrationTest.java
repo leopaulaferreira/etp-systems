@@ -44,7 +44,7 @@ class CertificadoApiIntegrationTest {
     @ParameterizedTest
     @ValueSource(strings = {"Fundamentos de Segurança da Informação", "Computação em Nuvem: Conceitos e Aplicações",
             "LGPD na Prática", "Introdução à Inteligência Artificial", "Gestão de Projetos Ágeis com Scrum",
-            "Cloud Computing Essencial", "Comunicação Assertiva no Ambiente de Trabalho", "Introdução à Criptografia"})
+            "Cloud Computing Essencial", "Comunicação Assertiva no Ambiente de Trabalho", "Introdução à Criptografia", "Fundamentos da Gestão do Tempo"})
     void issuesOnceAfterApprovalAndOnlyOwnerCanRead(String courseTitle) throws Exception {
         usuarios.save(new Usuario("Titular", ownerEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
         usuarios.save(new Usuario("Outra pessoa", otherEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
