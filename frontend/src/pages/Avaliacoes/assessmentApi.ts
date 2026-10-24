@@ -2,7 +2,7 @@ import { authSession } from '../../auth/session.ts'
 import type { Assessment, AssessmentQuestion, AssessmentAttempt } from '../../types/assessment.ts'
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-const topics = new Set(['privacy', 'security', 'cloud', 'access', 'ai', 'projects', 'communication'])
+const topics = new Set(['privacy', 'security', 'cloud', 'access', 'ai', 'projects', 'communication', 'workspace'])
 
 function object(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Resposta da API inválida')

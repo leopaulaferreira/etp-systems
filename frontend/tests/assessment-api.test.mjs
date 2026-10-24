@@ -53,7 +53,7 @@ test('o parser rejeita alternativas e notas inválidas', () => {
   assert.throws(() => parseAssessment(invalidScore), /Tentativa inválida/)
 })
 
-for (const topic of ['projects', 'communication']) {
+for (const topic of ['projects', 'communication', 'workspace']) {
   test(`avaliação de ${topic} preserva o tema e a ordem das 18 questões recebidas da API`, () => {
     const item = response()
     item.topic = topic

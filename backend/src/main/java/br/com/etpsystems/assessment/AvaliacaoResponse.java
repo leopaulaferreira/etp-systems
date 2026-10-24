@@ -47,6 +47,7 @@ public record AvaliacaoResponse(
             case "ai" -> "ai";
             case "projects" -> "projects";
             case "communication" -> "communication";
+            case "workspace" -> "workspace";
             default -> "privacy";
         };
         return new AvaliacaoResponse(avaliacao.getId(), avaliacao.getCurso().getId(), avaliacao.getTitulo(),

@@ -25,7 +25,7 @@ export type Assessment = {
   course: string
   courseType: 'Curso' | 'Trilha'
   type: 'Quiz' | 'Teste'
-  topic: 'privacy' | 'security' | 'cloud' | 'access' | 'ai' | 'projects' | 'communication'
+  topic: 'privacy' | 'security' | 'cloud' | 'access' | 'ai' | 'projects' | 'communication' | 'workspace'
   status: AssessmentStatus
   estimatedMinutes: number
   minimumScore: number

@@ -1,4 +1,4 @@
-import { BrainCircuit, CloudCog, Fingerprint, KeyRound, ShieldCheck, Workflow, MessagesSquare } from 'lucide-react'
+import { BrainCircuit, CloudCog, Fingerprint, KeyRound, ShieldCheck, Workflow, MessagesSquare, Clock3 } from 'lucide-react'
 import type { Assessment } from '../../../types/assessment'
 import IllustratedIcon from '../../../components/ui/IllustratedIcon'
 
@@ -10,6 +10,7 @@ const topics = {
   ai: { icon: BrainCircuit, tone: 'fuchsia' },
   projects: { icon: Workflow, tone: 'rose' },
   communication: { icon: MessagesSquare, tone: 'orange' },
+  workspace: { icon: Clock3, tone: 'blue' },
 } as const
 
 export default function AssessmentIcon({ topic }: { topic: Assessment['topic'] }) {
