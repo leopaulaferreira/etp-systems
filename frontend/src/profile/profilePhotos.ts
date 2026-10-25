@@ -1,5 +1,5 @@
-import rafaelPhoto from '../assets/avatars/rafael-martins.png'
-import rhPhoto from '../assets/avatars/rh-etp.png'
+import rafaelPhoto from '../assets/avatars/rafael-martins.webp'
+import rhPhoto from '../assets/avatars/rh-etp.webp'
 
 // Fotos das contas de demonstração; o vínculo por e-mail permanece ao editar o nome.
 export function profilePhoto(email?: string): string | undefined {
