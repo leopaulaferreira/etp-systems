@@ -1,0 +1,81 @@
+name: Deploy ETP
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: etp-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Testar, compilar e publicar
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment:
+      name: production
+      url: https://etp.leofe.com.br/
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+
+      - name: Testar e compilar API
+        run: mvn -B -ntp -f backend/pom.xml verify
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Testar e compilar interface
+        run: |
+          npm ci --prefix frontend
+          npm test --prefix frontend
+          npm run build --prefix frontend
+          test -s frontend/dist/index.html
+          test -n "$(find frontend/dist/videos -type f -name '*.mp4' -print -quit)"
+          test -s backend/target/etp-backend-0.1.0-SNAPSHOT.jar
+
+      - name: Preparar SSH com chave e servidor conhecidos
+        env:
+          DEPLOY_KEY: ${{ secrets.ETP_DEPLOY_KEY }}
+          KNOWN_HOSTS: ${{ secrets.ETP_KNOWN_HOSTS }}
+        run: |
+          test -n "$DEPLOY_KEY"
+          test -n "$KNOWN_HOSTS"
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_KEY" > "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/id_ed25519" "$HOME/.ssh/known_hosts"
+
+      - name: Enviar vídeos alterados e versão compilada
+        env:
+          DEPLOY_HOST: etpdeploy@147.15.127.35
+        run: |
+          ssh -o BatchMode=yes "$DEPLOY_HOST" "mkdir -p /home/etpdeploy/incoming/${GITHUB_SHA}/frontend"
+          rsync -a --checksum frontend/dist/videos/ "$DEPLOY_HOST:/opt/etp-systems/frontend/videos/"
+          rsync -az --exclude='/videos/***' frontend/dist/ "$DEPLOY_HOST:/home/etpdeploy/incoming/${GITHUB_SHA}/frontend/"
+          rsync -a backend/target/etp-backend-0.1.0-SNAPSHOT.jar \
+            "$DEPLOY_HOST:/home/etpdeploy/incoming/${GITHUB_SHA}/etp-backend.jar"
+
+      - name: Ativar versão na VM
+        env:
+          DEPLOY_HOST: etpdeploy@147.15.127.35
+        run: |
+          ssh -o BatchMode=yes "$DEPLOY_HOST" "sudo -n /usr/local/sbin/etp-activate ${GITHUB_SHA}"
+          curl --fail --silent --show-error --max-time 20 https://etp.leofe.com.br/
+          curl --fail --silent --show-error --max-time 20 https://etp.leofe.com.br/api/cursos > /dev/null
