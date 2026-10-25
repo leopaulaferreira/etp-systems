@@ -1,0 +1,43 @@
+# Banco isolado para uma VM pequena. Não inicia frontend nem backend.
+name: etp-database
+services:
+  database:
+    image: mysql:8.4.11
+    restart: unless-stopped
+    mem_limit: 384m
+    # Total de RAM + swap permitido ao container; depende de swap no host.
+    memswap_limit: 768m
+    environment:
+      MYSQL_DATABASE: etp_db
+      MYSQL_USER: etp_user
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Defina DB_ROOT_PASSWORD}
+      MYSQL_ROOT_HOST: localhost
+    command:
+      - --innodb-buffer-pool-size=64M
+      - --innodb-log-buffer-size=8M
+      - --performance-schema=OFF
+      - --max-connections=20
+      - --table-open-cache=256
+      - --table-definition-cache=256
+      - --temptable-max-ram=32M
+      - --temptable-max-mmap=0
+      - --key-buffer-size=8M
+      - --mysqlx=OFF
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_PASSWORD\" mysql -h 127.0.0.1 -u\"$$MYSQL_USER\" \"$$MYSQL_DATABASE\" -N -e 'SELECT 1' >/dev/null 2>&1"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 90s
+volumes:
+  mysql_data:
