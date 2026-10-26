@@ -55,11 +55,23 @@ class AvaliacaoApiIntegrationTest {
     }
 
     @Test
-    void aiAssessmentHasSixQuestionsAndGradesTheSubmittedAnswers() throws Exception {
+    void aiAssessmentHasEighteenQuestionsAndGradesTheSubmittedAnswers() throws Exception {
         usuarios.save(new Usuario("Aluno IA", firstEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
         UUID courseId = cursos.findAllByOrderByOrdemExibicaoAscTituloAsc().stream()
                 .filter(course -> course.getTitulo().equals("Introdução à Inteligência Artificial"))
                 .findFirst().orElseThrow().getId();
+        List<Map<String, Object>> questionCounts = jdbc.queryForList("""
+                SELECT q.ordem, COUNT(o.id) AS alternativas, SUM(o.correta) AS corretas
+                FROM questoes q JOIN avaliacoes a ON a.id = q.avaliacao_id
+                LEFT JOIN alternativas o ON o.questao_id = q.id
+                WHERE a.curso_id = ? GROUP BY q.id, q.ordem ORDER BY q.ordem
+                """, courseId.toString());
+        assertThat(questionCounts).hasSize(18);
+        for (int index = 0; index < questionCounts.size(); index++) {
+            assertThat(((Number) questionCounts.get(index).get("ordem")).intValue()).isEqualTo(index + 1);
+            assertThat(((Number) questionCounts.get(index).get("alternativas")).intValue()).isEqualTo(4);
+            assertThat(((Number) questionCounts.get(index).get("corretas")).intValue()).isEqualTo(1);
+        }
         try (HttpClient client = HttpClient.newHttpClient()) {
             String token = login(client, firstEmail);
             post(client, "/api/colaborador/inscricoes/cursos/" + courseId, token, null);
@@ -71,11 +83,15 @@ class AvaliacaoApiIntegrationTest {
             assertThat(assessment.path("maxAttempts").asInt()).isEqualTo(2);
             assertThat(assessment.path("topic").asText()).isEqualTo("ai");
             JsonNode questions = assessment.path("questions");
-            assertThat(questions.size()).isEqualTo(6);
+            assertThat(questions.size()).isEqualTo(18);
             assertThat(questions.get(0).path("prompt").asText())
                     .isEqualTo("Qual alternativa melhor define Inteligência Artificial?");
             assertThat(questions.get(5).path("prompt").asText())
                     .startsWith("Um colaborador precisa resumir um documento interno");
+            assertThat(questions.get(6).path("prompt").asText())
+                    .isEqualTo("Qual é a importância dos dados para muitos sistemas de Inteligência Artificial?");
+            assertThat(questions.get(17).path("prompt").asText())
+                    .isEqualTo("Qual prática é recomendada quando uma resposta de IA apresenta uma informação importante para uma decisão?");
             for (JsonNode question : questions) {
                 assertThat(question.path("options").size()).isEqualTo(4);
                 assertThat(question.path("optionIds").size()).isEqualTo(4);
@@ -85,12 +101,12 @@ class AvaliacaoApiIntegrationTest {
 
             List<Map<String, String>> wrong = new ArrayList<>();
             List<Map<String, String>> right = new ArrayList<>();
-            int[] correctOptions = {1, 1, 1, 2, 2, 2};
+            int[] correctOptions = {1, 1, 1, 2, 2, 2, 0, 1, 1, 0, 0, 1, 0, 2, 0, 1, 0, 1};
             for (int index = 0; index < questions.size(); index++) {
                 JsonNode question = questions.get(index);
                 String questionId = question.path("id").asText();
                 wrong.add(Map.of("questaoId", questionId,
-                        "alternativaId", question.path("optionIds").get(0).asText()));
+                        "alternativaId", question.path("optionIds").get((correctOptions[index] + 1) % 4).asText()));
                 right.add(Map.of("questaoId", questionId,
                         "alternativaId", question.path("optionIds").get(correctOptions[index]).asText()));
             }
@@ -110,6 +126,61 @@ class AvaliacaoApiIntegrationTest {
                 assertThat(passed.path("questions").get(index).path("explanation").asText())
                         .isNotBlank();
             }
+        }
+    }
+
+    @Test
+    void aiAssessmentKeepsOldSixAnswerAttemptAndAllowsTheRemainingAttempt() throws Exception {
+        usuarios.save(new Usuario("Aluno IA legado", firstEmail, passwords.encode(PASSWORD), Perfil.COLABORADOR, null));
+        UUID courseId = cursos.findAllByOrderByOrdemExibicaoAscTituloAsc().stream()
+                .filter(course -> course.getTitulo().equals("Introdução à Inteligência Artificial"))
+                .findFirst().orElseThrow().getId();
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            String token = login(client, firstEmail);
+            post(client, "/api/colaborador/inscricoes/cursos/" + courseId, token, null);
+            JsonNode assessment = JSON.readTree(get(client, "/api/colaborador/avaliacoes", token).body()).get(0);
+            JsonNode questions = assessment.path("questions");
+            assertThat(questions.size()).isEqualTo(18);
+
+            // Simula uma tentativa gravada quando a avaliação ainda tinha seis questões.
+            String attemptId = UUID.randomUUID().toString();
+            jdbc.update("""
+                    INSERT INTO tentativas_avaliacao (id, avaliacao_id, usuario_id, nota, aprovado)
+                    VALUES (?, ?, ?, 0, FALSE)
+                    """, attemptId, assessment.path("id").asText(),
+                    usuarios.findByEmailIgnoreCase(firstEmail).orElseThrow().getId().toString());
+            for (int index = 0; index < 6; index++) {
+                JsonNode question = questions.get(index);
+                jdbc.update("""
+                        INSERT INTO respostas_avaliacao (id, tentativa_id, questao_id, alternativa_id)
+                        VALUES (?, ?, ?, ?)
+                        """, UUID.randomUUID().toString(), attemptId, question.path("id").asText(),
+                        question.path("optionIds").get(0).asText());
+            }
+
+            JsonNode current = JSON.readTree(get(client, "/api/colaborador/avaliacoes", token).body()).get(0);
+            assertThat(current.path("questions").size()).isEqualTo(18);
+            assertThat(current.path("attempts").size()).isEqualTo(1);
+            assertThat(current.path("attempts").get(0).path("answers").size()).isEqualTo(6);
+            assertThat(current.path("attempts").get(0).path("score").asInt()).isZero();
+            assertThat(current.path("maxAttempts").asInt()).isEqualTo(2);
+
+            int[] correctOptions = {1, 1, 1, 2, 2, 2, 0, 1, 1, 0, 0, 1, 0, 2, 0, 1, 0, 1};
+            List<Map<String, String>> answers = new ArrayList<>();
+            for (int index = 0; index < questions.size(); index++) {
+                JsonNode question = questions.get(index);
+                answers.add(Map.of("questaoId", question.path("id").asText(),
+                        "alternativaId", question.path("optionIds").get(correctOptions[index]).asText()));
+            }
+            JsonNode result = JSON.readTree(post(client,
+                    "/api/colaborador/avaliacoes/" + assessment.path("id").asText() + "/tentativas",
+                    token, JSON.writeValueAsString(Map.of("respostas", answers))).body());
+            assertThat(result.path("attempts").size()).isEqualTo(2);
+            assertThat(result.path("attempts").get(0).path("answers").size()).isEqualTo(6);
+            assertThat(result.path("attempts").get(1).path("score").asInt()).isEqualTo(100);
+            assertThat(result.path("attempts").get(1).path("passed").asBoolean()).isTrue();
+            assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM respostas_avaliacao WHERE tentativa_id = ?",
+                    Integer.class, attemptId)).isEqualTo(6);
         }
     }
 
