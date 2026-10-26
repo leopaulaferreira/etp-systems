@@ -4,7 +4,7 @@ As rotas `/empresa/dashboard`, `/empresa/colaboradores`, `/empresa/avaliacoes` e
 
 O painel calcula os indicadores a partir das inscrições retornadas: pessoas em aprendizagem, cursos com 100% de progresso, média da última nota por pessoa/curso, certificados emitidos e distribuição do progresso. Nota ausente aparece como “—” e não entra na média; nota zero entra. Conclusão de curso e emissão de certificado são eventos distintos. As conclusões recentes usam a data do progresso, enquanto o detalhe do certificado usa a data de emissão. O diálogo individual mostra a categoria do curso, sem inferir uma trilha não registrada.
 
-Colaboradores permite buscar por nome/e-mail e filtrar por situação e área. Avaliações e Certificados permitem buscar e filtrar por curso. Colaboradores sem cursos, notas, certificados ou área são exibidos sem valores fictícios. Os filtros atuam sobre a lista; os indicadores representam a empresa inteira.
+Colaboradores permite buscar por nome/e-mail e filtrar por situação e área. Avaliações e Certificados permitem buscar e filtrar por curso. Colaboradores sem cursos, notas, certificados ou área são exibidos sem valores fictícios. Os indicadores da Visão geral representam a empresa inteira. Em Avaliações, a média e as contagens acompanham os filtros e consideram a última nota de cada par colaborador/curso; nota zero participa da média e a seleção vazia mostra “—”. Em Certificados, os totais do acervo representam a empresa inteira, e a contagem de registros indica os resultados filtrados.
 
 O login, a sessão e as permissões continuam centralizados em AuthContext e RequireAuth. O token fica em sessionStorage e a recarga valida `/api/auth/me`. A API de RH aceita somente o perfil `EMPRESA`; um colaborador não acessa essas consultas.
 
