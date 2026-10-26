@@ -20,6 +20,21 @@ jobs:
     environment:
       name: production
       url: https://etp.leofe.com.br/
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: ci-root-only
+          MYSQL_DATABASE: etp_ci
+          MYSQL_USER: etp_ci
+          MYSQL_PASSWORD: ci-test-only
+        ports:
+          - 3306/tcp
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
     steps:
       - uses: actions/checkout@v5
         with:
@@ -32,7 +47,18 @@ jobs:
           cache: maven
           cache-dependency-path: backend/pom.xml
 
+      - name: Testar scripts de implantação
+        run: python3 tests/deploy-activation.py
+
       - name: Testar e compilar API
+        env:
+          ETP_DB_TEST: 'true'
+          DB_HOST: 127.0.0.1
+          DB_PORT: ${{ job.services.mysql.ports[3306] }}
+          DB_NAME: etp_ci
+          DB_USER: etp_ci
+          DB_PASSWORD: ci-test-only
+          JWT_SECRET: Y2ktdGVzdC1vbmx5LXNlY3JldC1mb3ItZXRwLWludGVncmF0aW9uLXRlc3RzLTEyMzQ1Ng==
         run: mvn -B -ntp -f backend/pom.xml verify
 
       - uses: actions/setup-node@v5
@@ -66,11 +92,15 @@ jobs:
         env:
           DEPLOY_HOST: etpdeploy@147.15.127.35
         run: |
+          git rev-parse HEAD:backend > backend/target/backend-source
           ssh -o BatchMode=yes "$DEPLOY_HOST" "mkdir -p /home/etpdeploy/incoming/${GITHUB_SHA}/frontend"
           rsync -a --checksum frontend/dist/videos/ "$DEPLOY_HOST:/opt/etp-systems/frontend/videos/"
           rsync -az --exclude='/videos/***' frontend/dist/ "$DEPLOY_HOST:/home/etpdeploy/incoming/${GITHUB_SHA}/frontend/"
           rsync -a backend/target/etp-backend-0.1.0-SNAPSHOT.jar \
             "$DEPLOY_HOST:/home/etpdeploy/incoming/${GITHUB_SHA}/etp-backend.jar"
+
+          rsync -a backend/target/backend-source \
+            "$DEPLOY_HOST:/home/etpdeploy/incoming/${GITHUB_SHA}/backend-source"
 
       - name: Ativar versão na VM
         env:

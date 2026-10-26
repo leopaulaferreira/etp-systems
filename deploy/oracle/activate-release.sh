@@ -27,22 +27,40 @@ if [[ -f $app/deployed-commit && $(cat "$app/deployed-commit") == "$sha" ]]; the
   exit 0
 fi
 
+# Comparar o conteúdo versionado evita diferenças de timestamp entre builds do JAR.
+# Pacotes antigos sem marcador continuam fazendo a publicação completa.
+backend_changed=true
+backend_source=''
+if [[ -f $stage/backend-source ]]; then
+  backend_source=$(cat "$stage/backend-source")
+  [[ $backend_source =~ ^[0-9a-f]{40}$ ]] || { echo 'Identificador do backend inválido.' >&2; exit 1; }
+  if [[ -f $app/backend-source && $(cat "$app/backend-source") == "$backend_source" ]]; then
+    backend_changed=false
+  fi
+fi
+
 install -d -m 700 "$backup"
-cp "$app/etp-backend.jar" "$backup/etp-backend.jar"
 cp "$app/frontend/index.html" "$backup/index.html"
-# O banco permanece no volume Docker. O dump permite recuperar dados antes de migrations novas.
-docker exec etp-database sh -c 'MYSQL_PWD="$MYSQL_PASSWORD" mysqldump --single-transaction --no-tablespaces -u"$MYSQL_USER" "$MYSQL_DATABASE"' \
-  | gzip -1 > "$backup/database.sql.gz"
-gzip -t "$backup/database.sql.gz"
+if [[ $backend_changed == true ]]; then
+  cp "$app/etp-backend.jar" "$backup/etp-backend.jar"
+  # O banco permanece no volume Docker. O dump permite recuperar dados antes de migrations novas.
+  docker exec etp-database sh -c 'MYSQL_PWD="$MYSQL_PASSWORD" mysqldump --single-transaction --no-tablespaces -u"$MYSQL_USER" "$MYSQL_DATABASE"' \
+    | gzip -1 > "$backup/database.sql.gz"
+  gzip -t "$backup/database.sql.gz"
+fi
 
 # Arquivos versionados entram primeiro; o index troca por último. Vídeos são sincronizados à parte.
 rsync -a --no-owner --no-group --exclude='/index.html' --exclude='/videos/***' "$web/" "$app/frontend/"
 install -m 644 "$web/index.html" "$app/frontend/index.html.next"
 mv -f "$app/frontend/index.html.next" "$app/frontend/index.html"
-install -m 644 "$stage/etp-backend.jar" "$app/etp-backend.jar.next"
-mv -f "$app/etp-backend.jar.next" "$app/etp-backend.jar"
+if [[ $backend_changed == true ]]; then
+  install -m 644 "$stage/etp-backend.jar" "$app/etp-backend.jar.next"
+  mv -f "$app/etp-backend.jar.next" "$app/etp-backend.jar"
 
-"${compose[@]}" up -d --force-recreate --no-deps backend
+  "${compose[@]}" up -d --force-recreate --no-deps backend
+else
+  echo "Backend sem alterações; mantendo a API em execução."
+fi
 
 healthy=false
 for ((attempt=1; attempt<=36; attempt++)); do
@@ -55,15 +73,22 @@ for ((attempt=1; attempt<=36; attempt++)); do
 done
 
 if [[ $healthy != true ]]; then
-  echo 'Nova API não respondeu; restaurando JAR e página anterior.' >&2
-  install -m 644 "$backup/etp-backend.jar" "$app/etp-backend.jar.next"
-  mv -f "$app/etp-backend.jar.next" "$app/etp-backend.jar"
+  echo 'API não respondeu; restaurando a versão anterior.' >&2
+  if [[ $backend_changed == true ]]; then
+    install -m 644 "$backup/etp-backend.jar" "$app/etp-backend.jar.next"
+    mv -f "$app/etp-backend.jar.next" "$app/etp-backend.jar"
+    "${compose[@]}" up -d --force-recreate --no-deps backend
+  fi
   install -m 644 "$backup/index.html" "$app/frontend/index.html.next"
   mv -f "$app/frontend/index.html.next" "$app/frontend/index.html"
-  "${compose[@]}" up -d --force-recreate --no-deps backend
   exit 1
 fi
 
+if [[ -n $backend_source ]]; then
+  printf '%s\n' "$backend_source" > "$app/backend-source"
+else
+  rm -f "$app/backend-source"
+fi
 printf '%s\n' "$sha" > "$app/deployed-commit"
 echo "Implantação concluída: $sha"
 # O código enviado já está em uso; só o backup do banco/JAR fica para reversão.
