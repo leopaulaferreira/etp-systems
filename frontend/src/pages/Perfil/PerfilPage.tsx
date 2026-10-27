@@ -18,6 +18,7 @@ import CourseThumbnail from '../MeusCursos/components/CourseThumbnail'
 import { fetchMyCourses } from '../MeusCursos/myCoursesApi'
 import type { Certificate } from '../../types/certificate'
 import type { CourseItem } from '../MeusCursos/courseTypes'
+import ProfileNextStepCard from './ProfileNextStepCard'
 
 const cardClass = 'min-w-0 rounded-[22px] border border-ink-200/70 bg-panel p-5 shadow-card sm:p-6'
 const linkClass = 'inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-bold text-brand-blue-400 hover:bg-brand-blue-500/10 hover:text-brand-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400'
@@ -36,7 +37,7 @@ function DetailRow({ label, children }: { label: string; children: ReactNode }) 
 
 export default function PerfilPage() {
   const { profile } = useProfile()
-  const { assessments } = useAssessments()
+  const { assessments, status: assessmentStatus, reload: reloadAssessments } = useAssessments()
   const completedAssessments = assessmentSummary(assessments).completed
   const [announcement, setAnnouncement] = useState('')
   const [data, setData] = useState<{ courses: CourseItem[]; certificates: Certificate[] } | null>(null)
@@ -179,6 +180,16 @@ export default function PerfilPage() {
           </div>
         </section>
 
+        <ProfileNextStepCard
+          className={cardClass}
+          courses={data?.courses ?? []}
+          assessments={assessments}
+          status={status === 'error' || assessmentStatus === 'error' ? 'error' : status === 'loading' || assessmentStatus === 'loading' ? 'loading' : 'ready'}
+          onRetry={() => {
+            if (status === 'error') { setStatus('loading'); setRetry(value => value + 1) }
+            if (assessmentStatus === 'error') reloadAssessments()
+          }}
+        />
       </div>
       <p role="status" className="sr-only">{announcement}</p>
     </div>
