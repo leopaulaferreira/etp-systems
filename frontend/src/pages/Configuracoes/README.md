@@ -1,6 +1,6 @@
 # Configurações do colaborador
 
-A página `/configuracoes` organiza seis seções, selecionadas pelo parâmetro `secao`: `estudo` (padrão), `conta`, `notificacoes`, `acessibilidade`, `seguranca` e `privacidade`. No desktop, o menu apresenta a identidade do colaborador e um link para o perfil; no celular, um seletor com rótulos preserva a largura do conteúdo.
+A página `/configuracoes` organiza seis seções, selecionadas pelo parâmetro `secao`: `estudo` (padrão), `conta`, `notificacoes`, `acessibilidade`, `seguranca` e `privacidade`. A navegação fica em uma faixa no topo, integrada ao painel de conteúdo: seis opções no desktop, duas linhas em telas intermediárias e um seletor com rótulos no celular. A seção Conta reúne a identidade e o atalho para o perfil. Em Notificações, os controles e a prévia compartilham um único bloco, com colunas alinhadas no desktop e empilhadas no celular.
 
 - **Estudo:** objetivo e nível são salvos automaticamente na API do perfil. Os cartões de formatos registram preferências locais e não filtram o catálogo. Os lembretes são configurados em Notificações.
 - **Conta:** nome, telefone, cargo e localização são editáveis; e-mail e empresa aparecem apenas para consulta. O formulário mantém alterações ao alternar seções, permite cancelar e salva somente os campos editados. Uma gravação não reaplica valores antigos de notificações ou aprendizagem.

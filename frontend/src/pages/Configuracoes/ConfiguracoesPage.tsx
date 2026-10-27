@@ -1,7 +1,7 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import {
-  Accessibility, Bell, BookOpen, Check, ChevronRight, LockKeyhole, Target, Play, FileText, PencilLine,
+  Accessibility, Bell, BookOpen, Check, LockKeyhole, Target, Play, FileText, PencilLine,
   Mail, Settings, ShieldCheck, UserRound, LogOut, Download, Trash2, ArrowUpRight, Building2, Save, Monitor, Type, MousePointer2,
   type LucideIcon,
 } from 'lucide-react'
@@ -211,23 +211,26 @@ export default function ConfiguracoesPage() {
     <div className="flex min-w-0 flex-col gap-5 lg:gap-6">
       <PageHero eyebrow="Sua experiência" icon={Settings} title="Configurações" description="Seu perfil, seu jeito de aprender e os ajustes que fazem diferença no dia a dia." />
 
-      <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[240px_minmax(0,1fr)] xl:gap-6">
-        <nav aria-label="Seções de configurações" className="min-w-0 rounded-[22px] border border-ink-200/70 bg-panel p-3 xl:p-4">
-          <div className="mb-4 hidden border-b border-ink-200/60 pb-4 xl:block">
-            <div className="flex items-center gap-3"><Avatar name={profile.name} email={profile.email} className="h-11 w-11 shrink-0" /><div className="min-w-0"><p className="break-words text-sm font-bold text-ink-900">{profile.name}</p><p className="mt-1 text-[11px] text-ink-500">Colaborador</p></div></div>
-            <Link to="/perfil" className={`mt-3 flex min-h-11 items-center justify-between gap-2 rounded-lg text-xs font-semibold text-brand-blue-400 ${focusClass}`}>Ver meu perfil<ArrowUpRight className="h-4 w-4" aria-hidden="true" /></Link>
-          </div>
+      <div className="min-w-0 overflow-hidden rounded-[22px] border border-ink-200/70 bg-panel">
+        <nav aria-label="Seções de configurações" className="border-b border-ink-200/70 bg-panel-alt/30 p-3 sm:p-4">
           <label className="flex flex-col gap-2 text-xs font-semibold text-ink-500 sm:hidden">Seção de configurações
-            <select className={inputClass} value={selected} onChange={event => { setSelected(event.target.value as Section); setFeedback('') }}>{sections.map(section => <option key={section.id} value={section.id}>{section.label}</option>)}</select>
+            <select className={inputClass} aria-controls="settings-panel" value={selected} onChange={event => { setSelected(event.target.value as Section); setFeedback('') }}>{sections.map(section => <option key={section.id} value={section.id}>{section.label}</option>)}</select>
           </label>
-          <div className="hidden grid-cols-3 gap-1 sm:grid xl:flex xl:flex-col">
-            {sections.map(({ id, label, icon: Icon }) => <button key={id} type="button" aria-current={selected === id ? 'true' : undefined} aria-controls="settings-panel" onClick={() => { setSelected(id); setFeedback('') }} className={`flex min-h-12 min-w-0 items-center gap-2.5 rounded-xl px-3 py-3 text-left text-xs font-semibold transition-colors ${focusClass} ${selected === id ? 'bg-brand-blue-500/15 text-brand-blue-400' : 'text-ink-500 hover:bg-ink-100 hover:text-ink-900'}`}><Icon className="h-[18px] w-[18px] shrink-0" aria-hidden="true" /><span className="min-w-0 flex-1">{label}</span>{selected === id && <ChevronRight className="hidden h-3.5 w-3.5 shrink-0 xl:block" aria-hidden="true" />}</button>)}
+          <div className="hidden grid-cols-3 gap-2 sm:grid xl:grid-cols-6">
+            {sections.map(({ id, label, icon: Icon }) => <button
+              key={id}
+              type="button"
+              aria-current={selected === id ? 'true' : undefined}
+              aria-controls="settings-panel"
+              onClick={() => { setSelected(id); setFeedback('') }}
+              className={`flex min-h-14 min-w-0 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-left text-xs font-semibold transition-colors ${focusClass} ${selected === id ? 'border-brand-blue-400/30 bg-brand-blue-500/15 text-brand-blue-400' : 'border-transparent text-ink-500 hover:bg-ink-100 hover:text-ink-900'}`}
+            ><Icon className="h-[18px] w-[18px] shrink-0" aria-hidden="true" /><span className="min-w-0">{label}</span></button>)}
           </div>
         </nav>
 
-        <div className="min-w-0 space-y-4">
+        <div className="min-w-0 space-y-4 p-4 sm:p-6 lg:p-7">
           <section id="settings-panel" aria-labelledby="settings-title" className="min-w-0 space-y-5">
-            <header className="px-1"><p className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-brand-blue-400">{selected === 'estudo' ? 'Aprendizagem' : selected === 'acessibilidade' ? 'Conforto e leitura' : 'Preferências pessoais'}</p><h2 id="settings-title" className="text-xl font-extrabold tracking-tight text-ink-900">{currentSection.label}</h2><p className="mt-1 text-xs leading-5 text-ink-500">{currentSection.description}</p></header>
+            <header className="border-b border-ink-200/60 pb-5"><p className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-brand-blue-400">{selected === 'estudo' ? 'Aprendizagem' : selected === 'acessibilidade' ? 'Conforto e leitura' : 'Preferências pessoais'}</p><h2 id="settings-title" className="text-xl font-extrabold tracking-tight text-ink-900">{currentSection.label}</h2><p className="mt-1 text-xs leading-5 text-ink-500">{currentSection.description}</p></header>
 
             {selected === 'estudo' && <>
               <SettingsPanel className="relative overflow-hidden border-brand-blue-400/20 bg-gradient-to-br from-brand-blue-500/10 via-panel to-panel">
@@ -268,7 +271,7 @@ export default function ConfiguracoesPage() {
             </>}
 
             {selected === 'conta' && <form onSubmit={save} className="overflow-hidden rounded-[22px] border border-ink-200/70 bg-panel">
-              <div className="flex items-center gap-4 border-b border-ink-200/60 bg-gradient-to-r from-brand-blue-500/10 to-transparent p-5 sm:p-6"><Avatar name={account.name || profile.name} email={profile.email} className="h-16 w-16 shrink-0" /><div className="min-w-0"><h3 className="break-words text-base font-extrabold text-ink-900">{account.name || profile.name}</h3><p className="mt-1 text-xs text-ink-500">Seu perfil na plataforma</p></div></div>
+              <div className="flex items-center gap-4 border-b border-ink-200/60 bg-gradient-to-r from-brand-blue-500/10 to-transparent p-5 sm:p-6"><Avatar name={account.name || profile.name} email={profile.email} className="h-16 w-16 shrink-0" /><div className="min-w-0"><h3 className="break-words text-base font-extrabold text-ink-900">{account.name || profile.name}</h3><p className="mt-1 text-xs text-ink-500">Seu perfil na plataforma</p></div><Link to="/perfil" className={`ml-auto hidden min-h-11 shrink-0 items-center gap-2 rounded-lg px-2 text-xs font-semibold text-brand-blue-400 sm:inline-flex ${focusClass}`}>Ver meu perfil<ArrowUpRight className="h-4 w-4" aria-hidden="true" /></Link></div>
               <fieldset disabled={savingAccount} className="min-w-0 space-y-5 p-5 sm:p-6">
                 <legend className="sr-only">Dados pessoais e profissionais</legend>
                 <div className="grid min-w-0 gap-4 md:grid-cols-2">
@@ -290,13 +293,24 @@ export default function ConfiguracoesPage() {
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink-200/60 bg-panel-alt/30 px-5 py-4 sm:px-6"><p role="status" className={`text-xs ${saved ? 'text-brand-cyan-400' : accountDirty ? 'text-amber-200' : 'text-ink-500'}`}>{saved ? 'Alterações salvas.' : accountDirty ? 'Alterações não salvas' : 'Nenhuma alteração pendente'}</p><div className="flex flex-wrap gap-2"><button type="button" onClick={() => { setAccount(null); setSaved(false); setAccountError('') }} disabled={!accountDirty || savingAccount} className={actionClass}>Cancelar</button><button type="submit" disabled={!accountDirty || savingAccount} className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-blue-600 px-4 py-3 text-xs font-bold text-white hover:bg-brand-blue-700 disabled:cursor-not-allowed disabled:opacity-50 ${focusClass}`}><Save className="h-4 w-4" aria-hidden="true" />{savingAccount ? 'Salvando…' : 'Salvar alterações'}</button></div></div>
             </form>}
 
-            {selected === 'notificacoes' && <>
-              <SettingsPanel><label className="flex cursor-pointer items-center justify-between gap-4"><span className="min-w-0"><span className="block text-sm font-bold text-ink-900">Mostrar avisos no cabeçalho</span><span className="mt-1 block text-xs leading-5 text-ink-500">Preferência vinculada à sua conta, salva automaticamente.</span></span><SettingsToggle label="Mostrar avisos no cabeçalho" checked={notificationsEnabled} disabled={notificationDraft !== null} onChange={checked => { void changeNotifications(checked) }} /></label></SettingsPanel>
-              <div className="grid min-w-0 items-start gap-5 md:grid-cols-2">
-                <SettingsPanel><h3 className="text-sm font-bold text-ink-900">Tipos de lembrete</h3><p className="mt-1 text-xs leading-5 text-ink-500">Preferências salvas neste navegador.</p><div className="mt-3 divide-y divide-ink-200/60">{reminderOptions.map(([key, label, description]) => <label key={key} className="flex cursor-pointer items-center justify-between gap-4 py-4"><span className="min-w-0"><span className="block text-xs font-semibold text-ink-700">{label}</span><span className="mt-1 block text-xs leading-5 text-ink-500">{description}</span></span><SettingsToggle label={label} checked={study[key]} onChange={checked => changeStudy(key, checked)} /></label>)}</div></SettingsPanel>
-                <SettingsPanel className="border-brand-blue-400/20 bg-gradient-to-br from-brand-blue-500/10 to-panel"><div className="flex items-center gap-2"><Monitor className="h-4 w-4 text-brand-blue-400" aria-hidden="true" /><h3 className="text-sm font-bold text-ink-900">Prévia dos avisos</h3></div><p className="mt-2 text-xs leading-5 text-ink-500">Exemplos dos tipos escolhidos. Não há envio de e-mails ou notificações push.</p>{notificationsEnabled && reminderOptions.some(([key]) => study[key]) ? <ul className="mt-4 space-y-3">{reminderOptions.filter(([key]) => study[key]).map(([key, label, message]) => <li key={key} className="flex items-start gap-3 rounded-xl border border-ink-200/70 bg-panel p-4"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-cyan-400" aria-hidden="true" /><div><p className="text-xs font-bold text-ink-700">{label}</p><p className="mt-1 text-xs leading-5 text-ink-500">{message}</p></div></li>)}</ul> : <p className="mt-5 rounded-xl border border-dashed border-ink-400/50 p-4 text-xs leading-5 text-ink-500">{notificationsEnabled ? 'Nenhum tipo de aviso selecionado.' : 'Os avisos estão desativados.'}</p>}</SettingsPanel>
+            {selected === 'notificacoes' && <div className="grid min-w-0 overflow-hidden rounded-2xl border border-ink-200/70 md:grid-cols-2">
+              <div className="min-w-0 p-4 sm:p-5 lg:p-6">
+                <label className="flex cursor-pointer items-center justify-between gap-4 border-b border-ink-200/60 pb-5">
+                  <span className="min-w-0"><span className="block text-sm font-bold text-ink-900">Mostrar avisos no cabeçalho</span><span className="mt-1 block text-xs leading-5 text-ink-500">Preferência vinculada à sua conta, salva automaticamente.</span></span>
+                  <SettingsToggle label="Mostrar avisos no cabeçalho" checked={notificationsEnabled} disabled={notificationDraft !== null} onChange={checked => { void changeNotifications(checked) }} />
+                </label>
+                <h3 className="mt-5 text-sm font-bold text-ink-900">Tipos de lembrete</h3>
+                <p className="mt-1 text-xs leading-5 text-ink-500">Preferências salvas neste navegador.</p>
+                <div className="mt-3 divide-y divide-ink-200/60">
+                  {reminderOptions.map(([key, label, description]) => <label key={key} className="flex cursor-pointer items-center justify-between gap-4 py-4 last:pb-0"><span className="min-w-0"><span className="block text-xs font-semibold text-ink-700">{label}</span><span className="mt-1 block text-xs leading-5 text-ink-500">{description}</span></span><SettingsToggle label={label} checked={study[key]} onChange={checked => changeStudy(key, checked)} /></label>)}
+                </div>
               </div>
-            </>}
+              <aside aria-label="Prévia dos avisos" className="min-w-0 border-t border-ink-200/70 bg-gradient-to-br from-brand-blue-500/[0.07] to-panel-alt/30 p-4 sm:p-5 md:border-l md:border-t-0 lg:p-6">
+                <div className="flex items-center gap-2"><Monitor className="h-4 w-4 text-brand-blue-400" aria-hidden="true" /><h3 className="text-sm font-bold text-ink-900">Prévia dos avisos</h3></div>
+                <p className="mt-2 text-xs leading-5 text-ink-500">Exemplos dos tipos escolhidos. Não há envio de e-mails ou notificações push.</p>
+                {notificationsEnabled && reminderOptions.some(([key]) => study[key]) ? <ul className="mt-5 space-y-3">{reminderOptions.filter(([key]) => study[key]).map(([key, label, message]) => <li key={key} className="flex items-start gap-3 rounded-xl border border-ink-200/70 bg-panel p-4"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-cyan-400" aria-hidden="true" /><div><p className="text-xs font-bold text-ink-700">{label}</p><p className="mt-1 text-xs leading-5 text-ink-500">{message}</p></div></li>)}</ul> : <p className="mt-5 rounded-xl border border-dashed border-ink-400/50 p-4 text-xs leading-5 text-ink-500">{notificationsEnabled ? 'Nenhum tipo de aviso selecionado.' : 'Os avisos estão desativados.'}</p>}
+              </aside>
+            </div>}
 
             {selected === 'acessibilidade' && <>
               <SettingsPanel><div className="divide-y divide-ink-200/60">{([

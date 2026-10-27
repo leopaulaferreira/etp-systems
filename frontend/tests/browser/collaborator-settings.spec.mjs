@@ -50,7 +50,8 @@ test('conta preserva edição ao alternar seções e não sobrescreve notificaç
   await expect(page.getByText('Você tem alterações não salvas nos dados da conta.')).toBeVisible()
   const notification = page.getByRole('switch', { name: 'Mostrar avisos no cabeçalho' })
   state.fail = true
-  await notification.uncheck()
+  // A falha pode restaurar o valor antes da verificação interna de uncheck().
+  await notification.click()
   await expect(page.getByText('Não foi possível salvar a preferência. Tente novamente.')).toBeVisible()
   await expect(notification).toBeChecked()
   state.fail = false
