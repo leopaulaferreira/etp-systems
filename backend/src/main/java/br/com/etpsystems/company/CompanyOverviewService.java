@@ -10,6 +10,7 @@ import java.util.UUID;
 import br.com.etpsystems.assessment.Tentativa;
 import br.com.etpsystems.assessment.TentativaRepository;
 import br.com.etpsystems.certificate.Certificado;
+import br.com.etpsystems.certificate.CertificadoResponse;
 import br.com.etpsystems.certificate.CertificadoRepository;
 import br.com.etpsystems.course.Curso;
 import br.com.etpsystems.enrollment.Inscricao;
@@ -104,7 +105,8 @@ public class CompanyOverviewService {
                 progresso == null ? null : progresso.getConcluidoEm(),
                 tentativa == null ? null : tentativa.getNota(),
                 certificado == null ? null : certificado.getCodigo(),
-                certificado == null ? null : certificado.getEmitidoEm());
+                certificado == null ? null : certificado.getEmitidoEm(),
+                certificado == null ? null : CertificadoResponse.from(certificado));
     }
 
     private record CourseKey(UUID usuarioId, UUID cursoId) {}

@@ -56,6 +56,7 @@ class CompanyOverviewApiIntegrationTest {
     @Autowired private AvaliacaoService avaliacaoService;
     @Autowired private PasswordEncoder passwords;
     @Autowired private JdbcTemplate jdbc;
+    @Autowired private br.com.etpsystems.certificate.CertificadoService certificados;
 
     @Test
     void scopesTeamAndResultsToAuthenticatedCompany() throws Exception {
@@ -109,6 +110,16 @@ class CompanyOverviewApiIntegrationTest {
             assertThat(course.path("score").asInt()).isEqualTo(100);
             assertThat(course.path("certificateCode").asText()).startsWith("ETP-");
             assertThat(course.path("certificateIssuedAt").asText()).isNotEmpty();
+            // A mesma resposta usada na consulta do colaborador, após aprovação real.
+            var issued = certificados.listar(employee.getId()).getFirst();
+            assertThat(course.path("certificate")).isEqualTo(JSON.readTree(JSON.writeValueAsString(issued)));
+            assertThat(course.path("certificate").path("holderName").asText()).isEqualTo("Pessoa A");
+            assertThat(course.path("certificate").path("code").asText()).isEqualTo(course.path("certificateCode").asText());
+            assertThat(course.path("certificate").path("durationHours").asDouble()).isEqualTo(security.getDuracaoMinutos() / 60.0);
+            assertThat(JSON.readTree(get(client, "/api/empresa/painel", rhToken).body())
+                    .path("employees").get(0).path("courses").get(0).path("certificate"))
+                    .isEqualTo(course.path("certificate"));
+            assertThat(certificados.listar(employee.getId())).hasSize(1);
             assertThat(response.body()).doesNotContain(otherEmployeeEmail, "senha", "senhaHash");
 
             JsonNode other = JSON.readTree(get(client, "/api/empresa/painel", otherRhToken).body());
@@ -117,7 +128,8 @@ class CompanyOverviewApiIntegrationTest {
             assertThat(other.path("employees").get(0).path("email").asText()).isEqualTo(otherEmployeeEmail);
             assertThat(other.path("employees").get(0).path("courses").get(0).path("progress").asInt())
                     .isEqualTo(33);
-            assertThat(other.toString()).doesNotContain(employeeEmail);
+            assertThat(other.toString()).doesNotContain(employeeEmail, issued.code(), issued.id().toString());
+            assertThat(other.path("employees").get(0).path("courses").get(0).path("certificate").isNull()).isTrue();
         }
     }
 
