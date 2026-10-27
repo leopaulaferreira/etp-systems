@@ -22,7 +22,7 @@ export function useCompanySettings(companyId: string | null, companyName?: strin
     try { return companyId ? localStorage.getItem(storageKey) : null } catch { return null }
   }, () => null)
   const settings = useMemo(() => {
-    const defaults = { ...defaultCompanySettings, name: companyName ?? defaultCompanySettings.name,
+    const defaults = { ...defaultCompanySettings, name: companyName === 'ETP Demonstração' ? 'ETP Systems' : companyName ?? defaultCompanySettings.name,
       contactName: user?.nome ?? defaultCompanySettings.contactName,
       accountEmail: user?.email ?? defaultCompanySettings.accountEmail }
     try {
