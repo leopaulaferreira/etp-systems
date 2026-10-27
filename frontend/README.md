@@ -1,6 +1,6 @@
 # Frontend - ETP Systems
 
-Para iniciar frontend, backend e banco juntos, consulte o [guia de execução local](../docs/EXECUCAO_LOCAL.md). Os comandos abaixo são a alternativa com Node instalado no computador.
+Para iniciar frontend, backend e banco juntos, consulte o [guia de execução local](../EXECUCAO_LOCAL.md). Os comandos abaixo são a alternativa com Node instalado no computador.
 
 Interface web do ETP Systems, construída em **React + TypeScript + Vite + Tailwind CSS**.
 

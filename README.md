@@ -1,133 +1,146 @@
+<div align="center">
+
 # ETP Systems
 
-**Plataforma de aprendizagem e desenvolvimento corporativo**, desenvolvida como projeto acadêmico do curso de Análise e Desenvolvimento de Sistemas da Universidade Municipal de São Caetano do Sul (USCS).
+**Plataforma de aprendizagem e desenvolvimento corporativo**
 
-O ETP reúne cursos, trilhas, avaliações e certificados. Colaboradores acompanham seus estudos; profissionais de Empresa/RH consultam o progresso da organização e autorizam tentativas extras de avaliação.
+![Projeto acadêmico](https://img.shields.io/badge/Projeto-Acad%C3%AAmico-2563eb?style=flat-square)
+![USCS](https://img.shields.io/badge/USCS-An%C3%A1lise_e_Desenvolvimento_de_Sistemas-142747?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Em_desenvolvimento-d97706?style=flat-square)
 
-**Status:** em desenvolvimento. Os principais fluxos usam a API e o banco reais; funcionalidades ainda planejadas estão descritas abaixo.
+Um ambiente para aprender, acompanhar a evolução e reconhecer as conquistas da equipe.
 
-## Executar localmente
+[Sobre o projeto](#sobre-o-projeto) · [Funcionalidades](#funcionalidades-disponíveis) · [Interface](#prévia-da-interface) · [Executar localmente](EXECUCAO_LOCAL.md)
 
-Pré-requisitos: Docker em execução com Compose v2.20+, Bash (Linux/macOS ou WSL2) e OpenSSL para gerar a configuração. A primeira execução precisa de internet. Java, Maven, Node e MySQL rodam nos containers.
+</div>
 
-Na raiz do repositório:
+## Sobre o projeto
 
-```sh
-./etp iniciar
-```
+O **ETP Systems** é um projeto acadêmico do curso de **Análise e Desenvolvimento de Sistemas da Universidade Municipal de São Caetano do Sul (USCS)**. Sua proposta é apoiar a capacitação profissional dentro das organizações, reunindo cursos, trilhas de aprendizagem, avaliações e certificados em uma única plataforma.
 
-O comando cria `backend/.env` se necessário, gera credenciais locais, inicia os serviços e aguarda ficarem prontos. Arquivos de configuração existentes são preservados. As migrações são aplicadas automaticamente; não execute `database/schema.sql` manualmente.
+O sistema conecta duas perspectivas: a do **colaborador**, que estuda e acompanha sua evolução, e a da **Empresa / RH**, que consulta o desenvolvimento das pessoas vinculadas à organização. Os registros de aprendizagem permitem acompanhar cursos em andamento, resultados e conquistas sem depender de controles separados.
 
-| Serviço | Endereço padrão |
+A concepção inicial, registrada nos [materiais acadêmicos](docs/README.md), tomou como cenário a formação e o desenvolvimento de colaboradores do Banco do Brasil. A implementação atual apresenta essa proposta em um ambiente demonstrativo de aprendizagem corporativa.
+
+> **Estágio atual:** aplicação funcional em desenvolvimento, com interface integrada à API e ao banco de dados. O ambiente de demonstração inclui contas e registros ilustrativos para apresentar os fluxos do projeto.
+
+## O problema e a proposta
+
+Quando treinamentos, resultados de avaliações e certificados ficam dispersos, torna-se difícil responder a perguntas simples: **o que cada pessoa está estudando, como está avançando e quais cursos já concluiu?** Para o colaborador, falta uma visão organizada da própria jornada; para o RH, faltam informações reunidas para acompanhar a equipe.
+
+O ETP propõe centralizar essa experiência: organizar o acesso ao conteúdo, registrar o progresso e disponibilizar resultados para quem aprende e para quem acompanha o desenvolvimento profissional.
+
+| Para o colaborador | Para a Empresa / RH |
 | --- | --- |
-| Aplicação | http://127.0.0.1:5174 |
-| API | http://127.0.0.1:18080 |
-| Swagger | http://127.0.0.1:18080/swagger-ui/index.html |
-| MySQL | `127.0.0.1:3307` |
+| Encontrar cursos e percorrer trilhas de aprendizagem. | Consultar colaboradores e seus cursos em um único painel. |
+| Retomar os estudos e acompanhar o próprio progresso. | Acompanhar progresso, conclusões e resultados de avaliações. |
+| Realizar avaliações e consultar notas e certificados. | Visualizar certificados e autorizar novas oportunidades de avaliação. |
 
-Os endereços efetivos aparecem no terminal. As portas do Compose ficam acessíveis somente neste computador.
+## Objetivos acadêmicos
 
-### Contas de demonstração
+O projeto busca transformar uma necessidade de capacitação corporativa em uma solução de software, articulando:
 
-Na configuração gerada pelo comando:
+- **Análise do problema e definição de requisitos:** compreender as necessidades de colaboradores e profissionais de RH.
+- **Experiência de uso:** organizar a navegação e apresentar conteúdos, progresso e resultados de forma clara.
+- **Modelagem e implementação:** conectar usuários, empresas, cursos, inscrições, avaliações e certificados em uma aplicação web.
+- **Qualidade e controle de acesso:** validar regras de aprendizagem, persistência dos dados e separação das informações entre contas e organizações.
 
-| Perfil no login | E-mail padrão |
-| --- | --- |
-| Colaborador | `etp@gmail.com` |
-| Empresa / RH | `rhetp@gmail.com` |
+A contribuição pretendida é tornar a capacitação mais organizada e seu acompanhamento mais acessível. Impactos como retenção de talentos, mobilidade interna e redução de custos são possibilidades a investigar, não resultados já demonstrados pelo projeto.
 
-A senha inicial está em `ETP_DEMO_PASSWORD` no arquivo `backend/.env`. Alterar esse valor depois não redefine senhas de contas já criadas. Não versione o arquivo de credenciais.
+## Prévia da interface
 
-```sh
-./etp parar          # Para os serviços e preserva os dados
-./etp status         # Consulta o estado dos containers
-./etp logs backend   # Acompanha os logs da API
-./etp configurar    # Prepara a configuração sem iniciar os serviços
-```
+![Dashboard do colaborador no ETP Systems, com cursos em andamento, conclusões, certificados, retomada dos estudos e resultados recentes.](docs/imagens/dashboard-colaborador.png)
 
-Consulte o [guia de execução local](docs/EXECUCAO_LOCAL.md) para configurar portas, usar um `.env` existente e resolver problemas. Para desenvolver sem containers de aplicação, consulte os guias de [backend](backend/README.md) e [frontend](frontend/README.md).
+*Painel do colaborador em uma sessão de demonstração. Os valores da captura representam aquele momento de uso.*
+
+A interface reúne indicadores, continuidade dos estudos e acesso às principais áreas. O perfil Empresa / RH possui navegação própria para acompanhar colaboradores, avaliações e certificados. As telas se adaptam a computadores, tablets e celulares.
+
+Os [mockups e materiais de apresentação](docs/README.md) registram outras etapas da evolução visual do projeto.
 
 ## Funcionalidades disponíveis
 
-| Área | Comportamento atual |
+### Jornada do colaborador
+
+| Área | O que permite fazer |
 | --- | --- |
-| Autenticação | Login com BCrypt e JWT, validação da conta no banco, permissões por perfil, expiração e logout local |
-| Cursos | Catálogo com busca, filtros, detalhes, inscrição e prioridade para cursos com aulas disponíveis |
-| Meus Cursos | Inscrições da conta, retomada da última aula e progresso por conclusão de aulas |
-| Trilhas | Inscrição nos cursos da trilha e acompanhamento do progresso agregado |
-| Avaliações | Correção no servidor, histórico de notas, limite de tentativas e proteção das respostas em edição |
-| Certificados | Emissão após aprovação em cursos habilitados, consulta e download de PDF |
-| Dashboard e relatórios | Indicadores reais, atividade de aprendizagem e exportação CSV |
-| Perfil | Dados pessoais, objetivo de aprendizagem, nível e preferência de notificações persistidos na API |
-| Empresa / RH | Colaboradores, progresso, notas e certificados da própria organização; liberação individual de tentativa extra com motivo e histórico |
+| **Dashboard** | Consultar cursos em andamento, conclusões, certificados e horas certificadas; retomar os estudos e explorar o catálogo. |
+| **Cursos e aulas** | Buscar e filtrar cursos, consultar detalhes, realizar inscrições e estudar os conteúdos disponíveis em vídeo ou texto. |
+| **Trilhas de aprendizagem** | Inscrever-se em conjuntos de cursos relacionados e acompanhar o progresso agregado da jornada. |
+| **Meus Cursos** | Consultar inscrições, continuar a última aula acessada e registrar a conclusão de aulas. |
+| **Avaliações** | Responder questões, consultar notas e tentativas anteriores e revisar o gabarito após a aprovação. |
+| **Certificados** | Visualizar documentos emitidos após aprovação em cursos habilitados e baixar o PDF. |
+| **Relatórios** | Acompanhar indicadores pessoais, evolução mensal e histórico de avaliações; exportar um CSV da atividade do ano corrente. |
+| **Perfil** | Atualizar dados pessoais, objetivo de aprendizagem e nível de experiência. |
 
-### Regras de aprendizagem
+### Acompanhamento pela Empresa / RH
 
-- Cursos com aulas calculam o progresso pelas aulas marcadas como concluídas. Cursos sem aulas mantêm o endpoint de progresso manual.
-- A aprovação na avaliação emite certificado quando o curso está habilitado para certificação e leva o progresso do curso a 100%.
-- As avaliações publicadas usam nota mínima de 80% e duas tentativas iniciais. O RH pode liberar uma tentativa extra quando elas se esgotam, desde que não haja aprovação.
-- **Gabarito e explicações são enviados somente após aprovação**, inclusive quando as tentativas se esgotam. Nota e respostas enviadas continuam disponíveis. A tentativa extra reutiliza as questões do curso.
-- Respostas ainda não enviadas ficam em memória durante a sessão. Navegação, recarga e logout têm avisos para evitar perda acidental; isso não representa salvamento no servidor.
-- Horas certificadas representam a carga horária dos cursos certificados, não tempo de estudo medido.
-
-### Limites atuais e próximos passos
-
-- Formatos de conteúdo, lembretes e acessibilidade são preferências do navegador. Os controles não enviam notificações por e-mail ou push.
-- Configurações de contato da empresa também são locais. A solicitação de suporte é simulada.
-- Cadastro, recuperação de senha por e-mail e login Google/Microsoft ainda não estão disponíveis.
-- O tutor com inteligência artificial está planejado. A proposta é integrar um provedor pelo backend para explicar conteúdos, responder dúvidas e apoiar o estudo.
-- O ambiente Docker documentado é de desenvolvimento: o frontend usa o servidor do Vite.
-
-## Organização do projeto
-
-| Diretório | Conteúdo |
+| Área | O que permite fazer |
 | --- | --- |
-| [`backend/`](backend/README.md) | API Java 21+, Spring Boot, Spring Security, JPA e migrações Flyway |
-| [`frontend/`](frontend/README.md) | SPA React, TypeScript, Vite e Tailwind CSS |
-| [`database/`](database/README.md) | Documentação do banco e esquema histórico de referência |
-| [`docs/`](docs/README.md) | Guia local, materiais acadêmicos, apresentações e mockups |
-| `tests/` | Verificação do script de inicialização local |
+| **Visão geral** | Consultar indicadores de aprendizagem e progresso dos colaboradores da organização. |
+| **Colaboradores** | Buscar pessoas, filtrar por área ou situação e consultar cursos, progresso e resultados individuais. |
+| **Avaliações** | Consultar notas e tentativas; autorizar uma tentativa extra quando as oportunidades se esgotarem sem aprovação, registrando motivo e responsável. |
+| **Certificados** | Consultar o acervo da equipe, visualizar miniaturas, ampliar o mesmo documento emitido ao colaborador e baixar o PDF. |
+| **Configurações** | Personalizar o nome de exibição e os contatos locais, consultar informações da conta e encerrar a sessão. |
 
-As migrações em `backend/src/main/resources/db/migration/` são a fonte de evolução do banco MySQL. O Hibernate valida o esquema na inicialização.
+O acesso considera o perfil autenticado: o colaborador consulta seus próprios registros e o RH acompanha as pessoas vinculadas à sua empresa.
 
-## Validação
+### Como a aprendizagem acontece
 
-Os comandos abaixo usam as ferramentas instaladas no computador. Execute-os na raiz do repositório; para o frontend, use Node 22.18+ e instale as dependências com `npm --prefix frontend ci`.
+1. O colaborador encontra um curso ou uma trilha e realiza a inscrição.
+2. Acessa as aulas disponíveis e registra sua conclusão para atualizar o progresso.
+3. Realiza a avaliação e consulta o resultado. As avaliações publicadas usam nota mínima de **80%** e **duas tentativas iniciais**.
+4. A aprovação em um curso habilitado gera o certificado, disponível para consulta e download.
+5. O RH acompanha esses registros e pode autorizar uma tentativa extra quando as condições forem atendidas.
 
-```sh
-mvn -f backend/pom.xml verify
-npm --prefix frontend run build
-npm --prefix frontend run lint
-npm --prefix frontend test
-bash tests/local-startup.sh
-```
+A conclusão das aulas e a emissão do certificado são registros distintos: concluir aulas não emite o documento automaticamente. **Horas certificadas** correspondem à carga horária dos cursos certificados, não a uma medição do tempo de estudo.
 
-O Maven padrão executa os testes que não dependem de MySQL, incluindo autenticação, permissões e regras de exposição do gabarito. **Os testes de integração com banco são ignorados sem `ETP_DB_TEST=true`.** Para executá-los, configure um banco dedicado e suas variáveis de conexão conforme o [guia do backend](backend/README.md#verificação); a suíte aplica migrações e cria dados de teste.
+## Escopo atual e próximas evoluções
 
-Testes de navegador, em cinco tamanhos de tela:
+A versão atual prioriza o fluxo de aprendizagem e o acompanhamento pelo RH. Alguns pontos ainda estão em desenvolvimento ou possuem funcionamento limitado:
 
-```sh
-cd frontend
-npx playwright install chromium
-npm run test:mobile
-```
+| Recurso | Situação atual |
+| --- | --- |
+| **Conteúdo do catálogo** | Parte dos cursos já possui aulas e avaliações; os demais indicam conteúdo em preparação. |
+| **Preferências e configurações** | Formatos de conteúdo, lembretes, acessibilidade e dados de exibição/contato da empresa ficam no navegador. As preferências não enviam notificações por e-mail ou push. |
+| **Central de ajuda** | Possui conteúdo de orientação; a solicitação de suporte é simulada. |
+| **Gestão de acesso** | Cadastro público, recuperação e alteração de senha e login Google/Microsoft ainda não estão disponíveis. |
+| **Certificados** | Consulta autenticada e PDF disponíveis; a verificação pública de códigos ainda não foi implementada. |
+| **Gestão de conteúdos pelo RH** | O painel acompanha a aprendizagem; ainda não oferece criação de cursos, edição de trilhas ou administração de conteúdos. |
+| **Tutor com inteligência artificial** | Planejado para explicar conteúdos, esclarecer dúvidas e apoiar os estudos. Ainda não há integração ativa com um provedor de IA. |
 
-Eles iniciam o Vite e simulam as respostas da API, sem consumir tentativas de contas reais. Consulte os [cenários e limites dos testes de interface](frontend/tests/browser/README.md).
+As próximas evoluções devem ampliar essas capacidades e validar a experiência com usuários. A documentação acadêmica inclui propostas e protótipos que podem representar etapas anteriores ou funcionalidades futuras.
 
-## Autenticação e configuração
+## Tecnologias e organização
 
-`JWT_SECRET` deve representar pelo menos 32 bytes em Base64; para gerar uma chave, use `openssl rand -base64 32`. A duração do token é configurada por `JWT_EXPIRATION_MINUTES` (padrão: 60; permitido: 1–1440). O backend valida assinatura HS256, emissor, expiração, identificador e perfil, além de conferir se a conta continua habilitada.
+A aplicação possui três partes principais: a interface utilizada no navegador, a API que aplica as regras do sistema e o banco que armazena os registros.
 
-O token fica em `sessionStorage`, por aba. Logout remove a sessão local; não há renovação automática nem revogação individual do token no servidor.
+| Camada | Tecnologias | Responsabilidade |
+| --- | --- | --- |
+| **Frontend** | React, TypeScript, Vite e Tailwind CSS | Interface, navegação e interação com os dois perfis. |
+| **Backend** | Java, Spring Boot, Spring Security e JPA | Regras de negócio, autenticação e acesso aos dados. |
+| **Banco de dados** | MySQL e Flyway | Persistência e evolução versionada da estrutura do banco. |
+| **Ambiente e validação** | Docker Compose, testes Java/Node e Playwright | Execução local, verificações automatizadas e testes de interface. |
 
-O login permite, por padrão, 10 solicitações por IP em 60 segundos, incluindo logins válidos e corpos inválidos. O excesso retorna HTTP 429 com `Retry-After`. Configure `LOGIN_MAX_REQUESTS` e `LOGIN_WINDOW_SECONDS` para ajustar os limites. O controle é em memória por instância; atrás de proxy, configure a identificação confiável do IP ou aplique o limite no proxy.
+## Executar e conhecer a implementação
 
-## Prévia
+O passo a passo de instalação, as contas de demonstração e os comandos de validação estão no **[Guia de execução local](EXECUCAO_LOCAL.md)**, na raiz do repositório.
 
-![Dashboard do ETP Systems](https://github.com/user-attachments/assets/16faf94b-bc0e-4697-9576-d2d00463929a)
+| Documento | Conteúdo |
+| --- | --- |
+| [Execução local](EXECUCAO_LOCAL.md) | Pré-requisitos, inicialização, configuração, testes e solução de problemas. |
+| [Frontend](frontend/README.md) | Estrutura da interface, rotas e desenvolvimento com React. |
+| [Backend](backend/README.md) | API, autenticação, regras de negócio e integração com o banco. |
+| [Banco de dados](database/README.md) | Modelo de dados e orientações sobre as migrações. |
+| [Painel Empresa / RH](frontend/src/pages/Empresa/README.md) | Escopo da organização, tentativas extras e visualização de certificados. |
+| [Documentação acadêmica](docs/README.md) | Relatório, apresentação e evolução dos protótipos. |
 
-Mais telas e materiais estão em [`docs/mockup/`](docs/mockup/).
+## Equipe
 
-### Conteúdo de Gestão do Tempo
+Equipe identificada no relatório acadêmico do projeto:
 
-O curso **Fundamentos da Gestão do Tempo** (antes **Gestão do Tempo e Prioridades**) inclui três aulas: fundamentos, definição de prioridades e produtividade no dia a dia. A avaliação tem 18 questões, seis por aula, quatro alternativas por questão, duas tentativas iniciais e aprovação a partir de 80%, com emissão de certificado. O cadastro existente é preservado pelas migrações V35 e V36.
+- Leonardo Ferreira
+- Matheus Batista
+- Miguel Varjão
+- Nicolas Mendes
+- Rafael Melo
+- Vinicius Galbini

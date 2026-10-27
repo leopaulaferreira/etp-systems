@@ -1,29 +1,30 @@
-# Documentação - ETP Systems
+# Documentação acadêmica e visual — ETP Systems
 
-Esta pasta contém **documentos relacionados ao projeto ETP Systems**.
+[← Voltar à apresentação do projeto](../README.md)
 
-Aqui serão armazenados materiais produzidos durante o desenvolvimento do projeto na disciplina de **Projeto Integrador (PIN)**.
+Esta pasta reúne os materiais de concepção, apresentação e evolução visual do projeto acadêmico de Análise e Desenvolvimento de Sistemas da USCS.
 
----
+## Materiais acadêmicos
 
-## 📄 Conteúdo da pasta
+| Material | Conteúdo |
+| --- | --- |
+| [Relatório acadêmico](<Relatorio ETP.docx.pdf>) | Contexto inicial, problema, objetivos de negócio, ideação e prototipação. Inclui a identificação da equipe. |
+| [Apresentação do projeto](ETP_Apresentação.pdf) | Síntese da proposta, cenário de capacitação e protótipos usados na apresentação. |
+| [Relatório de funcionalidades](<Relatório de Funcionalidades – Aplicativo de Treinamento Corporativo (ETP) (1).docx>) | Registro da proposta funcional em formato editável. |
 
-Nesta pasta podem ser adicionados:
+Esses documentos registram etapas do desenvolvimento. Tecnologias candidatas, telas e funcionalidades descritas neles podem diferir da versão implementada. Consulte o [README principal](../README.md#funcionalidades-disponíveis) para conhecer o escopo atual.
 
-- Apresentações do projeto
-- Relatórios
-- Documentos da disciplina
-- Diagramas e modelos do sistema
-- Anotações importantes do projeto
+## Interface e conteúdos
 
----
+| Diretório | Conteúdo |
+| --- | --- |
+| [imagens/](imagens/) | Capturas usadas na apresentação atual do repositório. O dashboard do colaborador foi fornecido a partir de uma sessão de demonstração. |
+| [mockup/](mockup/) | Telas e referências visuais de etapas anteriores do projeto. |
+| [conteudos/](conteudos/) | Materiais de apoio à elaboração de conteúdos e avaliações. |
 
-## 🎯 Objetivo
+## Documentação técnica
 
-Centralizar os **documentos e materiais acadêmicos do projeto**, facilitando a organização e o acesso para todos os integrantes do grupo.
-
----
-
-## 📌 Observação
-
-Esta pasta é utilizada apenas para **armazenamento de documentos do projeto**, não contendo código da aplicação.
+- [Guia de execução local](../EXECUCAO_LOCAL.md): instalação, contas de demonstração, configuração, testes e diagnóstico.
+- [Frontend](../frontend/README.md): interface, rotas e desenvolvimento.
+- [Backend](../backend/README.md): API, autenticação, persistência e regras de negócio.
+- [Banco de dados](../database/README.md): modelo e migrações.

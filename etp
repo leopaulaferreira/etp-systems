@@ -16,7 +16,7 @@ Uso: ./etp [iniciar|parar|status|logs [frontend|backend|database]|configurar]
   logs        Acompanha os logs (Ctrl+C encerra apenas a visualização).
   configurar  Cria backend/.env com credenciais locais; preserva arquivo existente.
 
-Guia: docs/EXECUCAO_LOCAL.md
+Guia: EXECUCAO_LOCAL.md
 HELP
 }
 

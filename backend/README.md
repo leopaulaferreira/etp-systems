@@ -1,6 +1,6 @@
 # Backend do ETP Systems
 
-Para iniciar o projeto inteiro com um comando, consulte o [guia de execução local](../docs/EXECUCAO_LOCAL.md).
+Para iniciar o projeto inteiro com um comando, consulte o [guia de execução local](../EXECUCAO_LOCAL.md).
 
 API Java 21 + Spring Boot 4.1.1, MySQL 8 e Maven. As Fases 1–10 entregam a base, catálogo, autenticação, inscrições, progresso, avaliações, certificados e indicadores do colaborador.
 
@@ -222,3 +222,7 @@ As migrações V32–V34 adicionam três videoaulas e 18 questões (seis por aul
 | Manipulando Dados e Trabalhando com Relacionamentos | `frontend/public/videos/sql-aula-3.mp4` | `Aula_3__Manipulando_Dados_aula3.mp4` |
 
 Os testes de SQL em `AvaliacaoApiIntegrationTest` verificam a inscrição, a ordem das aulas, as 18 questões e seu gabarito, os exemplos SQL, os limites de aprovação, a revisão das respostas e a emissão do certificado. Execute com banco de testes e `ETP_DB_TEST=true`, conforme a seção de verificação acima.
+
+### Fundamentos da Gestão do Tempo
+
+As migrações V35–V36 atualizam o curso antes chamado Gestão do Tempo e Prioridades, preservando seu cadastro. O conteúdo tem três videoaulas — fundamentos, definição de prioridades e produtividade no dia a dia — e uma avaliação de 18 questões, seis por aula, com quatro alternativas. A aprovação exige 80%, com duas tentativas iniciais e emissão de certificado.
