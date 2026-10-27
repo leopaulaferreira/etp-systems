@@ -10,7 +10,7 @@ npm run test:mobile
 
 A suíte inicia o Vite em `127.0.0.1:5178` e o encerra ao terminar. A porta deve estar livre. Não inicia o backend nem modifica o banco. Para usar um Chromium já instalado, defina `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` com o caminho do executável.
 
-São 50 cenários: dez fluxos em cinco tamanhos de viewport — 320×568, 390×844, 844×390 (horizontal), 768×1024 e 1440×900 (controle desktop).
+São 60 cenários: doze fluxos em cinco tamanhos de viewport — 320×568, 390×844, 844×390 (horizontal), 768×1024 e 1440×900 (controle desktop).
 
 - Menu lateral: abertura, fechamento, Escape, retorno do foco, rolagem até a ajuda e navegação.
 - Menu da conta e controles principais: áreas de toque de pelo menos 44 pixels.
@@ -21,6 +21,7 @@ São 50 cenários: dez fluxos em cinco tamanhos de viewport — 320×568, 390×8
 - RH: motivo obrigatório, liberação individual, histórico persistido na API simulada e bloqueio de autorização duplicada.
 - Certificados do RH: miniatura à direita, documento com titular/código originais, ampliação com rolagem interna e teclado, PDF e retorno do foco ao fechar.
 - Certificados do RH sem dados completos: mantém os detalhes e não inventa prévia nem download.
+- Configurações do RH: edição, cancelamento, persistência local entre páginas, e-mail de acesso somente para consulta, falha de armazenamento com nova tentativa e logout. A indisponibilidade do painel não impede editar o responsável nem sobrescreve o nome da organização.
 - Perfil: valores da API prevalecem sobre preferências locais antigas; alterações rápidas preservam ambos os campos; falha de gravação permite tentar novamente.
 - Verificação de largura: página, área principal, menu e diálogos sem rolagem horizontal.
 

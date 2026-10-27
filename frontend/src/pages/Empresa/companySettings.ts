@@ -34,9 +34,14 @@ export function useCompanySettings(companyId: string | null, companyName?: strin
       ])), accountEmail: defaults.accountEmail } as CompanySettings
     } catch { return defaults }
   }, [raw, user, companyName])
-  function save(next: CompanySettings) {
+  function save(next: Partial<CompanySettings>) {
     if (!companyId) throw new Error('Empresa não identificada')
-    localStorage.setItem(storageKey, JSON.stringify(next))
+    let previous: Record<string, unknown> = {}
+    try {
+      const stored: unknown = JSON.parse(localStorage.getItem(storageKey) ?? 'null')
+      if (stored && typeof stored === 'object' && !Array.isArray(stored)) previous = stored as Record<string, unknown>
+    } catch { /* Uma preferência inválida pode ser substituída pelo formulário. */ }
+    localStorage.setItem(storageKey, JSON.stringify({ ...previous, ...next }))
     window.dispatchEvent(new Event(eventName))
   }
   return { settings, save }
