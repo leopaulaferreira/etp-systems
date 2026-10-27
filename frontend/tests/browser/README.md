@@ -10,7 +10,7 @@ npm run test:mobile
 
 A suíte inicia o Vite em `127.0.0.1:5178` e o encerra ao terminar. A porta deve estar livre. Não inicia o backend nem modifica o banco. Para usar um Chromium já instalado, defina `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` com o caminho do executável.
 
-São 60 cenários: doze fluxos em cinco tamanhos de viewport — 320×568, 390×844, 844×390 (horizontal), 768×1024 e 1440×900 (controle desktop).
+São 75 cenários: quinze fluxos em cinco tamanhos de viewport — 320×568, 390×844, 844×390 (horizontal), 768×1024 e 1440×900 (controle desktop).
 
 - Menu lateral: abertura, fechamento, Escape, retorno do foco, rolagem até a ajuda e navegação.
 - Menu da conta e controles principais: áreas de toque de pelo menos 44 pixels.
@@ -23,6 +23,7 @@ São 60 cenários: doze fluxos em cinco tamanhos de viewport — 320×568, 390×
 - Certificados do RH sem dados completos: mantém os detalhes e não inventa prévia nem download.
 - Configurações do RH: edição, cancelamento, persistência local entre páginas, e-mail de acesso somente para consulta, falha de armazenamento com nova tentativa e logout. A indisponibilidade do painel não impede editar o responsável nem sobrescreve o nome da organização.
 - Perfil: valores da API prevalecem sobre preferências locais antigas; alterações rápidas preservam ambos os campos; falha de gravação permite tentar novamente.
+- Configurações do colaborador: edição de conta preservada entre seções, falha de notificações com nova tentativa, preferências locais, acessibilidade por teclado, exportação JSON, limpeza com confirmação e proteção de respostas ao sair.
 - Verificação de largura: página, área principal, menu e diálogos sem rolagem horizontal.
 
 As respostas da API e a sessão são simuladas em `mobile.fixture.mjs`, com nomes e títulos longos. Isso permite reproduzir erros de conexão e resultados sem consumir tentativas de contas reais. O vídeo e o gerador de PDF são os do projeto. Estes testes de interface complementam os testes de integração do backend.
