@@ -1,3 +1,4 @@
+import { parseCertificate } from '../Certificados/certificatesApi.ts'
 import { authSession } from '../../auth/session.ts'
 import type { Employee, EmployeeCourse } from './company.ts'
 
@@ -22,7 +23,12 @@ function parseCourse(value: unknown): EmployeeCourse {
       (course.certificateCode !== null && (typeof course.certificateCode !== 'string' || !course.certificateCode.trim()))) {
     throw new Error('Dados de curso da empresa inválidos')
   }
-  return course as EmployeeCourse
+  const certificate = course.certificate == null ? null : parseCertificate(course.certificate)
+  if (certificate && (certificate.status !== 'completed' || certificate.courseId !== course.id ||
+      certificate.code !== course.certificateCode || certificate.issuedAt !== course.certificateIssuedAt)) {
+    throw new Error('Certificado divergente do curso da empresa')
+  }
+  return { ...course, certificate } as EmployeeCourse
 }
 
 export function parseCompanyOverview(value: unknown): CompanyOverview {

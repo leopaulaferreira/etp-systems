@@ -19,3 +19,11 @@ Validação: `npm run test:empresa` cobre o contrato da API, indicadores, dados 
 Em **Avaliações**, abra o resultado de um colaborador para consultar as tentativas. Quando todas estiverem esgotadas e não houver aprovação, informe o motivo e use **Liberar uma tentativa extra**. O mesmo controle aparece nos detalhes de um colaborador, nos cursos com avaliação entregue.
 
 A autorização vale apenas para aquele colaborador e curso. O servidor valida a empresa da conta RH, preserva todas as notas e registra responsável, motivo, data e a tentativa após a qual ocorreu a liberação. Uma autorização pendente não pode ser duplicada. O histórico aparece no próprio painel. O colaborador usa **Atualizar avaliações** para receber o novo limite.
+
+## Visualização do certificado emitido
+
+Os cartões de Certificados exibem a miniatura à direita do curso e do titular. **Ver certificado** abre o documento com ajuste à tela, ampliação de 100% a 200% e download em PDF. A área ampliada tem rolagem própria e pode ser percorrida pelo teclado.
+
+O campo `certificate` de cada curso no painel traz a mesma resposta usada na consulta do colaborador: ID, titular, curso, descrição, carga horária, código e data. A prévia usa `CertificatePreview` e o PDF usa `downloadCertificate`, os mesmos componentes do fluxo após a avaliação. A leitura não emite outro certificado. O frontend valida a correspondência do curso, código e data; quando os dados completos não chegam, mantém os detalhes disponíveis sem inventar uma prévia.
+
+A comparação entre o certificado do RH e o do colaborador é coberta nos testes de contrato, desenho e PDF. O teste de integração do painel verifica o documento após uma aprovação real, a preservação do registro e o isolamento entre empresas. Os testes de navegador cobrem miniatura, ampliação, PDF e foco em cinco tamanhos de tela.

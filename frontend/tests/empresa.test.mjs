@@ -76,3 +76,24 @@ test('conclusões recentes usam progresso registrado, mesmo sem certificado', ()
   assert.equal(recent[0].course.certificateCode, null)
   assert.deepEqual(employees, original)
 })
+
+test('RH reutiliza o certificado emitido, com a mesma prévia e PDF do colaborador', async () => {
+  const { parseCertificate } = await import('../src/pages/Certificados/certificatesApi.ts')
+  const { certificateSvg } = await import('../src/pages/Certificados/certificateArtwork.ts')
+  const { createCertificatePdf } = await import('../src/pages/Certificados/certificatePdf.ts')
+  const issued = { id: otherId, courseId, holderName: 'Ana Souza', title: 'Segurança', description: 'Curso concluído',
+    durationHours: 3.5, code: 'ETP-ANA', issuedAt: '2026-10-04T12:00:00Z' }
+  const data = structuredClone(payload)
+  data.employees[0].courses[0].certificate = issued
+  const companyCertificate = parseCompanyOverview(data).employees[0].courses[0].certificate
+  const employeeCertificate = parseCertificate(issued)
+  assert.deepEqual(companyCertificate, employeeCertificate)
+  assert.equal(certificateSvg(companyCertificate, 'RH ETP'), certificateSvg(employeeCertificate, 'Ana Souza'))
+  assert.equal(await createCertificatePdf(companyCertificate, 'RH ETP').text(), await createCertificatePdf(employeeCertificate, 'Ana Souza').text())
+  for (const patch of [{ courseId: otherId }, { code: 'DIVERGENTE' }, { issuedAt: '2026-01-01T12:00:00Z' }, { durationHours: undefined }, { holderName: '' }]) {
+    data.employees[0].courses[0].certificate = { ...issued, ...patch }
+    assert.throws(() => parseCompanyOverview(data))
+  }
+  delete data.employees[0].courses[0].certificate
+  assert.equal(parseCompanyOverview(data).employees[0].courses[0].certificate, null)
+})

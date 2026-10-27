@@ -1,3 +1,5 @@
+import type { Certificate } from '../../types/certificate'
+
 export type EmployeeCourse = {
   id: string
   title: string
@@ -8,6 +10,7 @@ export type EmployeeCourse = {
   score: number | null
   certificateCode: string | null
   certificateIssuedAt: string | null
+  certificate?: Certificate | null
 }
 export type Employee = {
   id: string
