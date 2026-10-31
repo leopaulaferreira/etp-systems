@@ -13,6 +13,7 @@ test('converte a inscrição real e valida o progresso', () => {
   assert.deepEqual(parseMyCourse(course), {
     id: course.id, title: course.title, description: course.description,
     type: 'CURSO', thumbnail: 'cloud', duration: '6h 30m', progress: 0, lessonCount: undefined,
+    enrolledAt: course.enrolledAt, completedAtIso: undefined,
     updatedAt: undefined, completedAt: undefined,
   })
   assert.throws(() => parseMyCourse({ ...course, id: 'curso-local' }), /incompletos/)

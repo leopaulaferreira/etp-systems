@@ -55,6 +55,8 @@ export function parseMyCourse(value: unknown): CourseItem {
     type: 'CURSO', thumbnail: courseThumbnail(valid.icon),
     duration: formatCourseDuration(valid.durationHours),
     progress: valid.progress,
+    enrolledAt: valid.enrolledAt,
+    completedAtIso: valid.completedAt ?? undefined,
     lessonCount: valid.lessonCount,
     updatedAt: valid.updatedAt ? formatDate(valid.updatedAt) : undefined,
     completedAt: valid.completedAt ? formatDate(valid.completedAt) : undefined,

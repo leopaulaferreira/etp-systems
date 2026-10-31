@@ -12,6 +12,8 @@ export type CourseItem = {
   progress?: number
   lastLesson?: string
   duration?: string
+  enrolledAt?: string
+  completedAtIso?: string
   completedAt?: string
   updatedAt?: string
 }
