@@ -19,6 +19,8 @@ import { fetchMyCourses } from '../MeusCursos/myCoursesApi'
 import type { Certificate } from '../../types/certificate'
 import type { CourseItem } from '../MeusCursos/courseTypes'
 import ProfileNextStepCard from './ProfileNextStepCard'
+import ProfileTimeline from './ProfileTimeline'
+import { profileTimeline } from './profileTimeline'
 
 const cardClass = 'min-w-0 rounded-[22px] border border-ink-200/70 bg-panel p-5 shadow-card sm:p-6'
 const linkClass = 'inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-bold text-brand-blue-400 hover:bg-brand-blue-500/10 hover:text-brand-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400'
@@ -191,6 +193,15 @@ export default function PerfilPage() {
           }}
         />
       </div>
+      <ProfileTimeline
+        className={cardClass}
+        events={profileTimeline(data?.courses ?? [], assessments, data?.certificates ?? [])}
+        status={status === 'error' || assessmentStatus === 'error' ? 'error' : status === 'loading' || assessmentStatus === 'loading' ? 'loading' : 'ready'}
+        onRetry={() => {
+          if (status === 'error') { setStatus('loading'); setRetry(value => value + 1) }
+          if (assessmentStatus === 'error') reloadAssessments()
+        }}
+      />
       <p role="status" className="sr-only">{announcement}</p>
     </div>
   )

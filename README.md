@@ -70,7 +70,7 @@ Os [mockups e materiais de apresentação](docs/README.md) registram outras etap
 | **Avaliações** | Responder questões, consultar notas e tentativas anteriores e revisar o gabarito após a aprovação. |
 | **Certificados** | Visualizar documentos emitidos após aprovação em cursos habilitados e baixar o PDF. |
 | **Relatórios** | Acompanhar indicadores pessoais, evolução mensal e histórico de avaliações; exportar um CSV da atividade do ano corrente. |
-| **Perfil** | Atualizar dados pessoais, objetivo de aprendizagem e nível de experiência. |
+| **Perfil** | Consultar a trajetória de inscrições, conclusões, avaliações e certificados; atualizar dados pessoais, objetivo de aprendizagem e nível de experiência. |
 
 ### Acompanhamento pela Empresa / RH
 
