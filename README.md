@@ -63,7 +63,7 @@ Os [mockups e materiais de apresentação](docs/README.md) registram outras etap
 
 | Área | O que permite fazer |
 | --- | --- |
-| **Dashboard** | Consultar cursos em andamento, conclusões, certificados e horas certificadas; retomar os estudos e explorar o catálogo. |
+| **Dashboard** | Consultar cursos em andamento, conclusões, avaliações disponíveis, certificados e horas certificadas; retomar os estudos e explorar o catálogo. |
 | **Cursos e aulas** | Buscar e filtrar cursos, consultar detalhes, realizar inscrições e estudar os conteúdos disponíveis em vídeo ou texto. |
 | **Trilhas de aprendizagem** | Inscrever-se em conjuntos de cursos relacionados e acompanhar o progresso agregado da jornada. |
 | **Meus Cursos** | Consultar inscrições, continuar a última aula acessada e registrar a conclusão de aulas. |
