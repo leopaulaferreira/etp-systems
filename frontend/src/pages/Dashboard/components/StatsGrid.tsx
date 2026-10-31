@@ -14,7 +14,7 @@ export default function StatsGrid({ data }: { data: DashboardData }) {
     { id: 'certificados', label: 'Certificados', value: String(data.certificates), detail: `${Number(data.certifiedHours.toFixed(1)).toLocaleString('pt-BR')}h certificadas`, ctaLabel: 'Ver certificados', accent: 'purple', icon: 'certificados', to: '/certificados' },
   ]
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {metricCards.map((metric) => (
         <MetricCard key={metric.id} data={metric} />
       ))}
