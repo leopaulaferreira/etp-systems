@@ -65,7 +65,7 @@ Os [mockups e materiais de apresentação](docs/README.md) registram outras etap
 | --- | --- |
 | **Dashboard** | Consultar cursos em andamento, conclusões, avaliações disponíveis, certificados e horas certificadas; retomar os estudos e explorar o catálogo. |
 | **Cursos e aulas** | Buscar e filtrar cursos, consultar detalhes, realizar inscrições e estudar os conteúdos disponíveis em vídeo ou texto. |
-| **Trilhas de aprendizagem** | Inscrever-se em conjuntos de cursos relacionados e acompanhar o progresso agregado da jornada. |
+| **Trilhas de aprendizagem** | Inscrever-se em conjuntos de cursos relacionados, incluindo Integração ao Ambiente Corporativo, e acompanhar o progresso agregado da jornada. |
 | **Meus Cursos** | Consultar inscrições, continuar a última aula acessada e registrar a conclusão de aulas. |
 | **Avaliações** | Responder questões, consultar notas e tentativas anteriores e revisar o gabarito após a aprovação. |
 | **Certificados** | Visualizar documentos emitidos após aprovação em cursos habilitados e baixar o PDF. |
@@ -132,6 +132,7 @@ O passo a passo de instalação, as contas de demonstração e os comandos de va
 | [Backend](backend/README.md) | API, autenticação, regras de negócio e integração com o banco. |
 | [Banco de dados](database/README.md) | Modelo de dados e orientações sobre as migrações. |
 | [Painel Empresa / RH](frontend/src/pages/Empresa/README.md) | Escopo da organização, tentativas extras e visualização de certificados. |
+| [Demonstração e validação](docs/VALIDACAO_E_DEMONSTRACAO.md) | Jornada de apresentação, tarefas e fichas para avaliação com usuários. |
 | [Documentação acadêmica](docs/README.md) | Relatório, apresentação e evolução dos protótipos. |
 
 ## Equipe

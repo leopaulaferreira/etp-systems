@@ -14,6 +14,10 @@ Esta pasta reúne os materiais de concepção, apresentação e evolução visua
 
 Esses documentos registram etapas do desenvolvimento. Tecnologias candidatas, telas e funcionalidades descritas neles podem diferir da versão implementada. Consulte o [README principal](../README.md#funcionalidades-disponíveis) para conhecer o escopo atual.
 
+## Demonstração e avaliação
+
+O [roteiro de demonstração e validação](VALIDACAO_E_DEMONSTRACAO.md) apresenta a trilha de integração corporativa e inclui tarefas e fichas para testes de usabilidade. As sessões com participantes ainda precisam ser realizadas.
+
 ## Interface e conteúdos
 
 | Diretório | Conteúdo |
