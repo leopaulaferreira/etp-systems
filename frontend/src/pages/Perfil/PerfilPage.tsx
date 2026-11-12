@@ -125,7 +125,7 @@ export default function PerfilPage() {
             <DetailRow label="Cargo">{profile.position || '—'}</DetailRow>
             <DetailRow label="Empresa">{profile.company || '—'}</DetailRow>
           </dl>
-          <Link to="/configuracoes" className="flex min-h-10 items-center justify-center gap-2 rounded-xl border border-ink-200 text-xs font-bold text-brand-blue-400 hover:border-brand-blue-500/40 hover:bg-brand-blue-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Editar informações <Pencil className="h-3.5 w-3.5" aria-hidden="true" /></Link>
+          <Link to="/configuracoes?secao=conta" className="flex min-h-10 items-center justify-center gap-2 rounded-xl border border-ink-200 text-xs font-bold text-brand-blue-400 hover:border-brand-blue-500/40 hover:bg-brand-blue-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400">Editar informações <Pencil className="h-3.5 w-3.5" aria-hidden="true" /></Link>
         </section>
 
         <section className={`${cardClass} flex flex-col gap-4`}>
@@ -177,7 +177,7 @@ export default function PerfilPage() {
               { label: 'Nível de experiência', value: profile.experienceLevel || 'Não informado', icon: GraduationCap },
               { label: 'Notificações', value: profile.notificationsEnabled ? 'Ativadas' : 'Desativadas', icon: Bell },
             ].map(({ label, value, icon: Icon }) => (
-              <Link key={label} to="/configuracoes" className="flex min-w-0 items-center gap-2 py-3 text-left hover:text-brand-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"><Icon className="h-4 w-4 shrink-0 text-brand-blue-400" aria-hidden="true" /><span className="flex-1 text-xs font-semibold text-ink-700">{label}</span><span className="max-w-[42%] truncate text-right text-[11px] text-ink-500" title={value}>{value}</span><ChevronRight className="h-3.5 w-3.5 shrink-0 text-ink-500" aria-hidden="true" /></Link>
+              <Link key={label} to={label === 'Notificações' ? '/configuracoes?secao=notificacoes' : '/configuracoes?secao=estudo'} className="flex min-w-0 items-center gap-2 py-3 text-left hover:text-brand-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"><Icon className="h-4 w-4 shrink-0 text-brand-blue-400" aria-hidden="true" /><span className="flex-1 text-xs font-semibold text-ink-700">{label}</span><span className="max-w-[42%] truncate text-right text-[11px] text-ink-500" title={value}>{value}</span><ChevronRight className="h-3.5 w-3.5 shrink-0 text-ink-500" aria-hidden="true" /></Link>
             ))}
           </div>
         </section>
