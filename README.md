@@ -51,7 +51,22 @@ A contribuição pretendida é tornar a capacitação mais organizada e seu acom
 
 ![Dashboard do colaborador no ETP Systems, com cursos em andamento, conclusões, certificados, retomada dos estudos e resultados recentes.](docs/imagens/dashboard-colaborador.png)
 
-*Painel do colaborador em uma sessão de demonstração. Os valores da captura representam aquele momento de uso.*
+*Interface atual capturada com dados ilustrativos em ambiente de teste; os números não representam resultados de uso real.*
+
+<details>
+<summary><strong>Ver a trajetória do colaborador e o acompanhamento pelo RH</strong></summary>
+
+**Trajetória no perfil** — inscrições, conclusões, avaliações e certificados em ordem cronológica.
+
+![Trajetória de aprendizagem no perfil](docs/imagens/trajetoria-colaborador.png)
+
+**Colaboradores no RH** — busca, filtros e acompanhamento individual.
+
+![Lista de colaboradores no acesso Empresa / RH](docs/imagens/colaboradores-rh.png)
+
+*Capturas com dados ilustrativos de teste.*
+
+</details>
 
 A interface reúne indicadores, continuidade dos estudos e acesso às principais áreas. O perfil Empresa / RH possui navegação própria para acompanhar colaboradores, avaliações e certificados. As telas se adaptam a computadores, tablets e celulares.
 

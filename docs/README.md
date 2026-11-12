@@ -18,7 +18,7 @@ Esses documentos registram etapas do desenvolvimento. Tecnologias candidatas, te
 
 | Diretório | Conteúdo |
 | --- | --- |
-| [imagens/](imagens/) | Capturas usadas na apresentação atual do repositório. O dashboard do colaborador foi fornecido a partir de uma sessão de demonstração. |
+| [imagens/](imagens/) | Capturas usadas na apresentação atual do repositório. Dashboard, trajetória do colaborador e lista do RH capturados na interface atual com dados ilustrativos de teste. |
 | [mockup/](mockup/) | Telas e referências visuais de etapas anteriores do projeto. |
 | [conteudos/](conteudos/) | Materiais de apoio à elaboração de conteúdos e avaliações. |
 
