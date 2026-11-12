@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useUrlFilters } from '../../hooks/useUrlFilters'
 import { RefreshCw } from 'lucide-react'
 import { fetchCourses } from '../Cursos/courseApi'
 import type { CourseItem } from './courseTypes'
@@ -13,8 +13,9 @@ import { courseThumbnail, fetchMyCourses, formatCourseDuration, prioritizeAvaila
 import './meus-cursos.css'
 
 export default function MeusCursosPage() {
-  const [searchParams] = useSearchParams()
-  const [activeTab, setActiveTab] = useState<CourseTab>(searchParams.get('aba') === 'concluidos' ? 'completed' : 'ongoing')
+  const [{ tab }, setTab] = useUrlFilters({ tab: 'andamento' }, { tab: 'aba' }, { tab: ['andamento', 'concluidos', 'salvos'] })
+  const activeTab: CourseTab = tab === 'concluidos' ? 'completed' : tab === 'salvos' ? 'saved' : 'ongoing'
+  const setActiveTab = (value: CourseTab) => setTab({ tab: value === 'completed' ? 'concluidos' : value === 'saved' ? 'salvos' : 'andamento' })
   const [courses, setCourses] = useState<CourseItem[]>([])
   const [suggestions, setSuggestions] = useState<CourseItem[]>([])
   const [saved, setSaved] = useState<CourseItem[]>([])

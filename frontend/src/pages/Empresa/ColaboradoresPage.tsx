@@ -1,4 +1,5 @@
 import IllustratedIcon from '../../components/ui/IllustratedIcon'
+import { useUrlFilters } from '../../hooks/useUrlFilters'
 import { useState } from 'react'
 import { Award, ChevronRight, ClipboardCheck, Search, SearchX, UsersRound } from 'lucide-react'
 import PageHero from '../../components/ui/PageHero'
@@ -19,16 +20,19 @@ export default function ColaboradoresPage() {
   const { companyId } = useAuth()
   const { data } = useCompanyOverview()
   const { settings } = useCompanySettings(companyId, data?.companyName)
-  const [query, setQuery] = useState('')
-  const [status, setStatus] = useState<EmployeeStatus | 'all'>('all')
-  const [department, setDepartment] = useState('')
+  const [{ query, status, department }, setFilters] = useUrlFilters<{ query: string; status: EmployeeStatus | 'all'; department: string }>(
+    { query: '', status: 'all', department: '' }, { query: 'busca', status: 'situacao', department: 'area' },
+    { status: ['all', 'not_started', 'in_progress', 'completed'] })
+  const setQuery = (query: string) => setFilters(current => ({ ...current, query }))
+  const setStatus = (status: EmployeeStatus | 'all') => setFilters(current => ({ ...current, status }))
+  const setDepartment = (department: string) => setFilters(current => ({ ...current, department }))
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const team = data?.employees ?? []
   const visible = filterEmployees(team, query, status, department)
   const selected = team.find((employee) => employee.id === selectedId)
   const filtered = Boolean(query || status !== 'all' || department)
   const departments = [...new Set(team.map((employee) => employee.department).filter((value): value is string => Boolean(value)))].sort()
-  function resetFilters() { setQuery(''); setStatus('all'); setDepartment('') }
+  function resetFilters() { setFilters({ query: '', status: 'all', department: '' }) }
   if (!data) return <CompanyLoadState />
   return <div className="flex min-w-0 flex-col gap-5 lg:gap-6">
     <PageHero eyebrow={settings.name} icon={UsersRound} title="Colaboradores" description="Conheça a equipe e acompanhe cada jornada de aprendizagem." />

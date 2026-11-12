@@ -1,5 +1,6 @@
+import ListLoadState from '../../components/ui/ListLoadState'
 import { useEffect, useState } from 'react'
-import { RefreshCw } from 'lucide-react'
+import { useUrlFilters } from '../../hooks/useUrlFilters'
 import { useProfile } from '../../profile/ProfileContext'
 import type { Certificate } from '../../types/certificate'
 import {
@@ -23,7 +24,9 @@ export default function CertificadosPage() {
   const [certificates, setCertificates] = useState<Certificate[]>([])
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [reload, setReload] = useState(0)
-  const [filters, setFilters] = useState(initialFilters)
+  const [filters, setFilters] = useUrlFilters<CertificateFilters>(initialFilters,
+    { query: 'busca', status: 'situacao', year: 'ano', order: 'ordem' },
+    { status: ['all', 'completed', 'in_progress'], order: ['recent', 'oldest', 'title'] })
   const [selected, setSelected] = useState<Certificate | null>(null)
   const [panel, setPanel] = useState<'hours' | 'history' | null>(null)
   const [downloads, setDownloads] = useState<{ certificateId: string; downloadedAt: string }[]>([])
@@ -65,8 +68,7 @@ export default function CertificadosPage() {
   return (
     <div className="flex min-w-0 flex-col gap-5 lg:gap-6">
       <CertificatesHero />
-      {status === 'loading' && <p role="status" className="rounded-[22px] border border-ink-200/70 bg-panel p-6 text-sm text-ink-500 shadow-card">Carregando certificados...</p>}
-      {status === 'error' && <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-[22px] border border-ink-200/70 bg-panel p-6 shadow-card"><p className="text-sm text-ink-700">Não foi possível carregar seus certificados.</p><button type="button" onClick={() => { setStatus('loading'); setReload((current) => current + 1) }} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-brand-blue-700 px-4 text-xs font-bold text-white hover:bg-brand-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"><RefreshCw className="h-4 w-4" aria-hidden="true" /> Tentar novamente</button></div>}
+      {status !== 'ready' && <ListLoadState loading="Carregando certificados..." error={status === 'error' ? 'Não foi possível carregar seus certificados.' : undefined} onRetry={() => { setStatus('loading'); setReload(current => current + 1) }} />}
       {status === 'ready' && <>
       <CertificateStats
         summary={summary}

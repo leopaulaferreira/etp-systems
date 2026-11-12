@@ -1,4 +1,5 @@
 import AttemptReleasePanel from './AttemptReleasePanel'
+import { useUrlFilters } from '../../hooks/useUrlFilters'
 import { useState } from 'react'
 import { Award, ClipboardCheck, Search } from 'lucide-react'
 import PageHero from '../../components/ui/PageHero'
@@ -15,8 +16,9 @@ import CompanyCertificateViewer from './CompanyCertificateViewer'
 
 export default function CompanyRecordsPage({ kind }: { kind: 'assessments' | 'certificates' }) {
   const { data } = useCompanyOverview()
-  const [query, setQuery] = useState('')
-  const [courseId, setCourseId] = useState('')
+  const [{ query, courseId }, setFilters] = useUrlFilters({ query: '', courseId: '' }, { query: 'busca', courseId: 'curso' })
+  const setQuery = (query: string) => setFilters(current => ({ ...current, query }))
+  const setCourseId = (courseId: string) => setFilters(current => ({ ...current, courseId }))
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const certificates = kind === 'certificates'
   const records = (data?.employees ?? []).flatMap(employee => employee.courses
@@ -37,7 +39,7 @@ export default function CompanyRecordsPage({ kind }: { kind: 'assessments' | 'ce
           <Input id="record-search" label="Buscar" type="search" tone="dark" value={query} onChange={event => setQuery(event.target.value)} placeholder={certificates ? "Colaborador, curso ou código..." : "Colaborador ou curso..."} icon={<Search className="h-4 w-4" />} />
           <div className="flex min-w-0 flex-col gap-1.5"><label htmlFor="record-course" className="text-[13px] font-semibold text-ink-700">Curso</label><select id="record-course" value={courseId} onChange={event => setCourseId(event.target.value)} className="min-h-[51px] w-full rounded-xl border border-ink-200 bg-panel-alt px-3 text-xs text-ink-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-400"><option value="">Todos os cursos</option>{courses.map(([id, title]) => <option key={id} value={id}>{title}</option>)}</select></div>
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-2"><p role="status" className="text-xs text-ink-500">{visible.length} de {records.length} registros</p>{(query || courseId) && <Button variant="ghost" onClick={() => { setQuery(''); setCourseId('') }}>Limpar filtros</Button>}</div>
+        <div className="flex flex-wrap items-center justify-between gap-2"><p role="status" className="text-xs text-ink-500">{visible.length} de {records.length} registros</p>{(query || courseId) && <Button variant="ghost" onClick={() => { setFilters({ query: '', courseId: '' }) }}>Limpar filtros</Button>}</div>
       </div>
       {certificates ? <CompanyCertificateGallery records={visible} onSelect={setSelectedId} /> : <CompanyAssessmentResults records={visible} onSelect={setSelectedId} />}
       {!visible.length && <div className="flex flex-col items-center gap-3 p-8 text-center">

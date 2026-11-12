@@ -10,7 +10,7 @@ npm run test:mobile
 
 A suíte inicia o Vite em `127.0.0.1:5178` e o encerra ao terminar. A porta deve estar livre. Não inicia o backend nem modifica o banco. Para usar um Chromium já instalado, defina `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` com o caminho do executável.
 
-São 100 cenários: vinte fluxos em cinco tamanhos de viewport — 320×568, 390×844, 844×390 (horizontal), 768×1024 e 1440×900 (controle desktop).
+São 115 cenários: vinte e três fluxos em cinco tamanhos de viewport — 320×568, 390×844, 844×390 (horizontal), 768×1024 e 1440×900 (controle desktop).
 
 - Menu lateral: abertura, fechamento, Escape, retorno do foco, rolagem até a ajuda e navegação.
 - Menu da conta e controles principais: áreas de toque de pelo menos 44 pixels.
@@ -34,3 +34,5 @@ Capturas de menu, aula, resultado e certificado ficam em `test-results/`. Falhas
 A revisão foi feita em Chromium com emulação de viewport e toque, incluindo inspeção das capturas. O comportamento específico de Safari/iOS, teclado virtual, recortes físicos da tela e o destino do PDF no aparelho ainda exige conferência em dispositivo real.
 
 - Trajetória do perfil: filtros, expansão do histórico, navegação para avaliação, recuperação de erro e ausência de registros.
+
+- Navegação: atalhos do perfil para a seção correta, filtros do catálogo preservados ao voltar/recarregar, recuperação de erro e limpeza dos filtros do RH.
